@@ -330,9 +330,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78ebe4727a9912c42baf1299956b6f89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SDProject.Combat.BattleController
-  battleConfig: {fileID: 11400000, guid: 7324f178c61543c47884791a385ab3aa, type: 2}
-  deck: {fileID: 1171244195}
-  hand: {fileID: 1117227410}
+  _deck: {fileID: 1171244195}
+  _hand: {fileID: 1117227410}
+  _handView: {fileID: 1342918702}
 --- !u!1 &357341890
 GameObject:
   m_ObjectHideFlags: 0

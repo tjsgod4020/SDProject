@@ -23,18 +23,28 @@ namespace SDProject.Combat
         [SerializeField] private HandView _handView;  // 씬에서 할당 (이벤트 기반이면 없어도 OK)
 
         private StateMachine _fsm;
+        private StPlayerTurn _stPlayer;
+        private StEnemyTurn _stEnemy;
 
         private void Awake()
         {
             _fsm = new StateMachine();
+            _stPlayer = new StPlayerTurn(this);
+            _stEnemy = new StEnemyTurn(this);
 
-            var stPlayer = new StPlayerTurn(this);
-            var stEnemy = new StEnemyTurn(this);
+            _fsm.AddTransition(_stPlayer, _stEnemy, SpacePressed);
+            _fsm.AddTransition(_stEnemy, _stPlayer, () => _stEnemy.IsFinished);
 
-            _fsm.AddTransition(stPlayer, stEnemy, SpacePressed);
-            _fsm.AddTransition(stEnemy, stPlayer, () => stEnemy.IsFinished);
+        }
+        private void Start()
+        {
+            StartCoroutine(BootFSMNextFrame());
+        }
 
-            _fsm.SetState(stPlayer);
+        private System.Collections.IEnumerator BootFSMNextFrame()
+        {
+            yield return null;             // 모든 Awake/OnEnable/Start 끝난 뒤
+            _fsm.SetState(_stPlayer);
         }
 
         private void Update()
@@ -57,23 +67,21 @@ namespace SDProject.Combat
         /// <summary>핸드를 비우고 새로 5장 드로우.</summary>
         public void DrawNewHand()
         {
-            if (_hand == null) return;
+            Debug.Log("[Battle] DrawNewHand()");
+
+            if (_hand == null) { Debug.LogError("[Battle] HandRuntime is NULL"); return; }
+            if (_deck == null) { Debug.LogError("[Battle] DeckRuntime is NULL (cannot draw)"); _handView?.Render(_hand); return; }
 
             _hand.Clear();
 
-            if (_deck != null)
-            {
-                // DeckRuntime에 Draw(int)와 HandMax가 있다고 가정(이전 단계 로직 기준)
-                var drawn = _deck.Draw(5);
-                _hand.AddCards(drawn, _deck.HandMax);
-            }
-            else
-            {
-                Debug.LogWarning("[Battle] DeckRuntime is missing. Cannot draw.");
-            }
+            var drawn = _deck.Draw(5); // deckList.initialDeck에서 5장 뽑음
+            if (drawn == null) { Debug.LogError("[Battle] DeckRuntime.Draw returned NULL"); _handView?.Render(_hand); return; }
 
-            // HandView가 GameEvents로 갱신된다면 아래 호출은 필요 없음.
-            // _handView?.Render(_hand);
+            var added = _hand.AddCards(drawn, _deck.HandMax);
+            Debug.Log($"[Battle] Draw request=5, returned={drawn.Count}, added={added}, now hand={_hand.Count}");
+
+            // ✅ 이벤트 의존 말고 즉시 반영
+            _handView?.Render(_hand);
         }
 
         // ======================
