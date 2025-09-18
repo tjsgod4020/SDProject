@@ -1,40 +1,40 @@
-using SDProject.Core.FSM;
-using SDProject.Core.Messaging;
-using SDProject.Data;
+﻿using System.Collections;
 using UnityEngine;
+using SDProject.Core.FSM;
+using SDProject.UI;
+
+
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace SDProject.Combat
 {
     /// <summary>
-    /// Orchestrates battle phases with a minimal FSM.
-    /// This step: Player turn draws cards at start, press Space to end turn.
+    /// Player ↔ Enemy 턴 순환 컨트롤러.
+    /// Space로 EnemyTurn 전환 → 1초 후 자동 PlayerTurn 복귀.
+    /// PlayerTurn 진입 시 새 카드 5장 드로우.
     /// </summary>
     public class BattleController : MonoBehaviour
     {
-        [Header("Config")]
-        public BattleConfig battleConfig;   // (����) AP ��
-        [Header("Deck")]
-        public DeckRuntime deck;            // assign in scene
-        public HandRuntime hand;            // assign in scene
+        [Header("Refs")]
+        [SerializeField] private DeckRuntime _deck;   // 씬에서 할당
+        [SerializeField] private HandRuntime _hand;   // 씬에서 할당
+        [SerializeField] private HandView _handView;  // 씬에서 할당 (이벤트 기반이면 없어도 OK)
 
         private StateMachine _fsm;
-        private IState _stSetup, _stPlayerStart, _stPlayerMain, _stPlayerEnd, _stEnemy;
-
-        private int _partyAP;
 
         private void Awake()
         {
             _fsm = new StateMachine();
-            _stSetup = new StSetup(this);
-            _stPlayerStart = new StPlayerStart(this);
-            _stPlayerMain = new StPlayerMain(this);
-            _stPlayerEnd = new StPlayerEnd(this);
-            _stEnemy = new StEnemy(this);
-        }
 
-        private void Start()
-        {
-            _fsm.SetState(_stSetup);
+            var stPlayer = new StPlayerTurn(this);
+            var stEnemy = new StEnemyTurn(this);
+
+            _fsm.AddTransition(stPlayer, stEnemy, SpacePressed);
+            _fsm.AddTransition(stEnemy, stPlayer, () => stEnemy.IsFinished);
+
+            _fsm.SetState(stPlayer);
         }
 
         private void Update()
@@ -42,143 +42,86 @@ namespace SDProject.Combat
             _fsm.Tick(Time.deltaTime);
         }
 
-        #region API
-        public void InitBattle()
+        // --- Helpers ---
+
+        private bool SpacePressed()
         {
-            _partyAP = battleConfig ? battleConfig.partyAPMax : 3;
-            GameEvents.RaisePartyAPChanged(_partyAP, battleConfig ? battleConfig.partyAPMax : 3);
-            GameEvents.RaiseBattleStart();
-#if UNITY_EDITOR
-            Debug.Log("[Battle] Init");
-#endif
-        }
-        public void RefillAP()
-        {
-            _partyAP = battleConfig ? battleConfig.partyAPMax : 3;
-            GameEvents.RaisePartyAPChanged(_partyAP, battleConfig ? battleConfig.partyAPMax : 3);
-        }
-        public void ToPlayerStart() => _fsm.SetState(_stPlayerStart);
-        public void ToPlayerMain() => _fsm.SetState(_stPlayerMain);
-        public void ToPlayerEnd() => _fsm.SetState(_stPlayerEnd);
-        public void ToEnemy() => _fsm.SetState(_stEnemy);
-        #endregion
-
-        #region States
-        private class StSetup : IState
-        {
-            private readonly BattleController c;
-            public StSetup(BattleController c) => this.c = c;
-            public void Enter()
-            {
-                c.InitBattle();
-                c.deck?.ResetFromList();
-                c.hand?.Clear();
-                c.ToPlayerStart();
-            }
-            public void Tick(float dt) { }
-            public void Exit() { }
-        }
-
-        private class StPlayerStart : IState
-        {
-            private readonly BattleController c;
-            public StPlayerStart(BattleController c) => this.c = c;
-            public void Enter()
-            {
-                GameEvents.RaiseTurnPhaseChanged(TurnPhase.PlayerStart);
-                c.RefillAP();
-
-                // Draw at turn start
-                int draw = c.deck ? c.deck.DrawPerTurn : 5;
-                var cards = c.deck?.Draw(draw);
-                if (cards != null)
-                    c.hand?.AddCards(cards, c.deck.HandMax);
-
-#if UNITY_EDITOR
-                Debug.Log($"[Battle] PlayerStart: Draw {draw}, Hand={c.hand?.Count}");
-#endif
-                c.ToPlayerMain();
-            }
-            public void Tick(float dt) { }
-            public void Exit() { }
-        }
-
-        private class StPlayerMain : IState
-        {
-            private readonly BattleController c;
-            public StPlayerMain(BattleController c) => this.c = c;
-
-            public void Enter()
-            {
-                GameEvents.RaiseTurnPhaseChanged(TurnPhase.PlayerMain);
-#if UNITY_EDITOR
-                Debug.Log("[Battle] PlayerMain: press Space to End Turn");
-#endif
-            }
-
-            public void Tick(float dt)
-            {
-                // Support both Input Systems
 #if ENABLE_INPUT_SYSTEM
-                // New Input System
-                var kb = UnityEngine.InputSystem.Keyboard.current;
-                if (kb != null && kb.spaceKey.wasPressedThisFrame)
-                    c.ToPlayerEnd();
+            var kb = Keyboard.current;
+            return kb != null && kb.spaceKey.wasPressedThisFrame;
 #else
-    // Old Input Manager
-    if (Input.GetKeyDown(KeyCode.Space))
-        c.ToPlayerEnd();
+            return Input.GetKeyDown(KeyCode.Space);
 #endif
-            }
-
-            public void Exit() { }
         }
 
-        private class StPlayerEnd : IState
+        /// <summary>핸드를 비우고 새로 5장 드로우.</summary>
+        public void DrawNewHand()
         {
-            private readonly BattleController c;
-            public StPlayerEnd(BattleController c) => this.c = c;
-            public void Enter()
+            if (_hand == null) return;
+
+            _hand.Clear();
+
+            if (_deck != null)
             {
-                GameEvents.RaiseTurnPhaseChanged(TurnPhase.PlayerEnd);
-                // For now: discard all hand at end
-                if (c.deck != null && c.hand != null)
-                {
-                    c.deck.Discard(c.hand.Cards);
-                    c.hand.Clear();
-                }
-                c.ToEnemy();
+                // DeckRuntime에 Draw(int)와 HandMax가 있다고 가정(이전 단계 로직 기준)
+                var drawn = _deck.Draw(5);
+                _hand.AddCards(drawn, _deck.HandMax);
             }
-            public void Tick(float dt) { }
-            public void Exit() { }
+            else
+            {
+                Debug.LogWarning("[Battle] DeckRuntime is missing. Cannot draw.");
+            }
+
+            // HandView가 GameEvents로 갱신된다면 아래 호출은 필요 없음.
+            // _handView?.Render(_hand);
         }
 
-        private class StEnemy : IState
+        // ======================
+        // States
+        // ======================
+
+        private class StPlayerTurn : IState
         {
             private readonly BattleController c;
-            private float t;
-            public StEnemy(BattleController c) => this.c = c;
+            public StPlayerTurn(BattleController ctx) => c = ctx;
+
             public void Enter()
             {
-                GameEvents.RaiseTurnPhaseChanged(TurnPhase.EnemyTurn);
-#if UNITY_EDITOR
+                Debug.Log("▶ PlayerTurn Enter");
+                c.DrawNewHand();
+            }
+
+            public void Tick(float dt) { /* 카드 클릭 처리 이미 UI에서 */ }
+
+            public void Exit()
+            {
+                Debug.Log("⏸ PlayerTurn Exit");
+            }
+        }
+
+        private class StEnemyTurn : IState
+        {
+            private readonly BattleController c;
+            public bool IsFinished { get; private set; }
+
+            public StEnemyTurn(BattleController ctx) => c = ctx;
+
+            public void Enter()
+            {
                 Debug.Log("[Battle] EnemyTurn...");
-#endif
-                t = 1.0f; // fake think time
+                IsFinished = false;
+                c.StartCoroutine(CoEnemy());
             }
-            public void Tick(float dt)
+
+            private IEnumerator CoEnemy()
             {
-            #if ENABLE_INPUT_SYSTEM
-                            var kb = UnityEngine.InputSystem.Keyboard.current;
-                            if (kb != null && kb.spaceKey.wasPressedThisFrame)
-                                c.ToPlayerEnd();
-            #else
-                if (Input.GetKeyDown(KeyCode.Space))
-                    c.ToPlayerEnd();
-            #endif
+                yield return new WaitForSeconds(1f);
+                IsFinished = true;
             }
+
+            public void Tick(float dt) { }
+
             public void Exit() { }
         }
-        #endregion
     }
 }

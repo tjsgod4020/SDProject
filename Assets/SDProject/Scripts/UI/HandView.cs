@@ -51,8 +51,13 @@ namespace SDProject.UI
             {
                 var go = Instantiate(cardItemPrefab, content);
                 var view = go.GetComponent<CardItemView>();
-                if (view) view.Bind(card, handRuntime);
+                view.Bind(card, handRuntime);
             }
+        }
+        public void Render(HandRuntime hand)
+        {
+            handRuntime = hand;
+            Rebuild(hand != null ? hand.Count : 0);
         }
     }
 }

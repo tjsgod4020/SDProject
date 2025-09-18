@@ -32,7 +32,7 @@ namespace SDProject.Combat
                 GameEvents.RaiseHandChanged(_cards.Count);
             }
         }
-        public int AddCards(IEnumerable<CardData> cards, int maxHand)
+        public int AddCards(IEnumerable<SDProject.Data.CardData> cards, int maxHand)
         {
             int added = 0;
             foreach (var c in cards)
