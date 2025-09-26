@@ -1,5 +1,7 @@
+﻿using SDProject.Combat;
 using TMPro;
 using UnityEngine;
+using SDProject.Core;
 using SDProject.Core.Messaging;
 
 namespace SDProject.UI
@@ -27,8 +29,19 @@ namespace SDProject.UI
             GameEvents.OnHandChanged -= OnHand;
         }
 
-        private void OnAP(int cur, int max) { if (txtAP) txtAP.text = $"AP {cur}/{max}"; }
-        private void OnPhase(TurnPhase phase) { if (txtPhase) txtPhase.text = phase.ToString(); }
-        private void OnHand(int count) { if (txtHand) txtHand.text = $"Hand {count}"; }
+        private void OnAP(int cur, int max)
+        {
+            if (txtAP) txtAP.text = $"AP {cur}/{max}";
+        }
+
+        private void OnPhase(TurnPhase phase)
+        {
+            if (txtPhase) txtPhase.text = phase.ToString();
+        }
+
+        private void OnHand(int count)
+        {
+            if (txtHand) txtHand.text = $"Hand {count}";
+        }
     }
 }

@@ -1,60 +1,65 @@
 ﻿// Assets/SDProject/Scripts/UI/HandView.cs
-using System.Linq;
 using UnityEngine;
-using SDProject.Combat;
+using UnityEngine.UI;
 using SDProject.Core.Messaging;
+using SDProject.Combat;
 
 namespace SDProject.UI
 {
-    /// Renders player's hand at the bottom using a prefab per card.
-    /// Listens to GameEvents.OnHandChanged and rebuilds.
-    /// SRP: hand -> UI sync only.
+    /// <summary>HandRuntime를 화면에 그려주는 단순 뷰.</summary>
     public class HandView : MonoBehaviour
     {
         [Header("Refs")]
-        [SerializeField] private HandRuntime handRuntime;    // 씬에서 연결 or Render로 주입
-        [SerializeField] private RectTransform content;      // HandPanel의 컨텐츠
-        [SerializeField] private GameObject cardItemPrefab;  // CardItemView 달린 프리팹
+        [SerializeField] private HandRuntime hand;                 // 씬의 HandRuntime
+        [SerializeField] private RectTransform content;            // HandPanel의 RectTransform
+        [SerializeField] private GameObject cardItemPrefab;        // CardItem.prefab (UI용)
 
-        private void OnEnable() => GameEvents.OnHandChanged += Rebuild;
-        private void OnDisable() => GameEvents.OnHandChanged -= Rebuild;
-
-        private void Start()
+        private void OnEnable()
         {
-            // 초기 카드가 이미 있으면 그리기
-            Rebuild(handRuntime ? handRuntime.Count : 0);
+            GameEvents.OnHandChanged += OnHandChanged;
+            // 초기 진입 시 현재 핸드로 그려주기
+            if (hand != null) Render(hand);
         }
 
-        private void ClearChildren()
+        private void OnDisable()
         {
-            if (!content) return;
-            for (int i = content.childCount - 1; i >= 0; i--)
-                Destroy(content.GetChild(i).gameObject);
+            GameEvents.OnHandChanged -= OnHandChanged;
         }
 
-        private void Rebuild(int _)
+        private void OnHandChanged(int _)
         {
-            if (!handRuntime || handRuntime.Cards == null || !content || !cardItemPrefab)
-                return;
+            if (hand != null) Render(hand);
+        }
 
-            ClearChildren();
-
-            foreach (var card in handRuntime.Cards.ToList())
+        public void Render(HandRuntime h)
+        {
+            if (!content || !cardItemPrefab || h == null)
             {
-                var go = Instantiate(cardItemPrefab, content);
-
-                // ✅ 제네릭 누락 수정
-                var view = go.GetComponent<CardItemView>();
-                if (view != null)
-                    view.Bind(card, handRuntime);
+                Debug.LogWarning("[HandView] Missing refs: content/prefab/hand", this);
+                return;
             }
-        }
 
-        // ✅ BattleController에서 호출해 handRuntime을 명시 주입 + 즉시 그리기
-        public void Render(HandRuntime hand)
-        {
-            handRuntime = hand;
-            Rebuild(hand != null ? hand.Count : 0);
+            // 1) 기존 자식 제거
+            for (int i = content.childCount - 1; i >= 0; --i)
+                Destroy(content.GetChild(i).gameObject);
+
+            // 2) 카드 UI 생성
+            foreach (var card in h.Cards)
+            {
+                var go = Instantiate(cardItemPrefab);
+                go.transform.SetParent(content, false);         // ★ worldPositionStays = false
+                go.transform.localScale = Vector3.one;
+
+                // 카드 프리팹 크기 보장 (찌그러짐 방지)
+                var le = go.GetComponent<LayoutElement>();
+                if (!le) le = go.AddComponent<LayoutElement>();
+                if (le.preferredWidth <= 0) le.preferredWidth = 280f;
+                if (le.preferredHeight <= 0) le.preferredHeight = 320f;
+
+                // (선택) 카드 내용 바인딩
+                var view = go.GetComponent<CardItemView>();
+                if (view) view.Bind(card, h);
+            }
         }
     }
 }

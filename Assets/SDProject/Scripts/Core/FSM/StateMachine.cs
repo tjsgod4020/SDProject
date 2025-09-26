@@ -1,63 +1,51 @@
-using System;
-using System.Collections.Generic;
+// StateMachine.cs
 using UnityEngine;
 
 namespace SDProject.Core.FSM
 {
-    /// <summary>
-    /// Minimal FSM with conditional transitions.
-    /// </summary>
-    public class StateMachine
+    /// <summary>KISS: 간단 상태 전이 + 조건.</summary>
+    public sealed class StateMachine
     {
         private IState _current;
 
-        private class Transition
+        // 간단 조건 전이 용 래퍼
+        private struct Transition
         {
-            public IState From;
-            public IState To;
-            public Func<bool> Condition;
+            public IState from, to;
+            public System.Func<bool> condition;
         }
 
-        private readonly List<Transition> _transitions = new();
-        private readonly List<Transition> _currentTransitions = new();
-
-        public void AddTransition(IState from, IState to, Func<bool> condition)
-        {
-            _transitions.Add(new Transition { From = from, To = to, Condition = condition });
-        }
+        private readonly System.Collections.Generic.List<Transition> _transitions = new();
 
         public void SetState(IState next)
         {
             if (_current == next) return;
-
             _current?.Exit();
             _current = next;
-
-            // rebuild currentTransitions
-            _currentTransitions.Clear();
-            foreach (var t in _transitions)
-                if (t.From == _current) _currentTransitions.Add(t);
-
+            _current?.Enter();
 #if UNITY_EDITOR
             Debug.Log($"[FSM] Switched to: {_current?.GetType().Name}");
 #endif
-            _current?.Enter();
+        }
+
+        public void AddTransition(IState from, IState to, System.Func<bool> condition)
+        {
+            _transitions.Add(new Transition { from = from, to = to, condition = condition });
         }
 
         public void Tick(float dt)
         {
-            // check transitions first
-            for (int i = 0; i < _currentTransitions.Count; i++)
+            // 조건 검사
+            for (int i = 0; i < _transitions.Count; i++)
             {
-                if (_currentTransitions[i].Condition())
+                var t = _transitions[i];
+                if (_current == t.from && t.condition != null && t.condition())
                 {
-                    SetState(_currentTransitions[i].To);
-                    break; // only first match
+                    SetState(t.to);
+                    break;
                 }
             }
             _current?.Tick(dt);
         }
-
-        public IState Current => _current;
     }
 }

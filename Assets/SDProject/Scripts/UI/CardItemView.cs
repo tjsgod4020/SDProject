@@ -1,19 +1,19 @@
-// Assets/SDProject/Scripts/UI/CardItemView.cs
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;    // ★ 추가
-using SDProject.Data;
+using TMPro;
 using SDProject.Combat;
+using SDProject.Data;
 
 namespace SDProject.UI
 {
-    // IPointerClickHandler로 UI 클릭 처리
-    public class CardItemView : MonoBehaviour, IPointerClickHandler
+    /// <summary>
+    /// Displays a single card in hand. Title/cost are read dynamically (if present).
+    /// </summary>
+    public class CardItemView : MonoBehaviour
     {
-        [SerializeField] private TMP_Text txtName;
-        [SerializeField] private TMP_Text txtCost;
-        [SerializeField] private Image background;
+        [SerializeField] private TMP_Text title;
+        [SerializeField] private TMP_Text cost;
+        [SerializeField] private Button button;
 
         private CardData _data;
         private HandRuntime _hand;
@@ -22,21 +22,90 @@ namespace SDProject.UI
         {
             _data = data;
             _hand = hand;
-            if (txtName) txtName.text = data.displayName;
-            if (txtCost) txtCost.text = $"AP {data.apCost}";
+
+            // Title: try common names, fallback to asset name
+            if (title)
+                title.text = TryGetStringByAnyName(data, out var t, "title", "Title", "displayName", "name")
+                    ? t
+                    : data ? data.name : "Card";
+
+            // Cost: try common names; hide text if not found
+            if (cost)
+            {
+                if (TryGetIntByAnyName(data, out var c, "cost", "Cost", "apCost", "AP", "Ap"))
+                    cost.text = $"AP {c}";
+                else
+                    cost.text = string.Empty;
+            }
+
+            if (button)
+            {
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(OnClick);
+            }
         }
 
-        // UI 클릭
-        public void OnPointerClick(PointerEventData eventData)
+        private void OnClick()
         {
-            if (_hand == null || _data == null) return;
+            if (_data != null && _hand != null)
+                _hand.Remove(_data); // prototype: use=remove
+        }
 
-            // 좌클릭만 제거로 처리 (원하면 우클릭/더블클릭도 분기 가능)
-            if (eventData.button == PointerEventData.InputButton.Left)
+        // ---- helpers ----
+        private static bool TryGetIntByAnyName(object obj, out int value, params string[] names)
+        {
+            value = 0;
+            if (obj == null) return false;
+            var t = obj.GetType();
+
+            // fields first
+            foreach (var n in names)
             {
-                Debug.Log($"[CardItemView] Click remove: {_data.displayName}");
-                _hand.Remove(_data);      // UI는 HandView가 이벤트로 재빌드
+                var f = t.GetField(n, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                if (f != null && f.FieldType == typeof(int))
+                {
+                    value = (int)f.GetValue(obj);
+                    return true;
+                }
             }
+            // then properties
+            foreach (var n in names)
+            {
+                var p = t.GetProperty(n, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                if (p != null && p.PropertyType == typeof(int) && p.CanRead)
+                {
+                    value = (int)p.GetValue(obj);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static bool TryGetStringByAnyName(object obj, out string value, params string[] names)
+        {
+            value = null;
+            if (obj == null) return false;
+            var t = obj.GetType();
+
+            foreach (var n in names)
+            {
+                var f = t.GetField(n, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                if (f != null && f.FieldType == typeof(string))
+                {
+                    value = (string)f.GetValue(obj);
+                    return true;
+                }
+            }
+            foreach (var n in names)
+            {
+                var p = t.GetProperty(n, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                if (p != null && p.PropertyType == typeof(string) && p.CanRead)
+                {
+                    value = (string)p.GetValue(obj);
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

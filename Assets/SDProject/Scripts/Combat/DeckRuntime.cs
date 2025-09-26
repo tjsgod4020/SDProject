@@ -1,7 +1,7 @@
-﻿// Assets/SDProject/Scripts/Combat/DeckRuntime.cs (보강만)
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using SDProject.Data;
+using SDProject.Core.Messaging;
 
 namespace SDProject.Combat
 {
@@ -14,7 +14,10 @@ namespace SDProject.Combat
         private System.Random _rng;
 
         public int DrawPerTurn => deckList ? deckList.drawPerTurn : 5;
-        public int HandMax => deckList ? deckList.handMax : 10;
+        public int HandMax => deckList ? deckList.handMax : 5;
+
+        public int DrawCount => _drawPile.Count;
+        public int DiscardCount => _discardPile.Count;
 
         private void Awake()
         {
@@ -27,45 +30,50 @@ namespace SDProject.Combat
             _drawPile.Clear();
             _discardPile.Clear();
 
-            if (deckList != null)
-            {
+            if (deckList != null && deckList.initialDeck != null)
                 _drawPile.AddRange(deckList.initialDeck);
-                Debug.Log($"[Deck] ResetFromList: initialDeck={deckList.initialDeck?.Count ?? 0}, handMax={HandMax}, drawPerTurn={DrawPerTurn}");
-            }
-            else
-            {
-                Debug.LogError("[Deck] deckList is NULL — drawPile will be empty");
-            }
 
             Shuffle(_drawPile);
-            Debug.Log($"[Deck] init: drawPile={_drawPile.Count}, discard={_discardPile.Count}");
+            Debug.Log($"[Deck] init: drawPile={_drawPile.Count}, discard={_discardPile.Count}, handMax={HandMax}, drawPerTurn={DrawPerTurn}");
+            RaiseCounts();
         }
 
         public List<CardData> Draw(int count)
         {
             var result = new List<CardData>(count);
+
             for (int i = 0; i < count; i++)
             {
                 if (_drawPile.Count == 0)
                 {
-                    if (_discardPile.Count == 0) break; // no more cards
+                    // Reshuffle from discard if available
+                    if (_discardPile.Count == 0) break;
                     _drawPile.AddRange(_discardPile);
                     _discardPile.Clear();
                     Shuffle(_drawPile);
+                    Debug.Log("[Deck] Reshuffle from discard.");
                 }
 
-                var idx = _drawPile.Count - 1;
+                int idx = _drawPile.Count - 1;
                 var card = _drawPile[idx];
                 _drawPile.RemoveAt(idx);
                 result.Add(card);
             }
-            Debug.Log($"[Deck] Draw {result.Count}/{count}, remain={_drawPile.Count}");
+
+            Debug.Log($"[Deck] Draw {result.Count}/{count}, remain draw={_drawPile.Count}, discard={_discardPile.Count}");
+            RaiseCounts();
             return result;
         }
 
         public void Discard(IEnumerable<CardData> cards)
         {
-            _discardPile.AddRange(cards);
+            if (cards == null) return;
+            foreach (var c in cards)
+            {
+                if (c != null) _discardPile.Add(c);
+            }
+            Debug.Log($"[Deck] Discard +{_discardPile.Count}, now draw={_drawPile.Count}, discard={_discardPile.Count}");
+            RaiseCounts();
         }
 
         private void Shuffle(List<CardData> list)
@@ -75,6 +83,11 @@ namespace SDProject.Combat
                 int j = _rng.Next(i + 1);
                 (list[i], list[j]) = (list[j], list[i]);
             }
+        }
+
+        private void RaiseCounts()
+        {
+            GameEvents.RaiseDeckChanged(_drawPile.Count, _discardPile.Count);
         }
     }
 }

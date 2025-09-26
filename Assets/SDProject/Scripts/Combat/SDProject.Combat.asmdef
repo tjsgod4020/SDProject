@@ -1,0 +1,18 @@
+{
+    "name": "SDProject.Combat",
+    "rootNamespace": "SDProject.Combat",
+    "references": [
+        "SDProject.Core",
+        "SDProject.Data",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

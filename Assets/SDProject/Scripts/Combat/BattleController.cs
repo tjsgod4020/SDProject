@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using UnityEngine;
 using SDProject.Core.FSM;
-using SDProject.UI;
-
+using SDProject.Data;
+using SDProject.Core.Messaging;   // ← 이벤트만 사용
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -10,17 +10,11 @@ using UnityEngine.InputSystem;
 
 namespace SDProject.Combat
 {
-    /// <summary>
-    /// Player ↔ Enemy 턴 순환 컨트롤러.
-    /// Space로 EnemyTurn 전환 → 1초 후 자동 PlayerTurn 복귀.
-    /// PlayerTurn 진입 시 새 카드 5장 드로우.
-    /// </summary>
     public class BattleController : MonoBehaviour
     {
         [Header("Refs")]
-        [SerializeField] private DeckRuntime _deck;   // 씬에서 할당
-        [SerializeField] private HandRuntime _hand;   // 씬에서 할당
-        [SerializeField] private HandView _handView;  // 씬에서 할당 (이벤트 기반이면 없어도 OK)
+        [SerializeField] private DeckRuntime _deck;
+        [SerializeField] private HandRuntime _hand;
 
         private StateMachine _fsm;
         private StPlayerTurn _stPlayer;
@@ -28,31 +22,20 @@ namespace SDProject.Combat
 
         private void Awake()
         {
+            if (!_deck) _deck = FindObjectOfType<DeckRuntime>(true);
+            if (!_hand) _hand = FindObjectOfType<HandRuntime>(true);
+
             _fsm = new StateMachine();
             _stPlayer = new StPlayerTurn(this);
             _stEnemy = new StEnemyTurn(this);
 
             _fsm.AddTransition(_stPlayer, _stEnemy, SpacePressed);
             _fsm.AddTransition(_stEnemy, _stPlayer, () => _stEnemy.IsFinished);
-
-        }
-        private void Start()
-        {
-            StartCoroutine(BootFSMNextFrame());
         }
 
-        private System.Collections.IEnumerator BootFSMNextFrame()
-        {
-            yield return null;             // 모든 Awake/OnEnable/Start 끝난 뒤
-            _fsm.SetState(_stPlayer);
-        }
-
-        private void Update()
-        {
-            _fsm.Tick(Time.deltaTime);
-        }
-
-        // --- Helpers ---
+        private void Start() => StartCoroutine(BootFSMNextFrame());
+        private IEnumerator BootFSMNextFrame() { yield return null; _fsm.SetState(_stPlayer); }
+        private void Update() => _fsm.Tick(Time.deltaTime);
 
         private bool SpacePressed()
         {
@@ -64,71 +47,54 @@ namespace SDProject.Combat
 #endif
         }
 
-        /// <summary>핸드를 비우고 새로 5장 드로우.</summary>
-        public void DrawNewHand()
+        // ── 턴 훅 ──────────────────────────────────────────────────────────────
+        public void OnPlayerTurnEnter() => DrawNewHand();
+
+        public void OnPlayerTurnExit()
         {
-            Debug.Log("[Battle] DrawNewHand()");
-
-            if (_hand == null) { Debug.LogError("[Battle] HandRuntime is NULL"); return; }
-            if (_deck == null) { Debug.LogError("[Battle] DeckRuntime is NULL (cannot draw)"); _handView?.Render(_hand); return; }
-
-            _hand.Clear();
-
-            var drawn = _deck.Draw(5); // deckList.initialDeck에서 5장 뽑음
-            if (drawn == null) { Debug.LogError("[Battle] DeckRuntime.Draw returned NULL"); _handView?.Render(_hand); return; }
-
-            var added = _hand.AddCards(drawn, _deck.HandMax);
-            Debug.Log($"[Battle] Draw request=5, returned={drawn.Count}, added={added}, now hand={_hand.Count}");
-
-            // ✅ 이벤트 의존 말고 즉시 반영
-            _handView?.Render(_hand);
+            if (_deck == null || _hand == null) return;
+            var rest = _hand.TakeAll();
+            _deck.Discard(rest);
+            // HandRuntime가 내부에서 GameEvents.RaiseHandChanged 호출함
+            GameEvents.RaiseDeckChanged(_deck.DrawCount, _deck.DiscardCount);
         }
 
-        // ======================
-        // States
-        // ======================
+        public void DrawNewHand()
+        {
+            if (_hand == null || _deck == null)
+            {
+                Debug.LogError("[Battle] DrawNewHand: missing refs.");
+                return;
+            }
 
+            _hand.Clear();
+            var drawn = _deck.Draw(_deck.DrawPerTurn);
+            var added = _hand.AddCards(drawn, _deck.HandMax);
+            Debug.Log($"[Battle] Draw request={_deck.DrawPerTurn}, returned={drawn.Count}, added={added}, now hand={_hand.Count}");
+
+            // UI로 알림만 보냄
+            GameEvents.RaiseHandChanged(_hand.Count);
+            GameEvents.RaiseDeckChanged(_deck.DrawCount, _deck.DiscardCount);
+        }
+
+        // ── States ────────────────────────────────────────────────────────────
         private class StPlayerTurn : IState
         {
             private readonly BattleController c;
             public StPlayerTurn(BattleController ctx) => c = ctx;
-
-            public void Enter()
-            {
-                Debug.Log("▶ PlayerTurn Enter");
-                c.DrawNewHand();
-            }
-
-            public void Tick(float dt) { /* 카드 클릭 처리 이미 UI에서 */ }
-
-            public void Exit()
-            {
-                Debug.Log("⏸ PlayerTurn Exit");
-            }
+            public void Enter() { Debug.Log("▶ PlayerTurn Enter"); c.OnPlayerTurnEnter(); }
+            public void Tick(float dt) { }
+            public void Exit() { Debug.Log("⏸ PlayerTurn Exit"); c.OnPlayerTurnExit(); }
         }
 
         private class StEnemyTurn : IState
         {
             private readonly BattleController c;
             public bool IsFinished { get; private set; }
-
             public StEnemyTurn(BattleController ctx) => c = ctx;
-
-            public void Enter()
-            {
-                Debug.Log("[Battle] EnemyTurn...");
-                IsFinished = false;
-                c.StartCoroutine(CoEnemy());
-            }
-
-            private IEnumerator CoEnemy()
-            {
-                yield return new WaitForSeconds(1f);
-                IsFinished = true;
-            }
-
+            public void Enter() { Debug.Log("[Battle] EnemyTurn..."); IsFinished = false; c.StartCoroutine(CoEnemy()); }
+            private IEnumerator CoEnemy() { yield return new WaitForSeconds(1f); IsFinished = true; }
             public void Tick(float dt) { }
-
             public void Exit() { }
         }
     }

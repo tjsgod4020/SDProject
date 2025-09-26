@@ -1,0 +1,20 @@
+{
+    "name": "SDProject.UI",
+    "rootNamespace": "SDProject.UI",
+    "references": [
+        "SDProject.Core",
+        "SDProject.Combat",
+        "Unity.TextMeshPro",
+        "Unity.InputSystem",
+        "SDProject.Data"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
