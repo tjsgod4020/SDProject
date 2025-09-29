@@ -1,5 +1,5 @@
-﻿# Code Snapshot - 2025-09-29 15:24:01
-Commit: 137e65b
+﻿# Code Snapshot - 2025-09-29 18:59:06
+Commit: a0b43ed
 
 ## Assets\SDProject\Scripts\Combat\Board\BoardLayout.cs
 ```csharp
@@ -247,6 +247,7 @@ namespace SDProject.Combat
         {
             if (!_deck) _deck = FindObjectOfType<DeckRuntime>(true);
             if (!_hand) _hand = FindObjectOfType<HandRuntime>(true);
+            _hand.OnUsed += OnCardUsed;
 
             _fsm = new StateMachine();
             _stPlayer = new StPlayerTurn(this);
@@ -320,36 +321,52 @@ namespace SDProject.Combat
             public void Tick(float dt) { }
             public void Exit() { }
         }
+
+        private void OnDestroy()
+        {
+            if (_hand != null) _hand.OnUsed -= OnCardUsed;
+        }
+
+        private void OnCardUsed(SDProject.Data.CardData card)
+        {
+            // 카드를 실제로 '버림 더미'로 이동
+            _deck.Discard(card);
+        }
     }
 }
 ```
 
 ## Assets\SDProject\Scripts\Combat\DeckRuntime.cs
 ```csharp
+// ... (using 생략)
+
+using SDProject.Core.Messaging;
+using SDProject.Data;
 using System.Collections.Generic;
 using UnityEngine;
-using SDProject.Data;
-using SDProject.Core.Messaging;
 
 namespace SDProject.Combat
 {
     public class DeckRuntime : MonoBehaviour
     {
+        [Header("Config")]
         [SerializeField] private DeckList deckList;
+        [SerializeField] private int drawPerTurn = 5;
+        [SerializeField] private int handMax = 5;
 
+        public int DrawPerTurn => drawPerTurn;
+        public int HandMax => handMax;
+
+        // ✅ 여기가 내부 저장소
         private readonly List<CardData> _drawPile = new();
         private readonly List<CardData> _discardPile = new();
-        private System.Random _rng;
 
-        public int DrawPerTurn => deckList ? deckList.drawPerTurn : 5;
-        public int HandMax => deckList ? deckList.handMax : 5;
-
+        // ✅ 🔹추가: BattleController 등에서 읽어갈 공개 카운터
         public int DrawCount => _drawPile.Count;
         public int DiscardCount => _discardPile.Count;
 
         private void Awake()
         {
-            _rng = new System.Random();
             ResetFromList();
         }
 
@@ -358,63 +375,64 @@ namespace SDProject.Combat
             _drawPile.Clear();
             _discardPile.Clear();
 
-            if (deckList != null && deckList.initialDeck != null)
-                _drawPile.AddRange(deckList.initialDeck);
+            if (deckList != null && deckList.cards != null)
+                _drawPile.AddRange(deckList.cards);
 
             Shuffle(_drawPile);
-            Debug.Log($"[Deck] init: drawPile={_drawPile.Count}, discard={_discardPile.Count}, handMax={HandMax}, drawPerTurn={DrawPerTurn}");
-            RaiseCounts();
+            BroadcastCounts();
+            Debug.Log($"[Deck] init: drawPile={_drawPile.Count}, discard={_discardPile.Count}");
         }
 
         public List<CardData> Draw(int count)
         {
+            EnsureDrawable(count);
             var result = new List<CardData>(count);
-
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < count && _drawPile.Count > 0; i++)
             {
-                if (_drawPile.Count == 0)
-                {
-                    // Reshuffle from discard if available
-                    if (_discardPile.Count == 0) break;
-                    _drawPile.AddRange(_discardPile);
-                    _discardPile.Clear();
-                    Shuffle(_drawPile);
-                    Debug.Log("[Deck] Reshuffle from discard.");
-                }
-
-                int idx = _drawPile.Count - 1;
-                var card = _drawPile[idx];
-                _drawPile.RemoveAt(idx);
-                result.Add(card);
+                var top = _drawPile[^1];
+                _drawPile.RemoveAt(_drawPile.Count - 1);
+                result.Add(top);
             }
-
-            Debug.Log($"[Deck] Draw {result.Count}/{count}, remain draw={_drawPile.Count}, discard={_discardPile.Count}");
-            RaiseCounts();
+            BroadcastCounts();
             return result;
+        }
+
+        public void Discard(CardData card)
+        {
+            if (card == null) return;
+            _discardPile.Add(card);
+            BroadcastCounts();
         }
 
         public void Discard(IEnumerable<CardData> cards)
         {
             if (cards == null) return;
-            foreach (var c in cards)
-            {
-                if (c != null) _discardPile.Add(c);
-            }
-            Debug.Log($"[Deck] Discard +{_discardPile.Count}, now draw={_drawPile.Count}, discard={_discardPile.Count}");
-            RaiseCounts();
+            _discardPile.AddRange(cards);
+            BroadcastCounts();
         }
 
-        private void Shuffle(List<CardData> list)
+        private void EnsureDrawable(int needed)
         {
-            for (int i = list.Count - 1; i > 0; i--)
+            if (_drawPile.Count >= needed) return;
+            if (_discardPile.Count == 0) return;
+
+            _drawPile.AddRange(_discardPile);
+            _discardPile.Clear();
+            Shuffle(_drawPile);
+        }
+
+        private static void Shuffle(List<CardData> list)
+        {
+            for (int i = 0; i < list.Count; i++)
             {
-                int j = _rng.Next(i + 1);
+                int j = Random.Range(i, list.Count);
                 (list[i], list[j]) = (list[j], list[i]);
             }
         }
 
-        private void RaiseCounts()
+        private void BroadcastCounts()
         {
+            // UI 갱신 이벤트
             GameEvents.RaiseDeckChanged(_drawPile.Count, _discardPile.Count);
         }
     }
@@ -425,50 +443,56 @@ namespace SDProject.Combat
 ```csharp
 using System.Collections.Generic;
 using UnityEngine;
-using SDProject.Core.Messaging;
 using SDProject.Data;
+using SDProject.Core.Messaging;
+using System;
 
 namespace SDProject.Combat
 {
+    /// <summary>
+    /// 손패 보관/변경 책임. 사용(=버림으로 보낼 후보)은 OnUsed로 통지.
+    /// </summary>
     public class HandRuntime : MonoBehaviour
     {
         [SerializeField] private List<CardData> _cards = new();
+        public IReadOnlyList<CardData> Cards => _cards;
         public int Count => _cards.Count;
-        public System.Collections.Generic.IReadOnlyList<CardData> Cards => _cards;
 
-        public void Clear()
+        /// <summary>카드 한 장이 '사용됨'을 알림 (실제 버림 이동은 상위 컨트롤러 책임).</summary>
+        public event Action<CardData> OnUsed;
+
+        public int AddCards(List<CardData> add, int maxHand)
         {
-            if (_cards.Count == 0) return;
-            _cards.Clear();
+            if (add == null || add.Count == 0) return 0;
+            int canAdd = Mathf.Max(0, maxHand - _cards.Count);
+            int take = Mathf.Min(canAdd, add.Count);
+            if (take <= 0) return 0;
+
+            for (int i = 0; i < take; i++)
+                _cards.Add(add[i]);
+
             GameEvents.RaiseHandChanged(_cards.Count);
+            return take;
         }
 
-        public void Add(CardData card)
+        public bool Remove(CardData c)
         {
-            if (!card) return;
-            _cards.Add(card);
-            GameEvents.RaiseHandChanged(_cards.Count);
-        }
-
-        public bool Remove(CardData card)
-        {
-            var ok = _cards.Remove(card);
+            bool ok = _cards.Remove(c);
             if (ok) GameEvents.RaiseHandChanged(_cards.Count);
             return ok;
         }
 
-        public int AddCards(IEnumerable<CardData> cards, int maxHand)
+        /// <summary>사용 버튼 핸들러가 호출. 내부에서 제거 후 OnUsed로 알림.</summary>
+        public void Use(CardData c)
         {
-            int added = 0;
-            foreach (var c in cards)
-            {
-                if (_cards.Count >= maxHand) break;
-                if (!c) continue;
-                _cards.Add(c);
-                added++;
-            }
+            if (Remove(c))
+                OnUsed?.Invoke(c);
+        }
+
+        public void Clear()
+        {
+            _cards.Clear();
             GameEvents.RaiseHandChanged(_cards.Count);
-            return added;
         }
 
         public List<CardData> TakeAll()
@@ -728,11 +752,8 @@ namespace SDProject.Data
     [CreateAssetMenu(menuName = "SDProject/Deck List", fileName = "DeckList")]
     public class DeckList : ScriptableObject
     {
-        [Min(1)] public int drawPerTurn = 5;
-        [Min(1)] public int handMax = 10;
-
-        [Tooltip("Initial deck composition (cards can repeat).")]
-        public List<CardData> initialDeck = new List<CardData>();
+        // 초기 덱 구성 리스트 (Inspector에서 카드들을 드래그하여 채우세요)
+        public List<CardData> cards = new();
     }
 }
 ```
@@ -849,7 +870,7 @@ namespace SDProject.UI
         private void OnClick()
         {
             if (_data != null && _hand != null)
-                _hand.Remove(_data); // prototype: use=remove
+                _hand.Use(_data);   // 🔴 변경점: Remove -> Use
         }
 
         // ---- helpers ----
