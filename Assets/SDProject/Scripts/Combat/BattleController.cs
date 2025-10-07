@@ -24,6 +24,7 @@ namespace SDProject.Combat
         {
             if (!_deck) _deck = FindObjectOfType<DeckRuntime>(true);
             if (!_hand) _hand = FindObjectOfType<HandRuntime>(true);
+            _hand.OnUsed += OnCardUsed;
 
             _fsm = new StateMachine();
             _stPlayer = new StPlayerTurn(this);
@@ -96,6 +97,17 @@ namespace SDProject.Combat
             private IEnumerator CoEnemy() { yield return new WaitForSeconds(1f); IsFinished = true; }
             public void Tick(float dt) { }
             public void Exit() { }
+        }
+
+        private void OnDestroy()
+        {
+            if (_hand != null) _hand.OnUsed -= OnCardUsed;
+        }
+
+        private void OnCardUsed(SDProject.Data.CardData card)
+        {
+            // 카드를 실제로 '버림 더미'로 이동
+            _deck.Discard(card);
         }
     }
 }

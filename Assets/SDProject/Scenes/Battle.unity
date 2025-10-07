@@ -523,8 +523,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 584.5, y: -210}
-  m_SizeDelta: {x: -1169, y: -420}
+  m_AnchoredPosition: {x: 584.5, y: -260.5}
+  m_SizeDelta: {x: -1169, y: -521}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &679167016
 MonoBehaviour:
@@ -576,7 +576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 147fa1507e7f354459dbb20788af0a5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SDProject.UI::SDProject.UI.PileCounterView
-  title: Deck
+  title: Discard
   txtTitle: {fileID: 1991142621}
   txtCount: {fileID: 1032489888}
   deck: {fileID: 1171244195}
@@ -952,6 +952,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SDProject.Combat.DeckRuntime
   deckList: {fileID: 11400000, guid: db52bd0c81c44f04a913bca161fe4fb8, type: 2}
+  drawPerTurn: 5
+  handMax: 5
 --- !u!4 &1171244196
 Transform:
   m_ObjectHideFlags: 0

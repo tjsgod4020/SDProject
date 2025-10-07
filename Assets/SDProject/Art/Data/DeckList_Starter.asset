@@ -12,9 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b1c71bb7aed3d44795fae8d696f5337, type: 3}
   m_Name: DeckList_Starter
   m_EditorClassIdentifier: Assembly-CSharp::SDProject.Data.DeckList
-  drawPerTurn: 5
-  handMax: 5
-  initialDeck:
+  cards:
+  - {fileID: 11400000, guid: 22a63975768bdf749809fc91d93dbec3, type: 2}
   - {fileID: 11400000, guid: fa9d09c5b8af9fb46b476f8b0177b7db, type: 2}
   - {fileID: 11400000, guid: fa9d09c5b8af9fb46b476f8b0177b7db, type: 2}
   - {fileID: 11400000, guid: fa9d09c5b8af9fb46b476f8b0177b7db, type: 2}
@@ -30,13 +29,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d903bdb58b80c5d418c56ffc2addef13, type: 2}
   - {fileID: 11400000, guid: d903bdb58b80c5d418c56ffc2addef13, type: 2}
   - {fileID: 11400000, guid: d903bdb58b80c5d418c56ffc2addef13, type: 2}
-  - {fileID: 11400000, guid: 22a63975768bdf749809fc91d93dbec3, type: 2}
-  - {fileID: 11400000, guid: 22a63975768bdf749809fc91d93dbec3, type: 2}
-  - {fileID: 11400000, guid: 22a63975768bdf749809fc91d93dbec3, type: 2}
-  - {fileID: 11400000, guid: 22a63975768bdf749809fc91d93dbec3, type: 2}
-  - {fileID: 11400000, guid: 22a63975768bdf749809fc91d93dbec3, type: 2}
   - {fileID: 11400000, guid: 23618474bf5fb844baa2873cfe9e27f6, type: 2}
   - {fileID: 11400000, guid: 23618474bf5fb844baa2873cfe9e27f6, type: 2}
   - {fileID: 11400000, guid: 23618474bf5fb844baa2873cfe9e27f6, type: 2}
   - {fileID: 11400000, guid: 23618474bf5fb844baa2873cfe9e27f6, type: 2}
   - {fileID: 11400000, guid: 23618474bf5fb844baa2873cfe9e27f6, type: 2}
+  - {fileID: 11400000, guid: 22a63975768bdf749809fc91d93dbec3, type: 2}
+  - {fileID: 11400000, guid: 22a63975768bdf749809fc91d93dbec3, type: 2}
+  - {fileID: 11400000, guid: 22a63975768bdf749809fc91d93dbec3, type: 2}
+  - {fileID: 11400000, guid: 22a63975768bdf749809fc91d93dbec3, type: 2}

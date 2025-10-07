@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using SDProject.Combat;
@@ -48,7 +48,7 @@ namespace SDProject.UI
         private void OnClick()
         {
             if (_data != null && _hand != null)
-                _hand.Remove(_data); // prototype: use=remove
+                _hand.Use(_data);   // 🔴 변경점: Remove -> Use
         }
 
         // ---- helpers ----
