@@ -1,5 +1,5 @@
-﻿# Code Snapshot - 2025-10-01
-Commit: ee09324
+﻿# Code Snapshot - 2025-10-07
+Commit: 15ad682
 
 ## Assets\SDProject\Scripts\Combat\Board\BoardLayout.cs
 ```csharp
@@ -765,6 +765,607 @@ namespace SDProject.Data
   "rootNamespace": "SDProject.Data",
   "references": []
 }
+```
+
+## Assets\SDProject\Scripts\ExcelImport\Abstractions\ExcelRowMapperBase.cs
+```csharp
+
+#if UNITY_EDITOR
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// Optional base with helpers (GetString/GetInt/etc).
+/// </summary>
+public abstract class ExcelRowMapperBase<T> : ScriptableObject, IExcelRowMapper<T>
+{
+    protected string GetString(Dictionary<string, string> row, string key, string defaultValue = "")
+    {
+        return row.TryGetValue(key, out var val) ? val : defaultValue;
+    }
+
+    protected int GetInt(Dictionary<string, string> row, string key, int defaultValue = 0)
+    {
+        if (row.TryGetValue(key, out var val) && int.TryParse(val, out var i)) return i;
+        return defaultValue;
+    }
+
+    protected float GetFloat(Dictionary<string, string> row, string key, float defaultValue = 0f)
+    {
+        if (row.TryGetValue(key, out var val) && float.TryParse(val, out var f)) return f;
+        return defaultValue;
+    }
+
+    public abstract bool TryMap(Dictionary<string, string> row, out T result);
+}
+#endif
+```
+
+## Assets\SDProject\Scripts\ExcelImport\Abstractions\IExcelDataSink.cs
+```csharp
+
+#if UNITY_EDITOR
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// SRP: Receive mapped rows and store them (e.g., into a ScriptableObject).
+/// </summary>
+public interface IExcelDataSink<T>
+{
+    void Clear();
+    void AddRange(IEnumerable<T> items);
+    void SaveDirty(); // mark asset dirty in Editor
+    Object AsUnityObject(); // for ping/select in editor logs
+}
+#endif
+```
+
+## Assets\SDProject\Scripts\ExcelImport\Abstractions\IExcelRowMapper.cs
+```csharp
+
+#if UNITY_EDITOR
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// SRP: One responsibility = convert a row dictionary to a strongly-typed model object.
+/// </summary>
+public interface IExcelRowMapper<T>
+{
+    /// <summary>Return true if row is valid and out is set; log errors as needed.</summary>
+    bool TryMap(Dictionary<string, string> row, out T result);
+}
+#endif
+```
+
+## Assets\SDProject\Scripts\ExcelImport\Config\ExcelImportConfig.cs
+```csharp
+
+#if UNITY_EDITOR
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "ExcelImportConfig", menuName = "Game/Excel/ImportConfig")]
+public class ExcelImportConfig : ScriptableObject
+{
+    [Header("XLSX")]
+    [Tooltip("Use Unity path under Assets/, e.g., Assets/DataTables/GameData.xlsx")]
+    public string xlsxAssetPath;
+
+    [Serializable]
+    public class SheetImportSetting
+    {
+        public string sheetName = "Cards";
+        [Min(0)] public int headerRowIndex = 0;
+        [Min(0)] public int dataStartRowIndex = 1;
+
+        [Header("Row Mapper (ScriptableObject implementing IExcelRowMapper<T>)")]
+        public ScriptableObject rowMapper; // e.g., CardRowMapper
+
+        [Header("Data Sink (ScriptableObject implementing IExcelDataSink<T>)")]
+        public ScriptableObject dataSink;  // e.g., CardDatabase
+    }
+
+    [Header("Sheets")]
+    public List<SheetImportSetting> sheets = new();
+
+    [Header("Events")]
+    public ExcelImportEvents events = new ExcelImportEvents();
+
+    [Serializable]
+    public class ExcelImportEvents
+    {
+        public ImportProgressEvent OnProgress = new ImportProgressEvent();
+        public ImportCompletedEvent OnCompleted = new ImportCompletedEvent();
+    }
+}
+#endif
+
+/*
+[Unity 적용 가이드]
+- Project 우클릭 → Create → Game/Excel/ImportConfig 생성.
+- xlsxAssetPath: 예) "Assets/DataTables/GameData.xlsx"
+- Sheets에 각 시트를 추가하고, 매퍼/싱크 ScriptableObject를 연결.
+- 다른 테이블(캐릭터 등)도 시트별로 항목만 추가하면 됨.
+*/
+```
+
+## Assets\SDProject\Scripts\ExcelImport\Core\ExcelImportEvents.cs
+```csharp
+
+#if UNITY_EDITOR
+using UnityEngine.Events;
+
+[System.Serializable]
+public class ImportProgressEvent : UnityEvent<string> { }
+
+[System.Serializable]
+public class ImportCompletedEvent : UnityEvent<bool, string> { } // success, message
+#endif
+
+/*
+[Unity 적용 가이드]
+- 다른 시스템과 느슨 결합: 임포트 진행/완료를 UI나 로거가 구독할 수 있음.
+*/
+```
+
+## Assets\SDProject\Scripts\ExcelImport\Core\ExcelImportStateMachine.cs
+```csharp
+
+#if UNITY_EDITOR
+using System;
+using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
+using UnityEngine;
+
+/// <summary>
+/// State pattern for import flow: Idle -> LoadWorkbook -> ParseSheets -> Completed/Failed
+/// Keeps logs at key points. Uses UnityEvents from config.
+/// </summary>
+public class ExcelImportStateMachine
+{
+    // ---------- States ----------
+    // Note: Keep nested states private; only the state machine itself uses them.
+    private abstract class State
+    {
+        protected readonly ExcelImportStateMachine ctx;
+        protected State(ExcelImportStateMachine c) { ctx = c; }
+        public virtual void Enter() { }
+        public virtual void Tick() { }
+    }
+
+    private class IdleState : State
+    {
+        public IdleState(ExcelImportStateMachine c) : base(c) { }
+        public override void Enter() { ctx.Log("Idle."); }
+    }
+
+    private class LoadWorkbookState : State
+    {
+        public LoadWorkbookState(ExcelImportStateMachine c) : base(c) { }
+        public override void Enter()
+        {
+            ctx.Log("Loading workbook...");
+            try
+            {
+                ctx.fullPath = Path.GetFullPath(ctx.assetPath);
+                if (!File.Exists(ctx.fullPath)) throw new FileNotFoundException(ctx.fullPath);
+                ctx.TransitionTo(new ParseSheetsState(ctx)); // internal transition
+            }
+            catch (Exception ex)
+            {
+                ctx.Fail($"LoadWorkbook failed: {ex.Message}");
+            }
+        }
+    }
+
+    private class ParseSheetsState : State
+    {
+        public ParseSheetsState(ExcelImportStateMachine c) : base(c) { }
+        public override void Enter()
+        {
+            ctx.Log("Parsing sheets...");
+            try
+            {
+                foreach (var s in ctx.settings)
+                {
+                    if (s.rowMapper == null || s.dataSink == null)
+                    {
+                        ctx.LogWarn($"Sheet '{s.sheetName}' skipped: mapper or sink not assigned.");
+                        continue;
+                    }
+
+                    var rows = ExcelReader.ReadSheet(ctx.fullPath, s.sheetName, s.headerRowIndex, s.dataStartRowIndex);
+
+                    // Infer T from IExcelRowMapper<T>
+                    var mapperType = s.rowMapper.GetType();
+                    var mapperIface = Array.Find(mapperType.GetInterfaces(), i =>
+                        i.IsGenericType && i.GetGenericTypeDefinition().Name.StartsWith("IExcelRowMapper"));
+                    if (mapperIface == null)
+                    {
+                        ctx.LogError($"Mapper {mapperType.Name} does not implement IExcelRowMapper<T>.");
+                        continue;
+                    }
+                    var modelType = mapperIface.GetGenericArguments()[0];
+
+                    var sinkType = s.dataSink.GetType();
+                    var sinkIface = Array.Find(sinkType.GetInterfaces(), i =>
+                        i.IsGenericType && i.GetGenericTypeDefinition().Name.StartsWith("IExcelDataSink"));
+                    if (sinkIface == null || sinkIface.GetGenericArguments()[0] != modelType)
+                    {
+                        ctx.LogError($"Sink {sinkType.Name} is not IExcelDataSink<{modelType.Name}>.");
+                        continue;
+                    }
+
+                    // Clear sink
+                    sinkType.GetMethod("Clear").Invoke(s.dataSink, null);
+
+                    // Map rows -> List<T>
+                    var mappedList = (System.Collections.IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(modelType));
+                    var tryMap = mapperType.GetMethod("TryMap");
+
+                    foreach (var row in rows)
+                    {
+                        object[] args = new object[] { row, null };
+                        bool ok = (bool)tryMap.Invoke(s.rowMapper, args);
+                        if (ok) mappedList.Add(args[1]); // out T result
+                    }
+
+                    // Persist
+                    sinkType.GetMethod("AddRange").Invoke(s.dataSink, new object[] { mappedList });
+                    sinkType.GetMethod("SaveDirty").Invoke(s.dataSink, null);
+
+                    ctx.Log($"Sheet '{s.sheetName}': {mappedList.Count} rows imported → {s.dataSink.name}");
+                }
+
+                ctx.TransitionTo(new CompletedState(ctx, true, "Import completed."));
+            }
+            catch (Exception ex)
+            {
+                ctx.Fail($"ParseSheets failed: {ex}");
+            }
+        }
+    }
+
+    private class CompletedState : State
+    {
+        private readonly bool success;
+        private readonly string message;
+        public CompletedState(ExcelImportStateMachine c, bool success, string message) : base(c)
+        { this.success = success; this.message = message; }
+        public override void Enter()
+        {
+            ctx.Log($"Completed. success={success} message={message}");
+            ctx.events?.OnCompleted?.Invoke(success, message);
+        }
+    }
+
+    // ---------- Context ----------
+    private State _state;
+    private readonly ExcelImportConfig config;
+    private readonly List<ExcelImportConfig.SheetImportSetting> settings;
+    private string assetPath => config.xlsxAssetPath;
+    private string _fullPath;
+    private ExcelImportConfig.ExcelImportEvents events => config.events;
+
+    public string fullPath { get => _fullPath; set => _fullPath = value; }
+
+    public ExcelImportStateMachine(ExcelImportConfig cfg)
+    {
+        config = cfg;
+        settings = cfg.sheets;
+        _state = new IdleState(this);
+    }
+
+    /// <summary>Entry point from EditorWindow/UI.</summary>
+    public void Start()
+    {
+        events?.OnProgress?.Invoke("Import started.");
+        TransitionTo(new LoadWorkbookState(this));
+    }
+
+    // ✅ FIX: make this private (or internal) so its parameter accessibility matches.
+    private void TransitionTo(State next)
+    {
+        _state = next;
+        _state.Enter();
+    }
+
+    public void Log(string msg)
+    {
+        Debug.Log($"[ExcelImport] {msg}");
+        events?.OnProgress?.Invoke(msg);
+    }
+
+    public void LogWarn(string msg)
+    {
+        Debug.LogWarning($"[ExcelImport] {msg}");
+        events?.OnProgress?.Invoke("WARN: " + msg);
+    }
+
+    public void LogError(string msg)
+    {
+        Debug.LogError($"[ExcelImport] {msg}");
+        events?.OnProgress?.Invoke("ERROR: " + msg);
+    }
+
+    public void Fail(string message)
+    {
+        LogError(message);
+        TransitionTo(new CompletedState(this, false, message));
+    }
+}
+#endif
+```
+
+## Assets\SDProject\Scripts\ExcelImport\Core\ExcelReader.cs
+```csharp
+#if UNITY_EDITOR
+using System;
+using System.Collections.Generic;
+using System.IO;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+using UnityEngine;
+
+public static class ExcelReader
+{
+    /// <summary>
+    /// Reads a sheet and returns rows as dictionaries {Header -> CellText}.
+    /// </summary>
+    public static List<Dictionary<string, string>> ReadSheet(
+        string fullXlsxPath,
+        string sheetName,
+        int headerRowIndex = 0,
+        int dataStartRowIndex = 1)
+    {
+        if (!File.Exists(fullXlsxPath))
+        {
+            Debug.LogError($"[ExcelReader] File not found: {fullXlsxPath}");
+            return new List<Dictionary<string, string>>();
+        }
+
+        using (var fs = new FileStream(fullXlsxPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        {
+            IWorkbook workbook = new XSSFWorkbook(fs);
+            var sheet = workbook.GetSheet(sheetName);
+            if (sheet == null)
+            {
+                Debug.LogError($"[ExcelReader] Sheet not found: {sheetName}");
+                return new List<Dictionary<string, string>>();
+            }
+
+            // Read headers
+            var headerRow = sheet.GetRow(headerRowIndex);
+            if (headerRow == null)
+            {
+                Debug.LogError($"[ExcelReader] Header row missing at index {headerRowIndex} (sheet: {sheetName})");
+                return new List<Dictionary<string, string>>();
+            }
+
+            var headers = new List<string>();
+            for (int c = 0; c < headerRow.LastCellNum; c++)
+            {
+                var cell = headerRow.GetCell(c);
+                headers.Add(cell?.ToString()?.Trim() ?? $"Col{c}");
+            }
+
+            var rows = new List<Dictionary<string, string>>();
+
+            for (int r = dataStartRowIndex; r <= sheet.LastRowNum; r++)
+            {
+                var row = sheet.GetRow(r);
+                if (row == null) continue;
+
+                var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                bool isAllEmpty = true;
+
+                for (int c = 0; c < headers.Count; c++)
+                {
+                    var cell = row.GetCell(c);
+                    string text = cell?.ToString()?.Trim() ?? string.Empty;
+                    if (!string.IsNullOrEmpty(text)) isAllEmpty = false;
+                    dict[headers[c]] = text;
+                }
+
+                if (!isAllEmpty) rows.Add(dict);
+            }
+
+            Debug.Log($"[ExcelReader] Read {rows.Count} rows from '{sheetName}' ({Path.GetFileName(fullXlsxPath)})");
+            return rows;
+        }
+    }
+}
+#endif
+
+/*
+[Unity 적용 가이드]
+- NPOI 설치 후(메뉴 Tools > NuGet > Manage NuGet Packages → NPOI, NPOI.OOXML) 자동으로 사용 가능.
+- Editor 전용이므로 #if UNITY_EDITOR 가드가 포함됨.
+*/
+```
+
+## Assets\SDProject\Scripts\ExcelImport\Data\CardData.cs
+```csharp
+
+using System;
+using UnityEngine;
+
+[Serializable]
+public struct CardData
+{
+    public string Id;         // Unique Id
+    public string Name;       // Display Name
+    public int Cost;          // Mana/Energy cost
+    public string Rarity;     // Common/Rare/Epic...
+    public string Tags;       // CSV tags (for quick demo)
+}
+```
+
+## Assets\SDProject\Scripts\ExcelImport\Data\CardDatabase.cs
+```csharp
+
+#if UNITY_EDITOR
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
+
+/// <summary>
+/// ScriptableObject sink for CardData (implements IExcelDataSink{CardData}).
+/// </summary>
+[CreateAssetMenu(fileName = "CardDatabase", menuName = "Game/Data/CardDatabase")]
+public class CardDatabase : ScriptableObject, IExcelDataSink<CardData>
+{
+    [SerializeField] private List<CardData> items = new List<CardData>();
+    public IReadOnlyList<CardData> Items => items;
+
+    public void Clear() => items.Clear();
+
+    public void AddRange(IEnumerable<CardData> add)
+    {
+        items.AddRange(add);
+    }
+
+    public void SaveDirty()
+    {
+        EditorUtility.SetDirty(this);
+        AssetDatabase.SaveAssets();
+    }
+
+    public Object AsUnityObject() => this;
+}
+#endif
+
+/*
+[Unity 적용 가이드]
+- Project 우클릭 → Create → Game/Data/CardDatabase 로 자산 생성.
+- 다른 테이블(캐릭터 등)도 동일 패턴으로 Database SO를 만들면 됨.
+*/
+```
+
+## Assets\SDProject\Scripts\ExcelImport\Editor\ExcelImporterWindow.cs
+```csharp
+
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEngine;
+
+public class ExcelImporterWindow : EditorWindow
+{
+    private ExcelImportConfig _config;
+    private Vector2 _scroll;
+    private string _logHint = "Ready.";
+
+    [MenuItem("Tools/Excel Importer")]
+    public static void Open()
+    {
+        GetWindow<ExcelImporterWindow>("Excel Importer");
+    }
+
+    private void OnGUI()
+    {
+        EditorGUILayout.LabelField("XLSX Import (NPOI)", EditorStyles.boldLabel);
+        _config = (ExcelImportConfig)EditorGUILayout.ObjectField("Import Config", _config, typeof(ExcelImportConfig), false);
+
+        EditorGUILayout.Space();
+        if (_config != null)
+        {
+            EditorGUILayout.HelpBox($"XLSX: {_config.xlsxAssetPath}", MessageType.Info);
+
+            if (GUILayout.Button("Run Import"))
+            {
+                RunImport();
+            }
+
+            _scroll = EditorGUILayout.BeginScrollView(_scroll, GUILayout.MinHeight(120));
+            EditorGUILayout.LabelField("Log:", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(_logHint, EditorStyles.wordWrappedLabel);
+            EditorGUILayout.EndScrollView();
+        }
+        else
+        {
+            EditorGUILayout.HelpBox("Assign an ExcelImportConfig asset.", MessageType.Warning);
+        }
+    }
+
+    private void RunImport()
+    {
+        if (_config == null) return;
+
+        // Wire events (temporary for window)
+        _config.events.OnProgress.RemoveAllListeners();
+        _config.events.OnCompleted.RemoveAllListeners();
+
+        _config.events.OnProgress.AddListener((msg) =>
+        {
+            _logHint = msg;
+            Repaint();
+        });
+
+        _config.events.OnCompleted.AddListener((ok, msg) =>
+        {
+            _logHint = (ok ? "SUCCESS: " : "FAILED: ") + msg;
+            Repaint();
+        });
+
+        var sm = new ExcelImportStateMachine(_config);
+        sm.Start();
+    }
+}
+#endif
+
+/*
+[Unity 적용 가이드]
+- 메뉴: Tools > Excel Importer
+- Import Config 할당 후 "Run Import" 버튼 클릭 → Console & 창 내부 로그 확인.
+- 필요 시 ScriptableObject 이벤트를 게임 내 TMP UI에 연결해도 됨(런타임 확인용).
+*/
+```
+
+## Assets\SDProject\Scripts\ExcelImport\Mappers\CardRowMapper.cs
+```csharp
+
+#if UNITY_EDITOR
+using SDProject.Data;
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// Maps row dictionary -> CardData. Columns: Id, Name, Cost, Rarity, Tags
+/// </summary>
+[CreateAssetMenu(fileName = "CardRowMapper", menuName = "Game/Excel/RowMapper/Card")]
+public class CardRowMapper : ExcelRowMapperBase<CardData>
+{
+    public override bool TryMap(Dictionary<string, string> row, out CardData result)
+    {
+        result = new CardData
+        {
+            Id = GetString(row, "Id"),
+            Name = GetString(row, "Name"),
+            Cost = GetInt(row, "Cost", 0),
+            Rarity = GetString(row, "Rarity"),
+            Tags = GetString(row, "Tags")
+        };
+
+        if (string.IsNullOrEmpty(result.Id))
+        {
+            Debug.LogWarning("[CardRowMapper] Row skipped: Id is required.");
+            return false;
+        }
+        return true;
+    }
+}
+#endif
+
+/*
+[Unity 적용 가이드]
+- Project 우클릭 → Create → Game/Excel/RowMapper/Card 로 매퍼 생성.
+- 시트 컬럼명과 정확히 일치해야 함(Id/Name/Cost/Rarity/Tags). 엑셀 헤더를 맞춰주세요.
+*/
 ```
 
 ## Assets\SDProject\Scripts\UI\BattleHUD.cs
