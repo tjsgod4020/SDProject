@@ -8,9 +8,22 @@
 [Mm]emoryCaptures/
 UserSettings/
 
+# Unity extra
+*.pidb
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+[Aa]ssets/AddressableAssetsData/*/link.xml
+[Aa]ssets/AddressableAssetsData/*/catalog_*.json
+[Aa]ssets/AddressableAssetsData/*/catalog_*.hash
+ServerData/
+
 # VS / IDE
 .vs/
 .vscode/
+.idea/
+*.sln.DotSettings.user
 *.csproj
 *.sln
 *.user
@@ -20,3 +33,12 @@ UserSettings/
 # OS
 .DS_Store
 Thumbs.db
+
+# (Optional) Mobile build artifacts
+.gradle/
+*.apk
+*.aab
+*.ipa
+Pods/
+Podfile.lock
+*.xcworkspace/
