@@ -1,0 +1,4 @@
+Id,Enabled,NameId,DescId,Type,Class,Rarity,CharId,Cost,TargetType,PosUse,PosHit,EffectsJSON,Upgradable,UpgradeStep,UpgradeRefId,Tags
+string,bool,string,string,enum,enum,enum,string,int,enum,flags,flags,json,bool,int,string,flags
+CardData_Common_Attack_NormalAttack_00,True,CardName_Common_Attack_NormalAttack_00,CardDesc_Common_Attack_NormalAttack_00,Attack,Common,Common,,1,Enemy,"Front,Mid1,Mid2,Back","Front,Mid1,Mid2,Mid3,Back","[{""type"":""Damage"",""value"":1}",True,0,CardData_Common_Attack_NormalAttack_01,
+CardData_Common_Attack_NormalAttack_01,True,CardName_Common_Attack_NormalAttack_01,CardDesc_Common_Attack_NormalAttack_01,Attack,Common,Common,,1,Enemy,"Front,Mid1,Mid2,Back","Front,Mid1,Mid2,Mid3,Back","[{""type"":""Damage"",""value"":3}",False,1,,

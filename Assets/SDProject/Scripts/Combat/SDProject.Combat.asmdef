@@ -4,7 +4,8 @@
     "references": [
         "SDProject.Core",
         "SDProject.Data",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

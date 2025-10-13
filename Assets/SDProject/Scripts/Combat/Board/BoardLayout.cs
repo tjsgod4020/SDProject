@@ -1,140 +1,95 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SDProject.Combat.Board
 {
-    public enum LayoutStyle { TwoRows, OneRowTwoGroups }
-
-    [DisallowMultipleComponent]
+    /// <summary>
+    /// 슬롯을 런타임에 생성/배치하고, 각 슬롯에 팀/인덱스를 부여합니다(A안).
+    /// - 공용 Slot 프리팹 1개만 사용 가능(CharacterSlot.assignAtRuntime=true 권장).
+    /// - 유닛 스폰은 책임에서 제외(SRP). 유닛은 다른 시스템에서 스폰/바인딩하세요.
+    /// </summary>
     public class BoardLayout : MonoBehaviour
     {
-        [Header("Layout")]
-        public LayoutStyle layoutStyle = LayoutStyle.TwoRows;
-
-        [Min(1)] public int allyCount = 4;
-        [Min(1)] public int enemyCount = 5;
-
-        [Header("TwoRows Y (world)")]
-        public float allyRowY = -2.5f;
-        public float enemyRowY = 2.0f;
-
-        [Header("OneRowTwoGroups")]
-        public float oneRowY = 0.0f;      // 한 줄일 때의 Y
-        public float groupGap = 3.0f;     // 두 그룹 사이의 공백 (world)
-
-        [Header("Common")]
-        public float spacing = 2.0f;      // 슬롯 간 간격 (world)
-
-        [Header("Prefabs")]
+        [Header("Common Slot Prefab")]
+        [Tooltip("CharacterSlot 컴포넌트가 포함된 공용 슬롯 프리팹")]
         public GameObject slotPrefab;
-        public GameObject dummyCharacterPrefab;
 
-        [Header("Parents")]
-        public Transform slotsRoot;
-        public Transform unitsRoot;
+        [Header("Ally Layout (4 lanes)")]
+        public int allySlotCount = 4;                    // Back(0), Mid2(1), Mid1(2), Front(3)
+        public Vector3 allyStart = new Vector3(-6f, 0f, 0f);
+        public float allyGap = 1.8f;
+        public Transform allyRoot;                       // 슬롯들을 담을 부모(없으면 this)
 
-        private readonly List<CharacterSlot> _slots = new();
+        [Header("Enemy Layout (5 lanes)")]
+        public int enemySlotCount = 5;                   // Front(0), Mid1(1), Mid2(2), Mid3(3), Back(4)
+        public Vector3 enemyStart = new Vector3(6f, 0f, 0f);
+        public float enemyGap = 1.8f;                    // 오른쪽에서 왼쪽으로 배치하려면 음수 transform을 써도 되고, 좌표만 조정해도 됩니다.
+        public Transform enemyRoot;                      // 슬롯들을 담을 부모(없으면 this)
+
+        [Header("Naming")]
+        public string allyNamePrefix = "Ally_";
+        public string enemyNamePrefix = "Enemy_";
 
         private void Awake()
         {
-            if (!slotsRoot)
-            {
-                var go = new GameObject("SlotsRoot");
-                go.transform.SetParent(transform, false);
-                slotsRoot = go.transform;
-            }
-            if (!unitsRoot)
-            {
-                var go = new GameObject("UnitsRoot");
-                go.transform.SetParent(transform, false);
-                unitsRoot = go.transform;
-            }
-        }
-
-        private void Start()
-        {
-            _slots.Clear();
-            switch (layoutStyle)
-            {
-                case LayoutStyle.OneRowTwoGroups:
-                    BuildOneRowTwoGroups(allyCount, enemyCount, oneRowY, spacing, groupGap);
-                    break;
-                default:
-                    BuildLine(TeamSide.Ally, allyCount, allyRowY);
-                    BuildLine(TeamSide.Enemy, enemyCount, enemyRowY);
-                    break;
-            }
-            SpawnDummies();
-        }
-
-        // ===== 기존 2줄(위/아래) =====
-        private void BuildLine(TeamSide team, int count, float rowY)
-        {
-            float totalWidth = spacing * (count - 1);
-            float startX = -totalWidth * 0.5f;
-
-            for (int i = 0; i < count; i++)
-            {
-                Vector3 pos = new Vector3(startX + i * spacing, rowY, 0f);
-                CreateSlot(team, i, pos);
-            }
-        }
-
-        // ===== 한 줄에 두 그룹(좌:아군, 우:적) =====
-        private void BuildOneRowTwoGroups(int allyN, int enemyN, float y, float s, float gap)
-        {
-            float allyWidth = s * (Mathf.Max(allyN, 1) - 1);
-            float enemyWidth = s * (Mathf.Max(enemyN, 1) - 1);
-
-            // 전체 폭: [ally][gap][enemy]
-            float total = allyWidth + gap + enemyWidth;
-            float leftStartX = -total * 0.5f;           // 왼쪽 그룹(아군)의 시작 x
-            float rightStartX = leftStartX + allyWidth + gap; // 오른쪽 그룹(적)의 시작 x
-
-            for (int i = 0; i < allyN; i++)
-            {
-                Vector3 pos = new Vector3(leftStartX + i * s, y, 0f);
-                CreateSlot(TeamSide.Ally, i, pos);
-            }
-            for (int i = 0; i < enemyN; i++)
-            {
-                Vector3 pos = new Vector3(rightStartX + i * s, y, 0f);
-                CreateSlot(TeamSide.Enemy, i, pos);
-            }
-        }
-
-        private void CreateSlot(TeamSide team, int idx, Vector3 pos)
-        {
-            var slotGO = slotPrefab ? Instantiate(slotPrefab, pos, Quaternion.identity, slotsRoot)
-                                    : new GameObject($"{team}_Slot_{idx:00}");
             if (!slotPrefab)
             {
-                slotGO.transform.SetParent(slotsRoot, true);
-                slotGO.transform.position = pos;
+                Debug.LogError("[BoardLayout] slotPrefab is missing.");
+                return;
             }
-            var slot = slotGO.GetComponent<CharacterSlot>();
-            if (!slot) slot = slotGO.AddComponent<CharacterSlot>();
-            slot.team = team;
-            slot.index = idx;
-            if (!slot.mount) slot.mount = slot.transform;
-            _slots.Add(slot);
+
+            if (!allyRoot) allyRoot = this.transform;
+            if (!enemyRoot) enemyRoot = this.transform;
+
+            BuildAllySlots();
+            BuildEnemySlots();
         }
 
-        private void SpawnDummies()
+        private void BuildAllySlots()
         {
-            foreach (var slot in _slots)
+            for (int i = 0; i < allySlotCount; i++)
             {
-                if (!dummyCharacterPrefab) { Debug.LogWarning("[BoardLayout] Dummy prefab is missing."); continue; }
-                var unit = Instantiate(dummyCharacterPrefab, slot.mount.position, Quaternion.identity, unitsRoot);
-                var d = unit.GetComponent<DummyCharacter>() ?? unit.AddComponent<DummyCharacter>();
-                d.Bind(slot.team, slot.index);
-                
-                if (slot.team == TeamSide.Enemy)
+                // 좌 -> 우로 배치: Back(0) → Mid2(1) → Mid1(2) → Front(3)
+                Vector3 pos = allyStart + new Vector3(i * allyGap, 0f, 0f);
+                var go = Instantiate(slotPrefab, pos, Quaternion.identity, allyRoot);
+                go.name = $"{allyNamePrefix}{i}";
+
+                var slot = go.GetComponent<CharacterSlot>();
+                if (!slot)
                 {
-                    var t = unit.transform;
-                    t.localScale = new Vector3(-Mathf.Abs(t.localScale.x), t.localScale.y, t.localScale.z);
+                    Debug.LogError($"[BoardLayout] Slot prefab has no CharacterSlot: {go.name}");
+                    continue;
                 }
 
+                // 런타임 팀/인덱스 확정
+                slot.Configure(TeamSide.Ally, i);
+
+                // mount가 비어있으면 슬롯 Transform 자체를 기준으로 사용(선택)
+                if (!slot.mount) slot.mount = slot.transform;
+            }
+        }
+
+        private void BuildEnemySlots()
+        {
+            for (int i = 0; i < enemySlotCount; i++)
+            {
+                // 좌 -> 우로 배치하되, 기획 우선순위는 Front(0) → Mid1(1) → Mid2(2) → Mid3(3) → Back(4)
+                // 기본값: enemyStart에서 왼쪽으로 진행하려면 x에 -enemyGap를 곱하거나, start를 오른쪽에 두고 양수 gap으로 왼쪽 이동시켜도 됩니다.
+                Vector3 pos = enemyStart + new Vector3(i * -enemyGap, 0f, 0f);
+                var go = Instantiate(slotPrefab, pos, Quaternion.identity, enemyRoot);
+                go.name = $"{enemyNamePrefix}{i}";
+
+                var slot = go.GetComponent<CharacterSlot>();
+                if (!slot)
+                {
+                    Debug.LogError($"[BoardLayout] Slot prefab has no CharacterSlot: {go.name}");
+                    continue;
+                }
+
+                // 런타임 팀/인덱스 확정
+                slot.Configure(TeamSide.Enemy, i);
+
+                // mount 기본값 처리
+                if (!slot.mount) slot.mount = slot.transform;
             }
         }
     }

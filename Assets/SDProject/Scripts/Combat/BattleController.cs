@@ -22,8 +22,8 @@ namespace SDProject.Combat
 
         private void Awake()
         {
-            if (!_deck) _deck = FindObjectOfType<DeckRuntime>(true);
-            if (!_hand) _hand = FindObjectOfType<HandRuntime>(true);
+            var hand = Object.FindFirstObjectByType<HandRuntime>(FindObjectsInactive.Include);
+            var deck = Object.FindFirstObjectByType<DeckRuntime>(FindObjectsInactive.Include);
             _hand.OnUsed += OnCardUsed;
 
             _fsm = new StateMachine();
