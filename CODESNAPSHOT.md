@@ -1,5 +1,5 @@
-﻿# Code Snapshot - 2025-10-07
-Commit: 15ad682
+﻿# Code Snapshot - 2025-10-13
+Commit: e2cc52d
 
 ## Assets\SDProject\Scripts\Combat\Board\BoardLayout.cs
 ```csharp
@@ -767,605 +767,592 @@ namespace SDProject.Data
 }
 ```
 
-## Assets\SDProject\Scripts\ExcelImport\Abstractions\ExcelRowMapperBase.cs
+## Assets\SDProject\Scripts\DataTable\Editor\ExcelEncodingInit.cs
 ```csharp
-
 #if UNITY_EDITOR
-using System;
-using System.Collections.Generic;
-using UnityEngine;
+using System.Text;
+using UnityEditor;
 
-/// <summary>
-/// Optional base with helpers (GetString/GetInt/etc).
-/// </summary>
-public abstract class ExcelRowMapperBase<T> : ScriptableObject, IExcelRowMapper<T>
+namespace SDProject.DataTable.Editor
 {
-    protected string GetString(Dictionary<string, string> row, string key, string defaultValue = "")
+    [InitializeOnLoad]
+    public static class ExcelEncodingInit
     {
-        return row.TryGetValue(key, out var val) ? val : defaultValue;
+        static ExcelEncodingInit()
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        }
     }
-
-    protected int GetInt(Dictionary<string, string> row, string key, int defaultValue = 0)
-    {
-        if (row.TryGetValue(key, out var val) && int.TryParse(val, out var i)) return i;
-        return defaultValue;
-    }
-
-    protected float GetFloat(Dictionary<string, string> row, string key, float defaultValue = 0f)
-    {
-        if (row.TryGetValue(key, out var val) && float.TryParse(val, out var f)) return f;
-        return defaultValue;
-    }
-
-    public abstract bool TryMap(Dictionary<string, string> row, out T result);
 }
 #endif
 ```
 
-## Assets\SDProject\Scripts\ExcelImport\Abstractions\IExcelDataSink.cs
+## Assets\SDProject\Scripts\DataTable\Editor\XlsxAssetPostprocessor.cs
 ```csharp
-
-#if UNITY_EDITOR
-using System.Collections.Generic;
-using UnityEngine;
-
-/// <summary>
-/// SRP: Receive mapped rows and store them (e.g., into a ScriptableObject).
-/// </summary>
-public interface IExcelDataSink<T>
-{
-    void Clear();
-    void AddRange(IEnumerable<T> items);
-    void SaveDirty(); // mark asset dirty in Editor
-    Object AsUnityObject(); // for ping/select in editor logs
-}
-#endif
-```
-
-## Assets\SDProject\Scripts\ExcelImport\Abstractions\IExcelRowMapper.cs
-```csharp
-
-#if UNITY_EDITOR
-using System.Collections.Generic;
-using UnityEngine;
-
-/// <summary>
-/// SRP: One responsibility = convert a row dictionary to a strongly-typed model object.
-/// </summary>
-public interface IExcelRowMapper<T>
-{
-    /// <summary>Return true if row is valid and out is set; log errors as needed.</summary>
-    bool TryMap(Dictionary<string, string> row, out T result);
-}
-#endif
-```
-
-## Assets\SDProject\Scripts\ExcelImport\Config\ExcelImportConfig.cs
-```csharp
-
-#if UNITY_EDITOR
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-
-[CreateAssetMenu(fileName = "ExcelImportConfig", menuName = "Game/Excel/ImportConfig")]
-public class ExcelImportConfig : ScriptableObject
-{
-    [Header("XLSX")]
-    [Tooltip("Use Unity path under Assets/, e.g., Assets/DataTables/GameData.xlsx")]
-    public string xlsxAssetPath;
-
-    [Serializable]
-    public class SheetImportSetting
-    {
-        public string sheetName = "Cards";
-        [Min(0)] public int headerRowIndex = 0;
-        [Min(0)] public int dataStartRowIndex = 1;
-
-        [Header("Row Mapper (ScriptableObject implementing IExcelRowMapper<T>)")]
-        public ScriptableObject rowMapper; // e.g., CardRowMapper
-
-        [Header("Data Sink (ScriptableObject implementing IExcelDataSink<T>)")]
-        public ScriptableObject dataSink;  // e.g., CardDatabase
-    }
-
-    [Header("Sheets")]
-    public List<SheetImportSetting> sheets = new();
-
-    [Header("Events")]
-    public ExcelImportEvents events = new ExcelImportEvents();
-
-    [Serializable]
-    public class ExcelImportEvents
-    {
-        public ImportProgressEvent OnProgress = new ImportProgressEvent();
-        public ImportCompletedEvent OnCompleted = new ImportCompletedEvent();
-    }
-}
-#endif
-
-/*
-[Unity 적용 가이드]
-- Project 우클릭 → Create → Game/Excel/ImportConfig 생성.
-- xlsxAssetPath: 예) "Assets/DataTables/GameData.xlsx"
-- Sheets에 각 시트를 추가하고, 매퍼/싱크 ScriptableObject를 연결.
-- 다른 테이블(캐릭터 등)도 시트별로 항목만 추가하면 됨.
-*/
-```
-
-## Assets\SDProject\Scripts\ExcelImport\Core\ExcelImportEvents.cs
-```csharp
-
-#if UNITY_EDITOR
-using UnityEngine.Events;
-
-[System.Serializable]
-public class ImportProgressEvent : UnityEvent<string> { }
-
-[System.Serializable]
-public class ImportCompletedEvent : UnityEvent<bool, string> { } // success, message
-#endif
-
-/*
-[Unity 적용 가이드]
-- 다른 시스템과 느슨 결합: 임포트 진행/완료를 UI나 로거가 구독할 수 있음.
-*/
-```
-
-## Assets\SDProject\Scripts\ExcelImport\Core\ExcelImportStateMachine.cs
-```csharp
+// File: Assets/SDProject/Scripts/DataTable/Editor/XlsxAssetPostprocessor.cs
+// Fix: remove bogus XamlRootSafe reference; use XlsxRoot directly.
 
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using ExcelDataReader;
 using UnityEditor;
 using UnityEngine;
 
-/// <summary>
-/// State pattern for import flow: Idle -> LoadWorkbook -> ParseSheets -> Completed/Failed
-/// Keeps logs at key points. Uses UnityEvents from config.
-/// </summary>
-public class ExcelImportStateMachine
+// System.Data alias (name collision safety)
+using DataTableType = global::System.Data.DataTable;
+using DataColumnType = global::System.Data.DataColumn;
+using DataRowType = global::System.Data.DataRow;
+
+namespace SDProject.DataTable.Editor
 {
-    // ---------- States ----------
-    // Note: Keep nested states private; only the state machine itself uses them.
-    private abstract class State
+    public class XlsxAssetPostprocessor : AssetPostprocessor
     {
-        protected readonly ExcelImportStateMachine ctx;
-        protected State(ExcelImportStateMachine c) { ctx = c; }
-        public virtual void Enter() { }
-        public virtual void Tick() { }
-    }
+        // XlsxAssetPostprocessor.cs - OnPostprocessAllAssets 안
 
-    private class IdleState : State
-    {
-        public IdleState(ExcelImportStateMachine c) : base(c) { }
-        public override void Enter() { ctx.Log("Idle."); }
-    }
-
-    private class LoadWorkbookState : State
-    {
-        public LoadWorkbookState(ExcelImportStateMachine c) : base(c) { }
-        public override void Enter()
+        static void OnPostprocessAllAssets(string[] imported, string[] deleted, string[] moved, string[] movedFrom)
         {
-            ctx.Log("Loading workbook...");
-            try
+            var targets = new List<string>();
+
+            bool IsXlsxUnderRoot(string path)
             {
-                ctx.fullPath = Path.GetFullPath(ctx.assetPath);
-                if (!File.Exists(ctx.fullPath)) throw new FileNotFoundException(ctx.fullPath);
-                ctx.TransitionTo(new ParseSheetsState(ctx)); // internal transition
+                var norm = path.Replace('\\', '/');
+                return norm.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase)
+                    && norm.StartsWith(SDProject.DataTable.DataTablePaths.XlsxRoot, StringComparison.Ordinal);
             }
-            catch (Exception ex)
+
+            void Consider(string path)
             {
-                ctx.Fail($"LoadWorkbook failed: {ex.Message}");
+                if (IsXlsxUnderRoot(path))
+                    targets.Add(path.Replace('\\', '/'));
+            }
+
+            foreach (var p in imported) Consider(p);
+            foreach (var p in moved) Consider(p);
+
+            foreach (var xlsxPath in targets.Distinct())
+            {
+                try
+                {
+                    ConvertOne(xlsxPath, out var tableId, out var headers, out var rowCount);
+                    Debug.Log($"[DataTable] Converted '{tableId}.xlsx' → CSV. Rows={rowCount}, Headers=[{string.Join(", ", headers)}], HeaderHash={HeaderHash(headers)}");
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"[DataTable] Conversion FAILED for '{xlsxPath}': {ex.Message}");
+                }
             }
         }
-    }
 
-    private class ParseSheetsState : State
-    {
-        public ParseSheetsState(ExcelImportStateMachine c) : base(c) { }
-        public override void Enter()
+
+        private static void ConvertOne(string xlsxPath, out string tableId, out List<string> headers, out int rowCount)
         {
-            ctx.Log("Parsing sheets...");
-            try
+            string tid = Path.GetFileNameWithoutExtension(xlsxPath);
+            tableId = tid;
+
+            headers = new List<string>();
+            rowCount = 0;
+
+            var reg = LoadRegistry();
+            TableSchema schema = null;
+            string sheetName = null;
+
+            if (reg != null && reg.entries != null)
             {
-                foreach (var s in ctx.settings)
+                var entry = reg.entries.FirstOrDefault(e =>
+                    e != null &&
+                    !string.IsNullOrWhiteSpace(e.tableId) &&
+                    string.Equals(e.tableId, tid, StringComparison.Ordinal));
+
+                if (entry != null)
                 {
-                    if (s.rowMapper == null || s.dataSink == null)
-                    {
-                        ctx.LogWarn($"Sheet '{s.sheetName}' skipped: mapper or sink not assigned.");
-                        continue;
-                    }
+                    sheetName = string.IsNullOrWhiteSpace(entry.sheetName) ? null : entry.sheetName;
+                    schema = entry.schema;
+                }
+            }
 
-                    var rows = ExcelReader.ReadSheet(ctx.fullPath, s.sheetName, s.headerRowIndex, s.dataStartRowIndex);
+            using var stream = File.Open(xlsxPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var reader = ExcelReaderFactory.CreateReader(stream);
+            var dataSet = reader.AsDataSet(new ExcelDataSetConfiguration
+            {
+                ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
+            });
 
-                    // Infer T from IExcelRowMapper<T>
-                    var mapperType = s.rowMapper.GetType();
-                    var mapperIface = Array.Find(mapperType.GetInterfaces(), i =>
-                        i.IsGenericType && i.GetGenericTypeDefinition().Name.StartsWith("IExcelRowMapper"));
-                    if (mapperIface == null)
-                    {
-                        ctx.LogError($"Mapper {mapperType.Name} does not implement IExcelRowMapper<T>.");
-                        continue;
-                    }
-                    var modelType = mapperIface.GetGenericArguments()[0];
+            DataTableType sheet = null;
+            if (!string.IsNullOrEmpty(sheetName))
+            {
+                sheet = dataSet.Tables.Cast<DataTableType>()
+                    .FirstOrDefault(t => string.Equals(t.TableName, sheetName, StringComparison.Ordinal));
+                if (sheet == null)
+                    throw new Exception($"Sheet '{sheetName}' not found in '{tid}.xlsx'.");
+            }
+            else
+            {
+                if (dataSet.Tables.Count == 0) throw new Exception("No sheets found.");
+                if (dataSet.Tables.Count > 1)
+                    Debug.LogWarning($"[DataTable] Multiple sheets in {tid}.xlsx; using first: '{dataSet.Tables[0].TableName}'.");
+                sheet = (DataTableType)dataSet.Tables[0];
+            }
 
-                    var sinkType = s.dataSink.GetType();
-                    var sinkIface = Array.Find(sinkType.GetInterfaces(), i =>
-                        i.IsGenericType && i.GetGenericTypeDefinition().Name.StartsWith("IExcelDataSink"));
-                    if (sinkIface == null || sinkIface.GetGenericArguments()[0] != modelType)
-                    {
-                        ctx.LogError($"Sink {sinkType.Name} is not IExcelDataSink<{modelType.Name}>.");
-                        continue;
-                    }
+            headers = sheet.Columns.Cast<DataColumnType>()
+                .Select(c => (c.ColumnName ?? "").Trim()).ToList();
 
-                    // Clear sink
-                    sinkType.GetMethod("Clear").Invoke(s.dataSink, null);
+            if (headers.Count == 0) throw new Exception("Header row is empty.");
+            if (headers.Count != headers.Distinct(StringComparer.Ordinal).Count())
+                throw new Exception("Duplicate headers detected.");
 
-                    // Map rows -> List<T>
-                    var mappedList = (System.Collections.IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(modelType));
-                    var tryMap = mapperType.GetMethod("TryMap");
+            var genPath = DataTablePaths.GetGeneratedCsvPath(tid);
+            Directory.CreateDirectory(Path.GetDirectoryName(genPath));
+            using var sw = new StreamWriter(genPath, false, new UTF8Encoding(false));
 
-                    foreach (var row in rows)
-                    {
-                        object[] args = new object[] { row, null };
-                        bool ok = (bool)tryMap.Invoke(s.rowMapper, args);
-                        if (ok) mappedList.Add(args[1]); // out T result
-                    }
+            sw.WriteLine(ToCsvLine(headers));
 
-                    // Persist
-                    sinkType.GetMethod("AddRange").Invoke(s.dataSink, new object[] { mappedList });
-                    sinkType.GetMethod("SaveDirty").Invoke(s.dataSink, null);
-
-                    ctx.Log($"Sheet '{s.sheetName}': {mappedList.Count} rows imported → {s.dataSink.name}");
+            foreach (DataRowType row in sheet.Rows)
+            {
+                var cells = new string[headers.Count];
+                for (int i = 0; i < headers.Count; i++)
+                {
+                    var v = row[i];
+                    var s = (v == null || v == DBNull.Value) ? "" : v.ToString();
+                    cells[i] = s ?? "";
                 }
 
-                ctx.TransitionTo(new CompletedState(ctx, true, "Import completed."));
+                if (schema != null) ValidateRowAgainstSchema(schema, headers, cells);
+
+                sw.WriteLine(ToCsvLine(cells));
+                rowCount++;
             }
-            catch (Exception ex)
-            {
-                ctx.Fail($"ParseSheets failed: {ex}");
-            }
-        }
-    }
 
-    private class CompletedState : State
-    {
-        private readonly bool success;
-        private readonly string message;
-        public CompletedState(ExcelImportStateMachine c, bool success, string message) : base(c)
-        { this.success = success; this.message = message; }
-        public override void Enter()
-        {
-            ctx.Log($"Completed. success={success} message={message}");
-            ctx.events?.OnCompleted?.Invoke(success, message);
-        }
-    }
-
-    // ---------- Context ----------
-    private State _state;
-    private readonly ExcelImportConfig config;
-    private readonly List<ExcelImportConfig.SheetImportSetting> settings;
-    private string assetPath => config.xlsxAssetPath;
-    private string _fullPath;
-    private ExcelImportConfig.ExcelImportEvents events => config.events;
-
-    public string fullPath { get => _fullPath; set => _fullPath = value; }
-
-    public ExcelImportStateMachine(ExcelImportConfig cfg)
-    {
-        config = cfg;
-        settings = cfg.sheets;
-        _state = new IdleState(this);
-    }
-
-    /// <summary>Entry point from EditorWindow/UI.</summary>
-    public void Start()
-    {
-        events?.OnProgress?.Invoke("Import started.");
-        TransitionTo(new LoadWorkbookState(this));
-    }
-
-    // ✅ FIX: make this private (or internal) so its parameter accessibility matches.
-    private void TransitionTo(State next)
-    {
-        _state = next;
-        _state.Enter();
-    }
-
-    public void Log(string msg)
-    {
-        Debug.Log($"[ExcelImport] {msg}");
-        events?.OnProgress?.Invoke(msg);
-    }
-
-    public void LogWarn(string msg)
-    {
-        Debug.LogWarning($"[ExcelImport] {msg}");
-        events?.OnProgress?.Invoke("WARN: " + msg);
-    }
-
-    public void LogError(string msg)
-    {
-        Debug.LogError($"[ExcelImport] {msg}");
-        events?.OnProgress?.Invoke("ERROR: " + msg);
-    }
-
-    public void Fail(string message)
-    {
-        LogError(message);
-        TransitionTo(new CompletedState(this, false, message));
-    }
-}
-#endif
-```
-
-## Assets\SDProject\Scripts\ExcelImport\Core\ExcelReader.cs
-```csharp
-#if UNITY_EDITOR
-using System;
-using System.Collections.Generic;
-using System.IO;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
-using UnityEngine;
-
-public static class ExcelReader
-{
-    /// <summary>
-    /// Reads a sheet and returns rows as dictionaries {Header -> CellText}.
-    /// </summary>
-    public static List<Dictionary<string, string>> ReadSheet(
-        string fullXlsxPath,
-        string sheetName,
-        int headerRowIndex = 0,
-        int dataStartRowIndex = 1)
-    {
-        if (!File.Exists(fullXlsxPath))
-        {
-            Debug.LogError($"[ExcelReader] File not found: {fullXlsxPath}");
-            return new List<Dictionary<string, string>>();
+            AssetDatabase.ImportAsset(ToRelativeAssetPath(genPath));
+            EditorApplication.delayCall += TryHotReload;
         }
 
-        using (var fs = new FileStream(fullXlsxPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        private static void ValidateRowAgainstSchema(TableSchema schema, List<string> headers, string[] cells)
         {
-            IWorkbook workbook = new XSSFWorkbook(fs);
-            var sheet = workbook.GetSheet(sheetName);
-            if (sheet == null)
+            foreach (var col in schema.columns)
+                if (col.required && !headers.Contains(col.name, StringComparer.Ordinal))
+                    throw new Exception($"Required column '{col.name}' missing (schema={schema.name}).");
+
+            for (int i = 0; i < headers.Count; i++)
             {
-                Debug.LogError($"[ExcelReader] Sheet not found: {sheetName}");
-                return new List<Dictionary<string, string>>();
-            }
+                if (!schema.TryGetColumn(headers[i], out var col)) continue;
 
-            // Read headers
-            var headerRow = sheet.GetRow(headerRowIndex);
-            if (headerRow == null)
-            {
-                Debug.LogError($"[ExcelReader] Header row missing at index {headerRowIndex} (sheet: {sheetName})");
-                return new List<Dictionary<string, string>>();
-            }
-
-            var headers = new List<string>();
-            for (int c = 0; c < headerRow.LastCellNum; c++)
-            {
-                var cell = headerRow.GetCell(c);
-                headers.Add(cell?.ToString()?.Trim() ?? $"Col{c}");
-            }
-
-            var rows = new List<Dictionary<string, string>>();
-
-            for (int r = dataStartRowIndex; r <= sheet.LastRowNum; r++)
-            {
-                var row = sheet.GetRow(r);
-                if (row == null) continue;
-
-                var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                bool isAllEmpty = true;
-
-                for (int c = 0; c < headers.Count; c++)
+                var value = (i < cells.Length) ? (cells[i] ?? "") : "";
+                if (string.IsNullOrEmpty(value))
                 {
-                    var cell = row.GetCell(c);
-                    string text = cell?.ToString()?.Trim() ?? string.Empty;
-                    if (!string.IsNullOrEmpty(text)) isAllEmpty = false;
-                    dict[headers[c]] = text;
+                    if (col.required && schema.validationLevel == ValidationLevel.Strict)
+                        throw new Exception($"Column '{col.name}' required but empty (Strict).");
+                    continue;
                 }
 
-                if (!isAllEmpty) rows.Add(dict);
+                switch (col.type)
+                {
+                    case ColumnType.Int:
+                        if (!int.TryParse(value, out _)) FailByLevel(schema, $"Column '{col.name}' expects Int, got '{value}'.");
+                        break;
+                    case ColumnType.Float:
+                        if (!float.TryParse(value, out _)) FailByLevel(schema, $"Column '{col.name}' expects Float, got '{value}'.");
+                        break;
+                    case ColumnType.Bool:
+                        if (!bool.TryParse(value, out _)) FailByLevel(schema, $"Column '{col.name}' expects Bool, got '{value}'.");
+                        break;
+                    case ColumnType.Flags:
+                        if (!int.TryParse(value, out _)) FailByLevel(schema, $"Column '{col.name}' expects Flags(Int), got '{value}'.");
+                        break;
+                    case ColumnType.String:
+                    case ColumnType.Enum:
+                    case ColumnType.Ref:
+                        break;
+                }
             }
-
-            Debug.Log($"[ExcelReader] Read {rows.Count} rows from '{sheetName}' ({Path.GetFileName(fullXlsxPath)})");
-            return rows;
         }
-    }
-}
-#endif
 
-/*
-[Unity 적용 가이드]
-- NPOI 설치 후(메뉴 Tools > NuGet > Manage NuGet Packages → NPOI, NPOI.OOXML) 자동으로 사용 가능.
-- Editor 전용이므로 #if UNITY_EDITOR 가드가 포함됨.
-*/
-```
-
-## Assets\SDProject\Scripts\ExcelImport\Data\CardData.cs
-```csharp
-
-using System;
-using UnityEngine;
-
-[Serializable]
-public struct CardData
-{
-    public string Id;         // Unique Id
-    public string Name;       // Display Name
-    public int Cost;          // Mana/Energy cost
-    public string Rarity;     // Common/Rare/Epic...
-    public string Tags;       // CSV tags (for quick demo)
-}
-```
-
-## Assets\SDProject\Scripts\ExcelImport\Data\CardDatabase.cs
-```csharp
-
-#if UNITY_EDITOR
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
-
-/// <summary>
-/// ScriptableObject sink for CardData (implements IExcelDataSink{CardData}).
-/// </summary>
-[CreateAssetMenu(fileName = "CardDatabase", menuName = "Game/Data/CardDatabase")]
-public class CardDatabase : ScriptableObject, IExcelDataSink<CardData>
-{
-    [SerializeField] private List<CardData> items = new List<CardData>();
-    public IReadOnlyList<CardData> Items => items;
-
-    public void Clear() => items.Clear();
-
-    public void AddRange(IEnumerable<CardData> add)
-    {
-        items.AddRange(add);
-    }
-
-    public void SaveDirty()
-    {
-        EditorUtility.SetDirty(this);
-        AssetDatabase.SaveAssets();
-    }
-
-    public Object AsUnityObject() => this;
-}
-#endif
-
-/*
-[Unity 적용 가이드]
-- Project 우클릭 → Create → Game/Data/CardDatabase 로 자산 생성.
-- 다른 테이블(캐릭터 등)도 동일 패턴으로 Database SO를 만들면 됨.
-*/
-```
-
-## Assets\SDProject\Scripts\ExcelImport\Editor\ExcelImporterWindow.cs
-```csharp
-
-#if UNITY_EDITOR
-using UnityEditor;
-using UnityEngine;
-
-public class ExcelImporterWindow : EditorWindow
-{
-    private ExcelImportConfig _config;
-    private Vector2 _scroll;
-    private string _logHint = "Ready.";
-
-    [MenuItem("Tools/Excel Importer")]
-    public static void Open()
-    {
-        GetWindow<ExcelImporterWindow>("Excel Importer");
-    }
-
-    private void OnGUI()
-    {
-        EditorGUILayout.LabelField("XLSX Import (NPOI)", EditorStyles.boldLabel);
-        _config = (ExcelImportConfig)EditorGUILayout.ObjectField("Import Config", _config, typeof(ExcelImportConfig), false);
-
-        EditorGUILayout.Space();
-        if (_config != null)
+        private static void FailByLevel(TableSchema schema, string message)
         {
-            EditorGUILayout.HelpBox($"XLSX: {_config.xlsxAssetPath}", MessageType.Info);
+            if (schema.validationLevel == ValidationLevel.Lenient) Debug.LogWarning($"[DataTable][Lenient] {message}");
+            else throw new Exception(message);
+        }
 
-            if (GUILayout.Button("Run Import"))
+        private static string ToCsvLine(IReadOnlyList<string> cells)
+        {
+            var sb = new StringBuilder();
+            for (int i = 0; i < cells.Count; i++)
             {
-                RunImport();
+                if (i > 0) sb.Append(',');
+                var s = cells[i] ?? "";
+                bool quote = s.Contains(",") || s.Contains("\"") || s.Contains("\n") || s.Contains("\r");
+                if (quote) sb.Append('"').Append(s.Replace("\"", "\"\"")).Append('"');
+                else sb.Append(s);
             }
-
-            _scroll = EditorGUILayout.BeginScrollView(_scroll, GUILayout.MinHeight(120));
-            EditorGUILayout.LabelField("Log:", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField(_logHint, EditorStyles.wordWrappedLabel);
-            EditorGUILayout.EndScrollView();
+            return sb.ToString();
         }
-        else
+
+        private static string HeaderHash(List<string> headers)
         {
-            EditorGUILayout.HelpBox("Assign an ExcelImportConfig asset.", MessageType.Warning);
+            var sorted = headers.OrderBy(h => h, StringComparer.Ordinal);
+            var text = string.Join("|", sorted);
+            using var sha1 = SHA1.Create();
+            var bytes = sha1.ComputeHash(Encoding.UTF8.GetBytes(text));
+            return BitConverter.ToString(bytes).Replace("-", "");
         }
-    }
 
-    private void RunImport()
-    {
-        if (_config == null) return;
-
-        // Wire events (temporary for window)
-        _config.events.OnProgress.RemoveAllListeners();
-        _config.events.OnCompleted.RemoveAllListeners();
-
-        _config.events.OnProgress.AddListener((msg) =>
+        private static string ToRelativeAssetPath(string absolute)
         {
-            _logHint = msg;
-            Repaint();
-        });
+            var p = absolute.Replace('\\', '/');
+            var idx = p.IndexOf("Assets/", StringComparison.Ordinal);
+            return (idx >= 0) ? p.Substring(idx) : p;
+        }
 
-        _config.events.OnCompleted.AddListener((ok, msg) =>
+        private static TableRegistry LoadRegistry()
         {
-            _logHint = (ok ? "SUCCESS: " : "FAILED: ") + msg;
-            Repaint();
-        });
+            var guids = AssetDatabase.FindAssets("t:SDProject.DataTable.TableRegistry");
+            if (guids.Length == 0) return null;
+            var path = AssetDatabase.GUIDToAssetPath(guids[0]);
+            return AssetDatabase.LoadAssetAtPath<TableRegistry>(path);
+        }
 
-        var sm = new ExcelImportStateMachine(_config);
-        sm.Start();
+        private static void TryHotReload()
+        {
+            if (!Application.isPlaying) return;
+            var loader = UnityEngine.Object.FindFirstObjectByType<DataTableLoader>();
+            if (loader != null) loader.Reload();
+        }
     }
 }
 #endif
-
-/*
-[Unity 적용 가이드]
-- 메뉴: Tools > Excel Importer
-- Import Config 할당 후 "Run Import" 버튼 클릭 → Console & 창 내부 로그 확인.
-- 필요 시 ScriptableObject 이벤트를 게임 내 TMP UI에 연결해도 됨(런타임 확인용).
-*/
 ```
 
-## Assets\SDProject\Scripts\ExcelImport\Mappers\CardRowMapper.cs
+## Assets\SDProject\Scripts\DataTable\Runtime\CsvLite.cs
 ```csharp
+using System.Collections.Generic;
+using System.Text;
 
-#if UNITY_EDITOR
-using SDProject.Data;
+namespace SDProject.DataTable
+{
+    public static class CsvLite
+    {
+        public struct CsvData
+        {
+            public List<string> headers;
+            public List<string[]> rows;
+        }
+
+        public static CsvData ParseWithHeader(string csv)
+        {
+            var data = new CsvData { headers = new List<string>(), rows = new List<string[]>() };
+            if (string.IsNullOrEmpty(csv)) return data;
+
+            var lines = SplitLines(csv);
+            if (lines.Count == 0) return data;
+
+            data.headers = ParseRow(lines[0]);
+
+            for (int i = 1; i < lines.Count; i++)
+            {
+                if (string.IsNullOrWhiteSpace(lines[i])) continue;
+                data.rows.Add(ParseRow(lines[i]).ToArray());
+            }
+            return data;
+        }
+
+        private static List<string> SplitLines(string text)
+        {
+            var list = new List<string>();
+            using (var reader = new System.IO.StringReader(text))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                    list.Add(line);
+            }
+            return list;
+        }
+
+        private static List<string> ParseRow(string line)
+        {
+            var cells = new List<string>();
+            if (line == null) return cells;
+
+            var sb = new StringBuilder();
+            bool inQuotes = false;
+
+            for (int i = 0; i < line.Length; i++)
+            {
+                char ch = line[i];
+                if (ch == '"')
+                {
+                    if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
+                    {
+                        sb.Append('"');
+                        i++;
+                    }
+                    else inQuotes = !inQuotes;
+                }
+                else if (ch == ',' && !inQuotes)
+                {
+                    cells.Add(sb.ToString());
+                    sb.Clear();
+                }
+                else sb.Append(ch);
+            }
+            cells.Add(sb.ToString());
+            return cells;
+        }
+    }
+}
+```
+
+## Assets\SDProject\Scripts\DataTable\Runtime\DataTableLoader.cs
+```csharp
+using System;
+using System.Collections;
+using System.Linq;
+using System.Reflection;
+using UnityEngine;
+
+namespace SDProject.DataTable
+{
+    public class DataTableLoader : MonoBehaviour
+    {
+        public enum LoadState { Idle, Loading, Completed, Failed }
+
+        [SerializeField] private TableRegistry registry;
+        [SerializeField] private LoadState state = LoadState.Idle;
+        [SerializeField] private int loadedCount;
+        [SerializeField] private string lastMessage;
+
+        public event Action<string> OnTableLoaded;
+        public event Action OnAllTablesLoaded;
+        public event Action<string> OnLoadFailed;
+
+        public LoadState State => state;
+        public int LoadedCount => loadedCount;
+
+        private void Awake()
+        {
+            if (registry == null)
+            {
+                Fail("Registry not assigned.");
+                return;
+            }
+            StartCoroutine(LoadAllRoutine());
+        }
+
+        public void Reload()
+        {
+            if (state == LoadState.Loading) return;
+            StartCoroutine(LoadAllRoutine());
+        }
+
+        private IEnumerator LoadAllRoutine()
+        {
+            SetState(LoadState.Loading, "Begin loading tables.");
+            loadedCount = 0;
+
+            var entries = registry.entries
+                .Where(e => e != null && e.enabled && !string.IsNullOrWhiteSpace(e.tableId))
+                .OrderBy(e => e.order);
+
+            foreach (var e in entries)
+            {
+                var key = DataTablePaths.GetResourcesKey(e.tableId);
+                var ta = Resources.Load<TextAsset>(key);
+                if (ta == null)
+                {
+                    Fail($"Missing generated TextAsset at Resources/{key}");
+                    yield break;
+                }
+
+                // Instantiate a specific TableAsset when available: {tableId}Table : TableAsset
+                var tableAsset = CreateTableAssetForId(e.tableId);
+                try
+                {
+                    tableAsset.Apply(ta.text);
+                    TableHub.Register(e.tableId, tableAsset);
+                    loadedCount++;
+                    Debug.Log($"[DataTableLoader] Loaded '{e.tableId}' into {tableAsset.GetType().Name}.");
+                    OnTableLoaded?.Invoke(e.tableId);
+                }
+                catch (Exception ex)
+                {
+                    Fail($"Apply failed for '{e.tableId}': {ex.Message}");
+                    yield break;
+                }
+
+                yield return null; // distribute frame cost
+            }
+
+            SetState(LoadState.Completed, $"Loaded {loadedCount} tables.");
+            OnAllTablesLoaded?.Invoke();
+        }
+
+        private TableAsset CreateTableAssetForId(string tableId)
+        {
+            var typeName = tableId + "Table";
+            var type = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(a => SafeTypes(a))
+                .FirstOrDefault(t => typeof(TableAsset).IsAssignableFrom(t) && t.Name == typeName);
+
+            var instance = (TableAsset)(type != null
+                ? ScriptableObject.CreateInstance(type)
+                : ScriptableObject.CreateInstance<GenericCsvTable>());
+
+            instance.name = typeName;
+            return instance;
+        }
+
+        private static Type[] SafeTypes(Assembly a)
+        {
+            try { return a.GetTypes(); } catch { return Array.Empty<Type>(); }
+        }
+
+        private void SetState(LoadState s, string message)
+        {
+            state = s;
+            lastMessage = message;
+            Debug.Log($"[DataTableLoader] State={s}. {message}");
+        }
+
+        private void Fail(string reason)
+        {
+            state = LoadState.Failed;
+            lastMessage = reason;
+            Debug.LogError($"[DataTableLoader] FAILED: {reason}");
+            OnLoadFailed?.Invoke(reason);
+        }
+    }
+}
+```
+
+## Assets\SDProject\Scripts\DataTable\Runtime\DataTablePaths.cs
+```csharp
+using UnityEngine;
+
+namespace SDProject.DataTable
+{
+    public static class DataTablePaths
+    {
+        // Authoring .xlsx location
+        public const string XlsxRoot = "Assets/SDProject/DataTable/Xlsx";
+
+        // Generated .csv/.json under Resources
+        // => Resources.Load<TextAsset>($"SDProject/DataTableGen/{tableId}")
+        public const string ResourcesGenRoot = "Assets/SDProject/DataTable/Resources/DataTableGen";
+        public const string ResourcesKeyPrefix = "DataTableGen/";
+
+        // Optional place to create schema/table assets
+        public const string SchemasRoot = "Assets/SDProject/DataTable/Schemas";
+        public const string TablesRoot = "Assets/SDProject/DataTable/Tables";
+
+        public static string GetXlsxPath(string tableId) =>
+            $"{XlsxRoot}/{tableId}.xlsx";
+
+        public static string GetGeneratedCsvPath(string tableId) =>
+            $"{ResourcesGenRoot}/{tableId}.csv";
+
+        public static string GetResourcesKey(string tableId) =>
+            $"{ResourcesKeyPrefix}{tableId}";
+    }
+}
+```
+
+## Assets\SDProject\Scripts\DataTable\Runtime\GenericCsvTable.cs
+```csharp
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Maps row dictionary -> CardData. Columns: Id, Name, Cost, Rarity, Tags
-/// </summary>
-[CreateAssetMenu(fileName = "CardRowMapper", menuName = "Game/Excel/RowMapper/Card")]
-public class CardRowMapper : ExcelRowMapperBase<CardData>
+namespace SDProject.DataTable
 {
-    public override bool TryMap(Dictionary<string, string> row, out CardData result)
+    [CreateAssetMenu(menuName = "SDProject/DataTable/Generic CSV Table", fileName = "GenericCsvTable")]
+    public class GenericCsvTable : TableAsset
     {
-        result = new CardData
-        {
-            Id = GetString(row, "Id"),
-            Name = GetString(row, "Name"),
-            Cost = GetInt(row, "Cost", 0),
-            Rarity = GetString(row, "Rarity"),
-            Tags = GetString(row, "Tags")
-        };
+        [SerializeField] private List<string> headers = new List<string>();
+        [SerializeField] private List<string[]> rows = new List<string[]>();
+        private Dictionary<string, int> headerIndex = new Dictionary<string, int>(StringComparer.Ordinal);
 
-        if (string.IsNullOrEmpty(result.Id))
+        public IReadOnlyList<string> Headers => headers;
+        public int RowCount => rows.Count;
+        public string Get(int row, string header)
         {
-            Debug.LogWarning("[CardRowMapper] Row skipped: Id is required.");
-            return false;
+            if (!headerIndex.TryGetValue(header, out var idx)) return string.Empty;
+            if (row < 0 || row >= rows.Count) return string.Empty;
+            var arr = rows[row];
+            return (idx >= 0 && idx < arr.Length) ? arr[idx] : string.Empty;
         }
-        return true;
+
+        public override void Apply(string rawText)
+        {
+            headers.Clear();
+            rows.Clear();
+            headerIndex.Clear();
+
+            var parsed = CsvLite.ParseWithHeader(rawText);
+            headers.AddRange(parsed.headers);
+            for (int i = 0; i < headers.Count; i++)
+                headerIndex[headers[i]] = i;
+
+            rows.AddRange(parsed.rows);
+            Debug.Log($"[GenericCsvTable] Applied. Rows={rows.Count}, Cols={headers.Count}");
+        }
     }
 }
-#endif
+```
 
-/*
-[Unity 적용 가이드]
-- Project 우클릭 → Create → Game/Excel/RowMapper/Card 로 매퍼 생성.
-- 시트 컬럼명과 정확히 일치해야 함(Id/Name/Cost/Rarity/Tags). 엑셀 헤더를 맞춰주세요.
-*/
+## Assets\SDProject\Scripts\DataTable\Runtime\TableAsset.cs
+```csharp
+using UnityEngine;
+
+namespace SDProject.DataTable
+{
+    public abstract class TableAsset : ScriptableObject
+    {
+        [TextArea][SerializeField] private string debugNote;
+        public virtual string DebugNote => debugNote;
+
+        /// Apply raw text (CSV/JSON/etc) into internal structures.
+        public abstract void Apply(string rawText);
+    }
+}
+```
+
+## Assets\SDProject\Scripts\DataTable\Runtime\TableHub.cs
+```csharp
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace SDProject.DataTable
+{
+    public static class TableHub
+    {
+        private static readonly Dictionary<string, TableAsset> _tables =
+            new Dictionary<string, TableAsset>(StringComparer.Ordinal);
+
+        public static void Register(string tableId, TableAsset asset)
+        {
+            _tables[tableId] = asset;
+        }
+
+        public static TableAsset Get(string tableId)
+        {
+            _tables.TryGetValue(tableId, out var a);
+            return a;
+        }
+
+        public static T Get<T>(string tableId) where T : TableAsset
+        {
+            var a = Get(tableId);
+            return a as T;
+        }
+
+        public static IReadOnlyDictionary<string, TableAsset> All => _tables;
+    }
+}
 ```
 
 ## Assets\SDProject\Scripts\UI\BattleHUD.cs
