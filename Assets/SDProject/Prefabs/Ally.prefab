@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 7364509439345286486}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 785.14294, y: 423.21472, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -78,18 +78,18 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_SortingLayerID: 544982795
+  m_SortingLayer: 2
+  m_SortingOrder: 10
+  m_Sprite: {fileID: 7482667652216324306, guid: da3446031ece57743a60c6aaaeb52f85, type: 3}
+  m_Color: {r: 0, g: 0, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &1657769299174782803
@@ -105,9 +105,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SDProject.Combat::SDProject.Combat.Cards.SimpleUnit
   Team: 0
-  Index: 0
+  Index: -1
   MaxHp: 30
-  CurrentHp: 0
+  CurrentHp: 3
   CurrentSlot: {fileID: 0}
 --- !u!114 &3137794839092094020
 MonoBehaviour:
@@ -123,3 +123,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: SDProject.Combat::SDProject.Combat.Cards.SimpleUnitBinder
   team: 0
   index: -1
+  waitOneFrame: 1
+  snapToMount: 1

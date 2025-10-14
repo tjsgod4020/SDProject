@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using UnityEngine;
 using SDProject.Core.FSM;
+using SDProject.Core.Messaging;   // GameEvents only
+using SDProject.Core;            // TurnPhase enum 등 (프로젝트 네임스페이스에 맞춰 사용)
 using SDProject.Data;
-using SDProject.Core.Messaging;   // ← 이벤트만 사용
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -22,9 +23,12 @@ namespace SDProject.Combat
 
         private void Awake()
         {
-            var hand = Object.FindFirstObjectByType<HandRuntime>(FindObjectsInactive.Include);
-            var deck = Object.FindFirstObjectByType<DeckRuntime>(FindObjectsInactive.Include);
-            _hand.OnUsed += OnCardUsed;
+            // 인스펙터에 없으면 Find로 보강(있으면 보존)
+            if (!_hand) _hand = Object.FindFirstObjectByType<HandRuntime>(FindObjectsInactive.Include);
+            if (!_deck) _deck = Object.FindFirstObjectByType<DeckRuntime>(FindObjectsInactive.Include);
+
+            if (_hand != null)
+                _hand.OnUsed += OnCardUsed;
 
             _fsm = new StateMachine();
             _stPlayer = new StPlayerTurn(this);
@@ -35,7 +39,12 @@ namespace SDProject.Combat
         }
 
         private void Start() => StartCoroutine(BootFSMNextFrame());
-        private IEnumerator BootFSMNextFrame() { yield return null; _fsm.SetState(_stPlayer); }
+        private IEnumerator BootFSMNextFrame()
+        {
+            yield return null;
+            _fsm.SetState(_stPlayer);
+        }
+
         private void Update() => _fsm.Tick(Time.deltaTime);
 
         private bool SpacePressed()
@@ -49,14 +58,20 @@ namespace SDProject.Combat
         }
 
         // ── 턴 훅 ──────────────────────────────────────────────────────────────
-        public void OnPlayerTurnEnter() => DrawNewHand();
+        public void OnPlayerTurnEnter()
+        {
+            GameEvents.RaiseTurnPhaseChanged(TurnPhase.Player); // HUD 동기화
+            DrawNewHand();
+        }
 
         public void OnPlayerTurnExit()
         {
             if (_deck == null || _hand == null) return;
-            var rest = _hand.TakeAll();
-            _deck.Discard(rest);
-            // HandRuntime가 내부에서 GameEvents.RaiseHandChanged 호출함
+
+            var rest = _hand.TakeAll();        // 손패 싹 비우기
+            _deck.Discard(rest);               // 남은 손패 전부 버림
+            // HandRuntime/DeckRuntime이 내부에서 이벤트를 쏘지 않는 경우 대비해 보강 통지
+            GameEvents.RaiseHandChanged(_hand.Count);
             GameEvents.RaiseDeckChanged(_deck.DrawCount, _deck.DiscardCount);
         }
 
@@ -69,11 +84,14 @@ namespace SDProject.Combat
             }
 
             _hand.Clear();
-            var drawn = _deck.Draw(_deck.DrawPerTurn);
-            var added = _hand.AddCards(drawn, _deck.HandMax);
+
+            // 프로젝트 API에 맞춰 호출(아래 함수명들은 샘플, 레포 시그니처에 맞춰 사용)
+            var drawn = _deck.Draw(_deck.DrawPerTurn);        // List<CardData>
+            var added = _hand.AddCards(drawn, _deck.HandMax); // 실제 추가된 수
+
             Debug.Log($"[Battle] Draw request={_deck.DrawPerTurn}, returned={drawn.Count}, added={added}, now hand={_hand.Count}");
 
-            // UI로 알림만 보냄
+            // HUD/카운터 동기화(내부에서 이미 쏜다면 중복 아님: GameEvents는 idempotent하게 설계 권장)
             GameEvents.RaiseHandChanged(_hand.Count);
             GameEvents.RaiseDeckChanged(_deck.DrawCount, _deck.DiscardCount);
         }
@@ -93,21 +111,42 @@ namespace SDProject.Combat
             private readonly BattleController c;
             public bool IsFinished { get; private set; }
             public StEnemyTurn(BattleController ctx) => c = ctx;
-            public void Enter() { Debug.Log("[Battle] EnemyTurn..."); IsFinished = false; c.StartCoroutine(CoEnemy()); }
-            private IEnumerator CoEnemy() { yield return new WaitForSeconds(1f); IsFinished = true; }
+
+            public void Enter()
+            {
+                Debug.Log("[Battle] EnemyTurn...");
+                GameEvents.RaiseTurnPhaseChanged(TurnPhase.Enemy); // HUD 동기화
+                IsFinished = false;
+                c.StartCoroutine(CoEnemy());
+            }
+
+            private IEnumerator CoEnemy()
+            {
+                yield return new WaitForSeconds(1f);
+                IsFinished = true;
+            }
+
             public void Tick(float dt) { }
             public void Exit() { }
         }
 
         private void OnDestroy()
         {
-            if (_hand != null) _hand.OnUsed -= OnCardUsed;
+            if (_hand != null)
+                _hand.OnUsed -= OnCardUsed;
         }
 
-        private void OnCardUsed(SDProject.Data.CardData card)
+        private void OnCardUsed(CardData card)
         {
-            // 카드를 실제로 '버림 더미'로 이동
-            _deck.Discard(card);
+            if (_deck == null || card == null) return;
+
+            // ⚠️ 프로젝트 규칙 확인:
+            // - HandRuntime.Use가 이미 버림까지 처리하면, 아래 Discard는 제거하세요.
+            //_deck.Discard(card);
+
+            // HUD 동기화 보강
+            GameEvents.RaiseHandChanged(_hand?.Count ?? 0);
+            GameEvents.RaiseDeckChanged(_deck.DrawCount, _deck.DiscardCount);
         }
     }
 }

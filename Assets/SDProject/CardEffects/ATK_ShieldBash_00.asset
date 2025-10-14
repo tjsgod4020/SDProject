@@ -27,4 +27,6 @@ MonoBehaviour:
   Upgradable: 1
   UpgradeStep: 0
   UpgradeRefId: 
-  Effects: []
+  Effects:
+  - {fileID: 11400000, guid: a839f06945d26c44089b8d73e461a7a4, type: 2}
+  - {fileID: 11400000, guid: e14db17236d9c954e88dab9c6a2d8aa3, type: 2}

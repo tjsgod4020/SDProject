@@ -14,8 +14,8 @@ namespace SDProject.Combat.Board
         public bool assignAtRuntime = true;
 
         [Header("Identity (assignAtRuntime=false일 때만 사용)")]
-        public TeamSide team = TeamSide.Ally; // ★ TeamSide는 기존 정의를 재사용합니다(중복 정의 금지).
-        public int index = 0;
+        public TeamSide Team = TeamSide.Ally; // ★ TeamSide는 기존 정의를 재사용합니다(중복 정의 금지).
+        public int Index = 0;
 
         [Header("Mount (유닛 스냅 지점)")]
         [Tooltip("유닛이 이 슬롯에 있을 때 위치를 맞출 기준 Transform입니다. 없으면 슬롯 Transform을 사용합니다.")]
@@ -26,8 +26,8 @@ namespace SDProject.Combat.Board
         /// </summary>
         public void Configure(TeamSide newTeam, int newIndex)
         {
-            team = newTeam;
-            index = newIndex;
+            Team = newTeam;
+            Index = newIndex;
         }
 
 #if UNITY_EDITOR
