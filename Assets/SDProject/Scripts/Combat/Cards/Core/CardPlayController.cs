@@ -1,199 +1,97 @@
-using System;
-using System.Linq;
+// Assets/SDProject/Scripts/Combat/Cards/Core/CardPlayController.cs
 using UnityEngine;
-using UnityEngine.Events;
+using TMPro;
+using SDProject.Data;
 using SDProject.Combat.Board;
 
 namespace SDProject.Combat.Cards
 {
-    [DisallowMultipleComponent]
-    public class CardPlayController : MonoBehaviour
+    /// <summary>
+    /// v1 미니멀: 카드 클릭 → 전열(Front-most) 적 1명 자동 타겟 → 사용 처리.
+    /// - CardData 스키마: cardId, displayName, apCost 만 사용
+    /// - BoardRuntime: GetFrontMostEnemyUnit() 만 사용
+    /// - 타겟팅/효과/JSON/레인필터는 이후 단계에서 확장
+    /// </summary>
+    public sealed class CardPlayController : MonoBehaviour
     {
         [Header("Refs")]
-        public BoardRuntime Board;
-        public TargetingSystem Targeting;
+        [SerializeField] private BoardRuntime _board;     // 전열 적 찾기에 필요
+        [SerializeField] private HandRuntime _hand;       // 사용 처리(손패에서 제거)
 
-        [Header("Events (v1: fixed text)")]
-        public UnityEvent OnCardPlayStarted;
-        public UnityEvent OnCardPlayFinished;
-        public UnityEvent<string> OnHint;
-        public UnityEvent<string> OnErrorLabel;
+        [Header("UI (optional)")]
+        [SerializeField] private TMP_Text _errorLabel;    // 간단 에러 라벨(v1 고정문구)
 
-        [Header("Debug")]
-        [SerializeField] private string _state = "Idle";
-
-        private IState _st;
-
-        private void Awake() => TransitionTo(new IdleState(this));
-
-        public void PlayCard(CardDefinition card, GameObject caster)
+        private void Awake()
         {
-            if (!card || !caster) { Debug.LogWarning("[CardPlay] Missing refs."); return; }
-            OnCardPlayStarted?.Invoke();
-            TransitionTo(new SelectingTargetsState(this, card, caster));
+            if (_board == null) _board = FindFirstObjectByType<BoardRuntime>(FindObjectsInactive.Include);
+            if (_hand == null) _hand = FindFirstObjectByType<HandRuntime>(FindObjectsInactive.Include);
         }
 
-        private void TransitionTo(IState next)
+        /// <summary>
+        /// CardView.OnClick() 에서 호출됨.
+        /// </summary>
+        public void PlayCard(CardData card, GameObject caster)
         {
-            _st?.Exit();
-            _st = next;
-            _state = _st.GetType().Name;
-            Debug.Log($"[FSM] -> {_state}");
-            _st.Enter();
-        }
+            ClearError();
 
-        // ===== States =====
-        interface IState { void Enter(); void Exit(); }
-
-        class IdleState : IState
-        {
-            private readonly CardPlayController c;
-            public IdleState(CardPlayController c) => this.c = c;
-            public void Enter() { }
-            public void Exit() { }
-        }
-
-        class SelectingTargetsState : IState
-        {
-            private readonly CardPlayController c;
-            private readonly CardDefinition card;
-            private readonly GameObject caster;
-
-            public SelectingTargetsState(CardPlayController c, CardDefinition card, GameObject caster)
-            { this.c = c; this.card = card; this.caster = caster; }
-
-            public void Enter()
+            if (card == null || caster == null)
             {
-                // Enabled?
-                if (!card.Enabled)
-                {
-                    c.EmitError(ErrorLabel.ERR_UNIT_DISABLED, "Card disabled.");
-                    c.TransitionTo(new DoneState(c));
-                    return;
-                }
-
-                // AP?
-                var ap = caster.GetComponent<IApConsumer>();
-                if (ap != null && !ap.TryConsumeAp(card.Cost))
-                {
-                    c.EmitError(ErrorLabel.ERR_AP_LACK, "Not enough AP.");
-                    c.TransitionTo(new DoneState(c));
-                    return;
-                }
-
-                // PosUse?
-                var su = caster.GetComponent<SimpleUnit>();
-                if (su == null) { c.EmitError(ErrorLabel.ERR_UNIT_DISABLED, "Caster invalid."); c.TransitionTo(new DoneState(c)); return; }
-
-                var casterLane = PositionResolver.ToLane(su.Team, su.Index);
-                if (!PositionResolver.LaneMatches(casterLane, card.PosUse))
-                {
-                    c.EmitError(ErrorLabel.ERR_POSUSE_MISMATCH, "Position not allowed.");
-                    c.TransitionTo(new DoneState(c));
-                    return;
-                }
-
-                switch (card.TargetType)
-                {
-                    case TargetType.EnemyFrontMost:
-                        var auto = c.FilterByPosHit(c.Targeting.AutoPickFrontMostEnemy(), card);
-                        c.TryResolveOrAbort(card, caster, auto);
-                        break;
-
-                    case TargetType.SingleManual:
-                        c.Targeting.OnTargetSelectionProvided.AddListener(OnManual);
-                        c.Targeting.OnTargetSelectionRequested.Invoke(card.TargetType);
-                        c.OnHint?.Invoke("Tap a valid target.");
-                        break;
-
-                    default:
-                        c.EmitError(ErrorLabel.ERR_NO_TARGET, $"Not implemented: {card.TargetType}");
-                        c.TransitionTo(new DoneState(c));
-                        break;
-                }
-            }
-
-            private void OnManual(GameObject[] picks)
-            {
-                c.Targeting.OnTargetSelectionProvided.RemoveListener(OnManual);
-                var filtered = c.FilterByPosHit(picks, card);
-                c.TryResolveOrAbort(card, caster, filtered);
-            }
-
-            public void Exit() => c.Targeting.OnTargetSelectionProvided.RemoveListener(OnManual);
-        }
-
-        class ResolvingState : IState
-        {
-            private readonly CardPlayController c;
-            private readonly CardDefinition card;
-            private readonly GameObject caster;
-            private readonly GameObject[] targets;
-
-            public ResolvingState(CardPlayController c, CardDefinition card, GameObject caster, GameObject[] targets)
-            { this.c = c; this.card = card; this.caster = caster; this.targets = targets ?? Array.Empty<GameObject>(); }
-
-            public void Enter()
-            {
-                Debug.Log($"[CardPlay] Resolving {card.Id} x{targets.Length}");
-                var ctx = new CardEffectContext(caster, targets, c.Board);
-
-                foreach (var so in card.Effects)
-                {
-                    if (so is ICardEffect eff) eff.Execute(ctx);
-                    else Debug.LogWarning($"[CardPlay] Effect not ICardEffect: {so?.name}");
-                }
-
-                c.TransitionTo(new DoneState(c));
-            }
-
-            public void Exit() { }
-        }
-
-        class DoneState : IState
-        {
-            private readonly CardPlayController c;
-            public DoneState(CardPlayController c) => this.c = c;
-            public void Enter()
-            {
-                Debug.Log("[CardPlay] Finished.");
-                c.OnCardPlayFinished?.Invoke();
-                c.TransitionTo(new IdleState(c));
-            }
-            public void Exit() { }
-        }
-
-        // ===== Helpers =====
-
-        private void TryResolveOrAbort(CardDefinition card, GameObject caster, GameObject[] rawTargets)
-        {
-            var filtered = FilterByPosHit(rawTargets, card);
-            if (filtered == null || filtered.Length == 0)
-            {
-                EmitError(ErrorLabel.ERR_NO_TARGET, "No valid targets.");
-                TransitionTo(new DoneState(this));
+                EmitError("사용 조건 불일치");
+                Debug.LogWarning("[CardPlay] Null card/caster.");
                 return;
             }
-            TransitionTo(new ResolvingState(this, card, caster, filtered));
-        }
 
-        private GameObject[] FilterByPosHit(GameObject[] raw, CardDefinition card)
-        {
-            if (raw == null || raw.Length == 0) return Array.Empty<GameObject>();
-
-            return raw.Where(t =>
+            if (_board == null)
             {
-                var loc = Board.GetUnitLocation(t);
-                if (loc == null) return false;
-                var lane = PositionResolver.ToLane(loc.Value.team, loc.Value.index);
-                return PositionResolver.LaneMatches(lane, card.PosHit);
-            }).ToArray();
+                EmitError("보드 없음");
+                Debug.LogWarning("[CardPlay] BoardRuntime missing.");
+                return;
+            }
+
+            // v1: 전열(Front-most) 적 자동 선택
+            var target = _board.GetFrontMostEnemyUnit();
+            if (target == null)
+            {
+                EmitError("대상 없음");
+                Debug.LogWarning("[CardPlay] No front-most enemy found.");
+                return;
+            }
+
+            // (추가 효과/데미지 시스템이 아직 없으므로) 로그만 남김
+            Debug.Log($"[CardPlay] '{(string.IsNullOrEmpty(card.displayName) ? card.name : card.displayName)}' AP:{card.apCost} → Target:{target.name}");
+
+            // 손패에서 제거(버림 처리는 BattleController에서 HandRuntime.OnUsed를 구독해 Discard로 이동시키는 구조 권장)
+            if (_hand != null)
+            {
+                _hand.MarkUsed(card);
+            }
+
         }
 
-        private void EmitError(ErrorLabel code, string uiText)
+        private void EmitError(string msg)
         {
-            Debug.LogWarning($"[CardPlay][{code}] {uiText}");
-            OnErrorLabel?.Invoke(uiText); // v1: 고정 텍스트
+            if (_errorLabel) _errorLabel.text = msg;
         }
+
+        private void ClearError()
+        {
+            if (_errorLabel) _errorLabel.text = string.Empty;
+        }
+    }
+
+    /// <summary>
+    /// TurnPhase enum 값이 프로젝트마다 달라도 안전하게 이벤트를 발행하기 위한 헬퍼.
+    /// </summary>
+    internal static class TurnPhaseEventHelper
+    {
+        /*public static void RaiseTurnPhaseChangedLabelSafe(this GameEvents _, string label)
+        {
+            // enum이 있으면 써주고, 없으면 조용히 스킵
+            if (System.Enum.TryParse<SDProject.Core.TurnPhase>(label, out var phase))
+            {
+                GameEvents.RaiseTurnPhaseChanged(phase);
+            }
+        }
+        */
     }
 }

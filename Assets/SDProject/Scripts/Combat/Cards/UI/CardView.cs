@@ -1,45 +1,81 @@
+// Assets/SDProject/Scripts/Combat/Cards/UI/CardView.cs
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using SDProject.Data;
 
 namespace SDProject.Combat.Cards
 {
-    public class CardView : MonoBehaviour
+    /// <summary>
+    /// Single card UI. Binds CardData and relays click to CardPlayController.
+    /// Safe-guards:
+    /// - Button.onClick is auto-wired in Awake.
+    /// - Texts set raycastTarget=false (won't swallow clicks).
+    /// - OnClick() falls back to BoardRuntime to fetch a caster if missing.
+    /// </summary>
+    [DisallowMultipleComponent]
+    public sealed class CardView : MonoBehaviour
     {
-        public CardDefinition Card;
-        public TextMeshProUGUI TitleText;
-        public TextMeshProUGUI CostText;
-        public TextMeshProUGUI DescText;
-        public Button PlayButton;
+        [Header("UI")]
+        [SerializeField] private TMP_Text _title;
+        [SerializeField] private TMP_Text _ap;
+        [SerializeField] private Image _typeIcon; // optional
 
-        [Header("Runtime")]
-        public CardPlayController PlayController;
-        public GameObject Caster; // who plays the card
+        // Runtime
+        private CardData _card;
+        private GameObject _caster;
+        private CardPlayController _play;
+
+        /// <summary>Legacy-friendly external injector.</summary>
+        public GameObject Caster
+        {
+            get => _caster;
+            set => _caster = value;
+        }
 
         private void Awake()
         {
-            if (PlayButton) PlayButton.onClick.AddListener(OnClickPlay);
+            // Auto-wire button
+            var btn = GetComponent<Button>();
+            if (btn != null)
+            {
+                btn.onClick.RemoveAllListeners();
+                btn.onClick.AddListener(OnClick);
+            }
+
+            if (_title) _title.raycastTarget = false;
+            if (_ap) _ap.raycastTarget = false;
         }
 
-        private void Start() => Refresh();
-
-        public void Refresh()
+        /// <summary>Bind all runtime references.</summary>
+        public void Bind(CardData card, GameObject caster, CardPlayController play)
         {
-            if (!Card) return;
-            if (TitleText) TitleText.SetText(string.IsNullOrEmpty(Card.NameId) ? Card.Id : Card.NameId);
-            if (CostText) CostText.SetText(Card.Cost.ToString());
-            if (DescText) DescText.SetText(string.IsNullOrEmpty(Card.DescId) ? "-" : Card.DescId);
+            _card = card;
+            _caster = caster;
+            _play = play;
+
+            if (_title) _title.text = string.IsNullOrEmpty(card.displayName) ? card.name : card.displayName;
+            if (_ap) _ap.text = card.apCost.ToString();
         }
 
-        private void OnClickPlay()
+        /// <summary>UI button callback.</summary>
+        public void OnClick()
         {
-            if (!Card || !PlayController || !Caster)
+            // Last-chance fallback for caster
+            if (_caster == null)
+            {
+                var board = FindFirstObjectByType<SDProject.Combat.Board.BoardRuntime>(FindObjectsInactive.Include);
+                _caster = board?.GetFirstAllyUnit();
+            }
+
+            Debug.Log($"[CardView] Click '{_card?.displayName}', play={_play != null}, caster={_caster != null}");
+            if (_card == null || _play == null || _caster == null)
             {
                 Debug.LogWarning("[CardView] Missing Card/PlayController/Caster.");
                 return;
             }
-            Debug.Log($"[CardView] Play {Card.Id}");
-            PlayController.PlayCard(Card, Caster);
+
+            _play.PlayCard(_card, _caster);
         }
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using SDProject.Combat.Board;
 
 namespace SDProject.Combat.Cards
 {

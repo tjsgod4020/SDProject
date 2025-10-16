@@ -1,5 +1,6 @@
 using UnityEngine;
 
+
 namespace SDProject.Combat.Board
 {
     /// <summary>
@@ -44,7 +45,7 @@ namespace SDProject.Combat.Board
             BuildEnemySlots();
 
             // ¡Ú One-line reinforcement: after slots are created, ask BoardRuntime to rescan immediately.
-            UnityEngine.Object.FindFirstObjectByType<SDProject.Combat.Cards.BoardRuntime>(FindObjectsInactive.Include)?.RefreshFromScene();
+            UnityEngine.Object.FindFirstObjectByType<SDProject.Combat.Board.BoardRuntime>(FindObjectsInactive.Include)?.RefreshFromScene();
         }
 
         private void BuildAllySlots()
