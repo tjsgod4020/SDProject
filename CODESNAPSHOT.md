@@ -1,5 +1,107 @@
-﻿# Code Snapshot - 2025-10-13 19:00:00
-Commit: 13cd1c4
+﻿# Code Snapshot - 2025-10-16 15:00:00
+Commit: b92c4dc
+
+## Assets\SDProject\Scripts\Bootstrap\UnitAutoSpawner.cs
+```csharp
+using System.Collections;
+using System.Linq;
+using UnityEngine;
+using SDProject.Combat.Board; // TeamSide, CharacterSlot
+
+namespace SDProject.Boot
+{
+    /// <summary>
+    /// 보드의 슬롯을 스캔하여 Ally/Enemy 유닛을 자동 스폰.
+    /// - BoardLayout가 슬롯을 만든 뒤에 동작하도록 1프레임 대기.
+    /// - count=-1 이면 슬롯 전부 채움.
+    /// - 유닛 프리팹에 SimpleUnitBinder가 있으면 팀/인덱스를 세팅하고 Rebind.
+    /// </summary>
+    public class UnitAutoSpawner : MonoBehaviour
+    {
+        [Header("Prefabs")]
+        [SerializeField] private GameObject _allyPrefab;
+        [SerializeField] private GameObject _enemyPrefab;
+
+        [Header("Counts (-1 = fill all slots)")]
+        [SerializeField] private int _allyCount = -1;
+        [SerializeField] private int _enemyCount = -1;
+
+        [Header("Parents (optional)")]
+        [SerializeField] private Transform _allyParent;
+        [SerializeField] private Transform _enemyParent;
+
+        [Header("Clear Before Spawn")]
+        [SerializeField] private bool _clearExistingAllies = true;
+        [SerializeField] private bool _clearExistingEnemies = true;
+
+        private void OnEnable() => StartCoroutine(CoSpawn());
+
+        private IEnumerator CoSpawn()
+        {
+            // BoardLayout/BoardRuntime가 초기화될 시간을 준다.
+            yield return null;
+
+            if (_clearExistingAllies) ClearUnits(TeamSide.Ally);
+            if (_clearExistingEnemies) ClearUnits(TeamSide.Enemy);
+
+            SpawnTeam(TeamSide.Ally, _allyPrefab, _allyCount, _allyParent);
+            SpawnTeam(TeamSide.Enemy, _enemyPrefab, _enemyCount, _enemyParent);
+        }
+
+        private void SpawnTeam(TeamSide team, GameObject prefab, int count, Transform parent)
+        {
+            if (!prefab)
+            {
+                Debug.Log($"[UnitAutoSpawner] Skip {team}: prefab missing.");
+                return;
+            }
+
+            var slots = FindObjectsByType<CharacterSlot>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+                        .Where(s => s && s.Team == team)
+                        .OrderBy(s => s.Index)
+                        .ToList();
+
+            if (slots.Count == 0)
+            {
+                Debug.LogWarning($"[UnitAutoSpawner] No slots for {team}.");
+                return;
+            }
+
+            int target = (count < 0) ? slots.Count : Mathf.Min(count, slots.Count);
+
+            for (int i = 0; i < target; i++)
+            {
+                var slot = slots[i];
+                var pos = slot.mount ? slot.mount.position : slot.transform.position;
+                var rot = slot.mount ? slot.mount.rotation : slot.transform.rotation;
+                var par = parent ? parent : slot.transform.parent;
+
+                var go = Instantiate(prefab, pos, rot, par);
+                go.name = $"{team}_Unit_{i}";
+
+                // Binder 있으면 팀/인덱스 세팅 후 즉시 바인드
+                var binder = go.GetComponent<SDProject.Combat.SimpleUnitBinder>();
+                if (binder != null)
+                {
+                    binder.SetBinding(team, slot.Index, rebind: true);
+                }
+            }
+
+            Debug.Log($"[UnitAutoSpawner] Spawned {target} {team} unit(s).");
+        }
+
+        private void ClearUnits(TeamSide team)
+        {
+            var binders = FindObjectsByType<SDProject.Combat.SimpleUnitBinder>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+                          .Where(b => b != null && b.Team == team);
+            foreach (var b in binders)
+            {
+                if (b) Destroy(b.gameObject);
+            }
+        }
+    }
+}
+```
 
 ## Assets\SDProject\Scripts\Combat\Board\BoardLayout.cs
 ```csharp
@@ -8,27 +110,27 @@ using UnityEngine;
 namespace SDProject.Combat.Board
 {
     /// <summary>
-    /// 슬롯을 런타임에 생성/배치하고, 각 슬롯에 팀/인덱스를 부여합니다(A안).
-    /// - 공용 Slot 프리팹 1개만 사용 가능(CharacterSlot.assignAtRuntime=true 권장).
-    /// - 유닛 스폰은 책임에서 제외(SRP). 유닛은 다른 시스템에서 스폰/바인딩하세요.
+    /// Creates and places slots at runtime and assigns Team/Index (Plan A).
+    /// - Uses a single shared Slot prefab (with CharacterSlot). Recommended: assignAtRuntime=true.
+    /// - Spawning/binding units is out of scope (SRP). Other systems should handle units.
     /// </summary>
     public class BoardLayout : MonoBehaviour
     {
         [Header("Common Slot Prefab")]
-        [Tooltip("CharacterSlot 컴포넌트가 포함된 공용 슬롯 프리팹")]
+        [Tooltip("A shared slot prefab that contains CharacterSlot component.")]
         public GameObject slotPrefab;
 
         [Header("Ally Layout (4 lanes)")]
         public int allySlotCount = 4;                    // Back(0), Mid2(1), Mid1(2), Front(3)
         public Vector3 allyStart = new Vector3(-6f, 0f, 0f);
         public float allyGap = 1.8f;
-        public Transform allyRoot;                       // 슬롯들을 담을 부모(없으면 this)
+        public Transform allyRoot;                       // Parent for ally slots (defaults to this)
 
         [Header("Enemy Layout (5 lanes)")]
         public int enemySlotCount = 5;                   // Front(0), Mid1(1), Mid2(2), Mid3(3), Back(4)
         public Vector3 enemyStart = new Vector3(6f, 0f, 0f);
-        public float enemyGap = 1.8f;                    // 오른쪽에서 왼쪽으로 배치하려면 음수 transform을 써도 되고, 좌표만 조정해도 됩니다.
-        public Transform enemyRoot;                      // 슬롯들을 담을 부모(없으면 this)
+        public float enemyGap = 1.8f;                    // Place from right to left by using -enemyGap in X
+        public Transform enemyRoot;                      // Parent for enemy slots (defaults to this)
 
         [Header("Naming")]
         public string allyNamePrefix = "Ally_";
@@ -47,13 +149,16 @@ namespace SDProject.Combat.Board
 
             BuildAllySlots();
             BuildEnemySlots();
+
+            // ★ One-line reinforcement: after slots are created, ask BoardRuntime to rescan immediately.
+            UnityEngine.Object.FindFirstObjectByType<SDProject.Combat.Cards.BoardRuntime>(FindObjectsInactive.Include)?.RefreshFromScene();
         }
 
         private void BuildAllySlots()
         {
             for (int i = 0; i < allySlotCount; i++)
             {
-                // 좌 -> 우로 배치: Back(0) → Mid2(1) → Mid1(2) → Front(3)
+                // Left -> Right: Back(0) → Mid2(1) → Mid1(2) → Front(3)
                 Vector3 pos = allyStart + new Vector3(i * allyGap, 0f, 0f);
                 var go = Instantiate(slotPrefab, pos, Quaternion.identity, allyRoot);
                 go.name = $"{allyNamePrefix}{i}";
@@ -65,10 +170,10 @@ namespace SDProject.Combat.Board
                     continue;
                 }
 
-                // 런타임 팀/인덱스 확정
+                // Assign team/index at runtime
                 slot.Configure(TeamSide.Ally, i);
 
-                // mount가 비어있으면 슬롯 Transform 자체를 기준으로 사용(선택)
+                // Default mount fallback
                 if (!slot.mount) slot.mount = slot.transform;
             }
         }
@@ -77,8 +182,7 @@ namespace SDProject.Combat.Board
         {
             for (int i = 0; i < enemySlotCount; i++)
             {
-                // 좌 -> 우로 배치하되, 기획 우선순위는 Front(0) → Mid1(1) → Mid2(2) → Mid3(3) → Back(4)
-                // 기본값: enemyStart에서 왼쪽으로 진행하려면 x에 -enemyGap를 곱하거나, start를 오른쪽에 두고 양수 gap으로 왼쪽 이동시켜도 됩니다.
+                // Place from right to left in world space: Front(0) → Mid1(1) → Mid2(2) → Mid3(3) → Back(4)
                 Vector3 pos = enemyStart + new Vector3(i * -enemyGap, 0f, 0f);
                 var go = Instantiate(slotPrefab, pos, Quaternion.identity, enemyRoot);
                 go.name = $"{enemyNamePrefix}{i}";
@@ -90,10 +194,10 @@ namespace SDProject.Combat.Board
                     continue;
                 }
 
-                // 런타임 팀/인덱스 확정
+                // Assign team/index at runtime
                 slot.Configure(TeamSide.Enemy, i);
 
-                // mount 기본값 처리
+                // Default mount fallback
                 if (!slot.mount) slot.mount = slot.transform;
             }
         }
@@ -119,8 +223,8 @@ namespace SDProject.Combat.Board
         public bool assignAtRuntime = true;
 
         [Header("Identity (assignAtRuntime=false일 때만 사용)")]
-        public TeamSide team = TeamSide.Ally; // ★ TeamSide는 기존 정의를 재사용합니다(중복 정의 금지).
-        public int index = 0;
+        public TeamSide Team = TeamSide.Ally; // ★ TeamSide는 기존 정의를 재사용합니다(중복 정의 금지).
+        public int Index = 0;
 
         [Header("Mount (유닛 스냅 지점)")]
         [Tooltip("유닛이 이 슬롯에 있을 때 위치를 맞출 기준 Transform입니다. 없으면 슬롯 Transform을 사용합니다.")]
@@ -131,8 +235,8 @@ namespace SDProject.Combat.Board
         /// </summary>
         public void Configure(TeamSide newTeam, int newIndex)
         {
-            team = newTeam;
-            index = newIndex;
+            Team = newTeam;
+            Index = newIndex;
         }
 
 #if UNITY_EDITOR
@@ -195,6 +299,8 @@ namespace SDProject.Combat.Board
 
 ## Assets\SDProject\Scripts\Combat\Cards\Board\BoardRuntime.cs
 ```csharp
+// Assets/SDProject/Scripts/Combat/Cards/Core/BoardRuntime.cs
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -204,8 +310,9 @@ namespace SDProject.Combat.Cards
 {
     /// <summary>
     /// Runtime view over CharacterSlot[] + Unit occupancy.
-    /// Finds all CharacterSlot in scene and maintains (team,index)->occupant mapping.
-    /// Provides FrontMost, PosUse/PosHit checks, and Knockback.
+    /// - Builds slot lists after BoardLayout finished (next frame).
+    /// - Exposes RefreshFromScene() to rebuild on demand.
+    /// - Logs counts for quick diagnosis.
     /// </summary>
     [DisallowMultipleComponent]
     public class BoardRuntime : MonoBehaviour
@@ -220,27 +327,40 @@ namespace SDProject.Combat.Cards
         public IReadOnlyList<CharacterSlot> AllySlots => _allySlots;
         public IReadOnlyList<CharacterSlot> EnemySlots => _enemySlots;
 
-        private void Awake()
+        private bool _builtOnce;
+
+        private void OnEnable()
         {
-            BuildFromScene();
+            // 슬롯 생성(보통 BoardLayout)이 끝난 다음 프레임에 스캔
+            StartCoroutine(CoBuildNextFrame());
         }
 
-        private void BuildFromScene()
+        private IEnumerator CoBuildNextFrame()
+        {
+            yield return null;
+            RefreshFromScene();
+        }
+
+        /// <summary>
+        /// Public: 외부(예: BoardLayout 끝부분)에서 호출해 강제로 재스캔.
+        /// </summary>
+        public void RefreshFromScene()
         {
             _allySlots.Clear();
             _enemySlots.Clear();
-            _occ.Clear();
 
-            var slots = FindObjectsByType<SDProject.Combat.Board.CharacterSlot>(
-                FindObjectsInactive.Include, FindObjectsSortMode.None);
-
+            var slots = FindObjectsByType<CharacterSlot>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             foreach (var s in slots)
             {
-                if (s.team == SDProject.Combat.Board.TeamSide.Ally) _allySlots.Add(s);
+                if (!s) continue;
+                if (s.Team == TeamSide.Ally) _allySlots.Add(s);
                 else _enemySlots.Add(s);
             }
-            _allySlots.Sort((a, b) => a.index.CompareTo(b.index));
-            _enemySlots.Sort((a, b) => a.index.CompareTo(b.index));
+            _allySlots.Sort((a, b) => a.Index.CompareTo(b.Index));
+            _enemySlots.Sort((a, b) => a.Index.CompareTo(b.Index));
+            _builtOnce = true;
+
+            Debug.Log($"[BoardRuntime] Slots built. Ally={_allySlots.Count}, Enemy={_enemySlots.Count}", this);
         }
 
         // ==== Register / Query ====
@@ -250,7 +370,7 @@ namespace SDProject.Combat.Cards
             var key = (team, index);
             _occ[key] = unit;
 
-            // Try assign CurrentSlot if the unit has SimpleUnit
+            // Try assign CurrentSlot if the unit has SimpleUnit (선택적)
             var su = unit.GetComponent<SimpleUnit>();
             if (su != null)
             {
@@ -258,12 +378,18 @@ namespace SDProject.Combat.Cards
                 su.Index = index;
                 su.CurrentSlot = GetSlot(team, index);
             }
+
+            Debug.Log($"[BoardRuntime] RegisterUnit: {unit.name} -> {team}[{index}]", unit);
         }
 
         public void UnregisterUnit(GameObject unit, TeamSide team, int index)
         {
             var key = (team, index);
-            if (_occ.TryGetValue(key, out var u) && u == unit) _occ.Remove(key);
+            if (_occ.TryGetValue(key, out var u) && u == unit)
+            {
+                _occ.Remove(key);
+                Debug.Log($"[BoardRuntime] UnregisterUnit: {unit.name} <- {team}[{index}]", unit);
+            }
         }
 
         public CharacterSlot GetSlot(TeamSide team, int index)
@@ -287,17 +413,26 @@ namespace SDProject.Combat.Cards
             return null;
         }
 
-        // First alive enemy by designed priority: Front -> Mid1 -> Mid2 -> Mid3 -> Back
+        /// <summary>
+        /// First alive enemy by priority: Front -> Mid1 -> Mid2 -> Mid3 -> Back
+        /// </summary>
         public GameObject GetFrontMostEnemyUnit()
         {
+            if (!_builtOnce)
+            {
+                Debug.LogWarning("[BoardRuntime] GetFrontMostEnemyUnit called before slots were built. Forcing refresh.", this);
+                RefreshFromScene();
+            }
+
             foreach (var s in _enemySlots)
             {
-                var u = GetOccupant(TeamSide.Enemy, s.index);
+                var u = GetOccupant(TeamSide.Enemy, s.Index);
                 if (u == null) continue;
                 var hp = u.GetComponent<IDamageable>();
                 if (hp == null || !hp.IsAlive()) continue;
                 return u;
             }
+            Debug.LogWarning("[BoardRuntime] No valid enemy unit found in any enemy slots.", this);
             return null;
         }
 
@@ -312,7 +447,7 @@ namespace SDProject.Combat.Cards
 
             var (team, idx) = loc.Value;
             var list = (team == TeamSide.Ally) ? _allySlots : _enemySlots;
-            int targetIdx = idx + cells; // "back" is higher index on both teams by our design
+            int targetIdx = idx + cells; // "back" has higher index
 
             if (targetIdx < 0 || targetIdx >= list.Count) return false;
 
@@ -419,53 +554,271 @@ namespace SDProject.Combat.Cards
 
 ## Assets\SDProject\Scripts\Combat\Cards\Board\SimpleUnitBinder.cs
 ```csharp
+using System.Collections;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
+using SDProject.Combat.Board;
 
-namespace SDProject.Combat.Cards
+namespace SDProject.Combat
 {
     /// <summary>
-    /// Registers the unit to BoardRuntime at start.
-    /// If index < 0, binds to nearest slot of the configured team.
+    /// Binds a unit to a board slot at runtime.
+    /// - Exposes read-only properties Team/Index for external usage (binder.Team / binder.Index).
+    /// - If Index < 0, finds the nearest slot of the given Team and snaps to it.
+    /// - If BoardRuntime exists, tries to register the unit there (via direct ref or reflection fallback).
+    /// - If BoardRuntime is missing, still snaps to the slot's mount for safe v1 usage.
     /// </summary>
     [DisallowMultipleComponent]
     public class SimpleUnitBinder : MonoBehaviour
     {
-        public SDProject.Combat.Board.TeamSide team;
-        public int index = -1; // -1 => infer by nearest slot of the team
+        [Header("Binding")]
+        [SerializeField] private TeamSide team = TeamSide.Ally;
+        [SerializeField] private int index = -1; // -1 = auto (nearest)
+        [Tooltip("Wait one frame before binding to ensure BoardLayout/Runtime are ready.")]
+        [SerializeField] private bool waitOneFrame = true;
 
-        private void Start()
+        [Header("Snap")]
+        [Tooltip("If true, snaps the transform to slot mount after binding.")]
+        [SerializeField] private bool snapToMount = true;
+
+        // ---- Public read-only properties (권장안 핵심) ----
+        public TeamSide Team => team;
+        public int Index => index;
+
+        // ---- Runtime references (optional/diagnostics) ----
+        public CharacterSlot CurrentSlot { get; private set; }
+        public MonoBehaviour BoardRuntimeRef { get; private set; } // keep as MonoBehaviour to avoid hard dependency
+        private Component _boardRuntimeComp; // cached component (any type named "BoardRuntime")
+        private Transform _cachedMount;
+        private Transform _t;
+
+        private void Awake()
         {
-            // Use Unity's official API directly (no helper to avoid CS0108)
-            var runtime = UnityEngine.Object.FindFirstObjectByType<BoardRuntime>(FindObjectsInactive.Include);
-            if (!runtime)
+            _t = transform;
+        }
+
+        private void OnEnable()
+        {
+            if (waitOneFrame) StartCoroutine(CoBindNextFrame());
+            else TryBindNow();
+        }
+
+        private IEnumerator CoBindNextFrame()
+        {
+            yield return null; // let BoardLayout create slots & BoardRuntime scan them
+            TryBindNow();
+        }
+
+        /// <summary>
+        /// External setter with optional rebind.
+        /// </summary>
+        public void SetBinding(TeamSide newTeam, int newIndex, bool rebind = true)
+        {
+            team = newTeam;
+            index = newIndex;
+            if (rebind && isActiveAndEnabled)
             {
-                Debug.LogWarning("[UnitBinder] BoardRuntime not found.");
+                TryBindNow();
+            }
+        }
+
+        /// <summary>
+        /// Re-run binding with current team/index.
+        /// </summary>
+        [ContextMenu("Rebind")]
+        public void Rebind()
+        {
+            TryBindNow();
+        }
+
+        private void TryBindNow()
+        {
+            // 1) Find BoardRuntime (optional)
+            _boardRuntimeComp = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+                .FirstOrDefault(mb => mb != null && mb.GetType().Name == "BoardRuntime");
+            BoardRuntimeRef = _boardRuntimeComp as MonoBehaviour;
+
+            // 2) Resolve target slot index
+            var targetIndex = index >= 0 ? index : FindNearestSlotIndex(team);
+
+            if (targetIndex < 0)
+            {
+                Debug.LogWarning($"[SimpleUnitBinder] No valid slot found for Team={team}.", this);
                 return;
             }
 
-            int resolvedIdx = index;
-            if (resolvedIdx < 0)
-            {
-                var slots = (team == SDProject.Combat.Board.TeamSide.Ally)
-                    ? runtime.AllySlots : runtime.EnemySlots;
+            index = targetIndex; // lock-in chosen index
 
-                float best = float.MaxValue;
-                int bestIdx = -1;
-                for (int i = 0; i < slots.Count; i++)
-                {
-                    var s = slots[i];
-                    var p = s.mount ? s.mount.position : s.transform.position;
-                    float d = Vector3.SqrMagnitude(transform.position - p);
-                    if (d < best) { best = d; bestIdx = i; }
-                }
-                resolvedIdx = bestIdx;
+            // 3) Get the CharacterSlot we are going to occupy/snap to
+            var slot = GetSlotByTeamIndex(team, targetIndex);
+            if (slot == null)
+            {
+                Debug.LogWarning($"[SimpleUnitBinder] Slot not found Team={team}, Index={targetIndex}.", this);
+                return;
             }
 
-            var unit = GetComponent<SimpleUnit>() ?? gameObject.AddComponent<SimpleUnit>();
-            unit.Team = team;
-            unit.Index = resolvedIdx;
+            CurrentSlot = slot;
+            _cachedMount = slot.mount != null ? slot.mount : slot.transform;
 
-            runtime.RegisterUnit(gameObject, team, resolvedIdx);
+            // 4) Register to BoardRuntime if available; otherwise just snap
+            bool registered = TryRegisterToBoardRuntime(_boardRuntimeComp, team, targetIndex);
+
+            if (!registered)
+            {
+                // Fallback: just snap to mount so v1 keeps working
+                if (snapToMount && _cachedMount)
+                {
+                    _t.position = _cachedMount.position;
+                    _t.rotation = _cachedMount.rotation;
+                }
+                Debug.Log($"[SimpleUnitBinder] Fallback snap only. (No BoardRuntime or method not found) Team={team}, Index={index}, Unit={name}", this);
+            }
+            else
+            {
+                if (snapToMount && _cachedMount)
+                {
+                    _t.position = _cachedMount.position;
+                    _t.rotation = _cachedMount.rotation;
+                }
+                Debug.Log($"[SimpleUnitBinder] Registered to BoardRuntime. Team={team}, Index={index}, Unit={name}", this);
+            }
+        }
+
+        /// <summary>
+        /// Finds nearest slot index by distance to this transform among the given team.
+        /// Returns -1 if none found.
+        /// </summary>
+        private int FindNearestSlotIndex(TeamSide side)
+        {
+            var allSlots = FindObjectsByType<CharacterSlot>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+                .Where(s => s != null && s.Team == side)
+                .ToList();
+
+            if (allSlots.Count == 0) return -1;
+
+            var nearest = allSlots
+                .OrderBy(s => (s.transform.position - _t.position).sqrMagnitude)
+                .First();
+
+            return nearest.Index;
+        }
+
+        /// <summary>
+        /// Fetch slot by (team, index) using scene scan. Returns null if not found.
+        /// </summary>
+        private CharacterSlot GetSlotByTeamIndex(TeamSide side, int idx)
+        {
+            return FindObjectsByType<CharacterSlot>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+                .FirstOrDefault(s => s != null && s.Team == side && s.Index == idx);
+        }
+
+        /// <summary>
+        /// Attempts to call BoardRuntime.RegisterUnit(this.gameObject, team, index) or RegisterUnit(SimpleUnit, TeamSide, int)
+        /// via reflection so we don't hard depend on a specific signature.
+        /// Returns true if any registration method was successfully invoked.
+        /// </summary>
+        private bool TryRegisterToBoardRuntime(Component boardRuntime, TeamSide side, int idx)
+        {
+            if (boardRuntime == null) return false;
+
+            var brType = boardRuntime.GetType();
+
+            // Try some common signatures by reflection (no hard dependency):
+            // 1) RegisterUnit(GameObject, TeamSide, int)
+            // 2) RegisterUnit(Component/MonoBehaviour, TeamSide, int)
+            // 3) RegisterUnit(object, TeamSide, int)
+            // 4) RegisterUnit(TeamSide, int, GameObject)
+
+            var args1 = new object[] { this.gameObject, side, idx };
+            var args2 = new object[] { this, side, idx };
+
+            // (a) exact by name with 3 params
+            var mi = brType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .FirstOrDefault(m =>
+                {
+                    if (m.Name != "RegisterUnit") return false;
+                    var ps = m.GetParameters();
+                    if (ps.Length != 3) return false;
+                    return true;
+                });
+
+            if (mi != null)
+            {
+                try
+                {
+                    // try with (GameObject, TeamSide, int)
+                    var parameters = mi.GetParameters();
+                    object[] useArgs = null;
+
+                    // Heuristic match
+                    if (parameters[0].ParameterType == typeof(GameObject))
+                        useArgs = args1;
+                    else if (parameters[0].ParameterType.IsAssignableFrom(this.GetType()))
+                        useArgs = args2;
+                    else
+                        useArgs = args1; // last resort
+
+                    mi.Invoke(boardRuntime, useArgs);
+                    return true;
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogWarning($"[SimpleUnitBinder] RegisterUnit reflection failed: {ex.Message}", this);
+                }
+            }
+
+            // (b) alternative signature: RegisterUnit(TeamSide, int, GameObject)
+            mi = brType.GetMethod("RegisterUnit", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                                   null, new[] { typeof(TeamSide), typeof(int), typeof(GameObject) }, null);
+            if (mi != null)
+            {
+                try
+                {
+                    mi.Invoke(boardRuntime, new object[] { side, idx, this.gameObject });
+                    return true;
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogWarning($"[SimpleUnitBinder] RegisterUnit(TeamSide,int,GameObject) failed: {ex.Message}", this);
+                }
+            }
+
+            return false;
+        }
+
+        // Optional: clean-up hook – try to unregister if method exists
+        private void OnDisable()
+        {
+            TryUnregister();
+        }
+
+        private void OnDestroy()
+        {
+            TryUnregister();
+        }
+
+        private void TryUnregister()
+        {
+            if (_boardRuntimeComp == null) return;
+
+            var brType = _boardRuntimeComp.GetType();
+            var mi = brType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .FirstOrDefault(m =>
+                {
+                    if (m.Name != "UnregisterUnit") return false;
+                    var ps = m.GetParameters();
+                    return ps.Length == 1; // try UnregisterUnit(GameObject) or (Component)
+                });
+
+            if (mi != null)
+            {
+                try
+                {
+                    mi.Invoke(_boardRuntimeComp, new object[] { this.gameObject });
+                }
+                catch { /* ignore */ }
+            }
         }
     }
 }
@@ -585,203 +938,344 @@ namespace SDProject.Combat.Cards.Bridge
 
 ## Assets\SDProject\Scripts\Combat\Cards\Core\CardPlayController.cs
 ```csharp
+// Assets/SDProject/Scripts/Combat/Cards/Core/CardPlayController.cs
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
+using TMPro;
+using SDProject.Data;
 using SDProject.Combat.Board;
+using SDProject.Core.Messaging;
 
 namespace SDProject.Combat.Cards
 {
-    [DisallowMultipleComponent]
-    public class CardPlayController : MonoBehaviour
+    /// <summary>
+    /// Handles card play flow: select → target → resolve.
+    /// Uses existing TargetType + PosHit (lane mask).
+    /// </summary>
+    public sealed class CardPlayController : MonoBehaviour
     {
         [Header("Refs")]
-        public BoardRuntime Board;
-        public TargetingSystem Targeting;
+        [SerializeField] private BoardRuntime _board;
+        [SerializeField] private TargetingSystem _targeting;
 
-        [Header("Events (v1: fixed text)")]
-        public UnityEvent OnCardPlayStarted;
-        public UnityEvent OnCardPlayFinished;
-        public UnityEvent<string> OnHint;
-        public UnityEvent<string> OnErrorLabel;
+        [Header("UI (optional)")]
+        [SerializeField] private TMP_Text _errorLabel; // fixed text v1 (optional)
 
-        [Header("Debug")]
-        [SerializeField] private string _state = "Idle";
+        private IState _state;
+        private IdleState _idle;
+        private SelectingTargetsState _selecting;
+        private ResolvingState _resolving;
 
-        private IState _st;
+        // working context
+        private CardData _curCard;
+        private GameObject _curCaster;
+        private readonly List<GameObject> _curTargets = new();
 
-        private void Awake() => TransitionTo(new IdleState(this));
-
-        public void PlayCard(CardDefinition card, GameObject caster)
+        private void Awake()
         {
-            if (!card || !caster) { Debug.LogWarning("[CardPlay] Missing refs."); return; }
-            OnCardPlayStarted?.Invoke();
-            TransitionTo(new SelectingTargetsState(this, card, caster));
+            _idle = new IdleState(this);
+            _selecting = new SelectingTargetsState(this);
+            _resolving = new ResolvingState(this);
+            TransitionTo(_idle);
         }
+
+        public void PlayCard(CardData card, GameObject caster)
+        {
+            if (card == null || caster == null)
+            {
+                EmitError(ErrorLabel.ERR_COND, "Null card/caster");
+                return;
+            }
+            _curCard = card;
+            _curCaster = caster;
+            TransitionTo(_selecting);
+        }
+
+        private void Update() => _state?.Tick(Time.deltaTime);
 
         private void TransitionTo(IState next)
         {
-            _st?.Exit();
-            _st = next;
-            _state = _st.GetType().Name;
-            Debug.Log($"[FSM] -> {_state}");
-            _st.Enter();
+            _state?.Exit();
+            _state = next;
+            _state?.Enter();
         }
 
-        // ===== States =====
-        interface IState { void Enter(); void Exit(); }
+        private void ClearError() { if (_errorLabel) _errorLabel.text = string.Empty; }
 
-        class IdleState : IState
+        public enum ErrorLabel { ERR_AP, ERR_COND, ERR_POS_HIT, ERR_NO_TARGET }
+
+        public void EmitError(ErrorLabel code, string detail = null)
+        {
+            string msg = code switch
+            {
+                ErrorLabel.ERR_AP => "AP 부족",
+                ErrorLabel.ERR_COND => "사용 조건 불일치",
+                ErrorLabel.ERR_POS_HIT => "타격 위치 미일치",
+                _ => "대상 없음"
+            };
+            if (!string.IsNullOrEmpty(detail)) msg += $" ({detail})";
+            if (_errorLabel) _errorLabel.text = msg;
+            Debug.LogWarning($"[CardPlay][{code}] {detail ?? ""}");
+        }
+
+        // ─────────────────── States ───────────────────
+        private interface IState { void Enter(); void Tick(float dt); void Exit(); }
+
+        private class IdleState : IState
         {
             private readonly CardPlayController c;
-            public IdleState(CardPlayController c) => this.c = c;
-            public void Enter() { }
+            public IdleState(CardPlayController ctx) => c = ctx;
+            public void Enter() { c.ClearError(); }
+            public void Tick(float dt) { }
             public void Exit() { }
         }
 
-        class SelectingTargetsState : IState
+        private class SelectingTargetsState : IState
         {
             private readonly CardPlayController c;
-            private readonly CardDefinition card;
-            private readonly GameObject caster;
-
-            public SelectingTargetsState(CardPlayController c, CardDefinition card, GameObject caster)
-            { this.c = c; this.card = card; this.caster = caster; }
+            public SelectingTargetsState(CardPlayController ctx) => c = ctx;
 
             public void Enter()
             {
-                // Enabled?
-                if (!card.Enabled)
-                {
-                    c.EmitError(ErrorLabel.ERR_UNIT_DISABLED, "Card disabled.");
-                    c.TransitionTo(new DoneState(c));
-                    return;
-                }
+                c.ClearError();
+                c._curTargets.Clear();
 
-                // AP?
-                var ap = caster.GetComponent<IApConsumer>();
-                if (ap != null && !ap.TryConsumeAp(card.Cost))
-                {
-                    c.EmitError(ErrorLabel.ERR_AP_LACK, "Not enough AP.");
-                    c.TransitionTo(new DoneState(c));
-                    return;
-                }
+                // Quick AP check placeholder (v1: assume enough AP or check via event/system)
+                // If AP system integrated, gate here and EmitError(ERR_AP).
 
-                // PosUse?
-                var su = caster.GetComponent<SimpleUnit>();
-                if (su == null) { c.EmitError(ErrorLabel.ERR_UNIT_DISABLED, "Caster invalid."); c.TransitionTo(new DoneState(c)); return; }
-
-                var casterLane = PositionResolver.ToLane(su.Team, su.Index);
-                if (!PositionResolver.LaneMatches(casterLane, card.PosUse))
-                {
-                    c.EmitError(ErrorLabel.ERR_POSUSE_MISMATCH, "Position not allowed.");
-                    c.TransitionTo(new DoneState(c));
-                    return;
-                }
-
-                switch (card.TargetType)
-                {
-                    case TargetType.EnemyFrontMost:
-                        var auto = c.FilterByPosHit(c.Targeting.AutoPickFrontMostEnemy(), card);
-                        c.TryResolveOrAbort(card, caster, auto);
-                        break;
-
-                    case TargetType.SingleManual:
-                        c.Targeting.OnTargetSelectionProvided.AddListener(OnManual);
-                        c.Targeting.OnTargetSelectionRequested.Invoke(card.TargetType);
-                        c.OnHint?.Invoke("Tap a valid target.");
-                        break;
-
-                    default:
-                        c.EmitError(ErrorLabel.ERR_NO_TARGET, $"Not implemented: {card.TargetType}");
-                        c.TransitionTo(new DoneState(c));
-                        break;
-                }
+                // Derive team/mode from TargetType (minimal mapping for common cases)
+                c.ResolveTargetsOrBeginManual();
             }
 
-            private void OnManual(GameObject[] picks)
-            {
-                c.Targeting.OnTargetSelectionProvided.RemoveListener(OnManual);
-                var filtered = c.FilterByPosHit(picks, card);
-                c.TryResolveOrAbort(card, caster, filtered);
-            }
-
-            public void Exit() => c.Targeting.OnTargetSelectionProvided.RemoveListener(OnManual);
-        }
-
-        class ResolvingState : IState
-        {
-            private readonly CardPlayController c;
-            private readonly CardDefinition card;
-            private readonly GameObject caster;
-            private readonly GameObject[] targets;
-
-            public ResolvingState(CardPlayController c, CardDefinition card, GameObject caster, GameObject[] targets)
-            { this.c = c; this.card = card; this.caster = caster; this.targets = targets ?? Array.Empty<GameObject>(); }
-
-            public void Enter()
-            {
-                Debug.Log($"[CardPlay] Resolving {card.Id} x{targets.Length}");
-                var ctx = new CardEffectContext(caster, targets, c.Board);
-
-                foreach (var so in card.Effects)
-                {
-                    if (so is ICardEffect eff) eff.Execute(ctx);
-                    else Debug.LogWarning($"[CardPlay] Effect not ICardEffect: {so?.name}");
-                }
-
-                c.TransitionTo(new DoneState(c));
-            }
-
+            public void Tick(float dt) { }
             public void Exit() { }
         }
 
-        class DoneState : IState
+        private class ResolvingState : IState
         {
             private readonly CardPlayController c;
-            public DoneState(CardPlayController c) => this.c = c;
+            public ResolvingState(CardPlayController ctx) => c = ctx;
+
             public void Enter()
             {
-                Debug.Log("[CardPlay] Finished.");
-                c.OnCardPlayFinished?.Invoke();
-                c.TransitionTo(new IdleState(c));
+                // Execute EffectsJSON with current targets
+                c.ExecuteEffects(c._curCard, c._curCaster, c._curTargets);
+
+                // TODO: AP consume here if integrated; then raise HUD events
+                GameEvents.RaiseTurnPhaseChanged(SDProject.Core.TurnPhase.PlayerActing);
+
+                c.TransitionTo(c._idle);
             }
+
+            public void Tick(float dt) { }
             public void Exit() { }
         }
 
-        // ===== Helpers =====
-
-        private void TryResolveOrAbort(CardDefinition card, GameObject caster, GameObject[] rawTargets)
+        // ────────────────── Targeting ─────────────────
+        private void ResolveTargetsOrBeginManual()
         {
-            var filtered = FilterByPosHit(rawTargets, card);
-            if (filtered == null || filtered.Length == 0)
+            if (_board == null) { EmitError(ErrorLabel.ERR_COND, "Board missing"); TransitionTo(_idle); return; }
+            if (_curCard == null || _curCaster == null) { EmitError(ErrorLabel.ERR_COND); TransitionTo(_idle); return; }
+
+            // Minimal map: treat common target types; fallback to manual single.
+            var (team, mode, all) = GuessTargeting(_curCard);
+
+            // Lane mask filter using PosHit
+            var mask = _curCard.PosHit; // assume PositionFlags-style flags in SO
+
+            if (mode == TargetMode.Auto)
             {
-                EmitError(ErrorLabel.ERR_NO_TARGET, "No valid targets.");
-                TransitionTo(new DoneState(this));
+                var pool = _board.EnumerateUnits(team);
+                var filtered = new List<GameObject>();
+                foreach (var u in pool)
+                {
+                    var loc = _board.GetUnitLocation(u);
+                    if (loc == null) continue;
+                    var lane = BoardRuntime.LaneOf(loc.Value.team, loc.Value.index);
+                    if (BoardRuntime.LaneMatches(lane, mask))
+                        filtered.Add(u);
+                }
+
+                // Sort by lane priority already defined by slot order (Front→Back)
+                // EnumerateUnits should return in board order; if not, keep as-is.
+
+                if (filtered.Count == 0)
+                {
+                    EmitError(ErrorLabel.ERR_NO_TARGET);
+                    TransitionTo(_idle);
+                    return;
+                }
+
+                if (all)
+                {
+                    _curTargets.AddRange(filtered);
+                }
+                else
+                {
+                    // front-most first
+                    _curTargets.Add(filtered[0]);
+                }
+                TransitionTo(_resolving);
+            }
+            else
+            {
+                int need = all ? int.MaxValue : 1; // v1 manual only single officially; extend later if N-select added
+                _targeting.BeginManualSelect(
+                    _curCard, mask, team, need,
+                    onDone: (targets) =>
+                    {
+                        if (targets == null || targets.Count == 0)
+                        {
+                            EmitError(ErrorLabel.ERR_NO_TARGET);
+                            TransitionTo(_idle);
+                            return;
+                        }
+                        _curTargets.Clear();
+                        _curTargets.AddRange(targets);
+                        TransitionTo(_resolving);
+                    },
+                    onCancel: () => TransitionTo(_idle)
+                );
+            }
+        }
+
+        private enum TargetMode { Auto, Manual }
+
+        private (TeamSide team, TargetMode mode, bool all) GuessTargeting(CardData card)
+        {
+            // Heuristic for common built-in types. Adjust names to your enum.
+            // Defaults: Enemy + Manual Single
+            TeamSide team = TeamSide.Enemy;
+            TargetMode mode = TargetMode.Manual;
+            bool all = false;
+
+            var tt = card.TargetType.ToString(); // enum → string
+            if (tt.Contains("Ally")) team = TeamSide.Ally;
+            if (tt.Contains("Enemy")) team = TeamSide.Enemy;
+            if (tt.Contains("Self")) { team = team; mode = TargetMode.Auto; all = false; }
+
+            if (tt.Contains("All")) { mode = TargetMode.Auto; all = true; }
+            else if (tt.Contains("Front")) { mode = TargetMode.Auto; all = false; }
+            else if (tt.Contains("Manual")) { mode = TargetMode.Manual; }
+
+            return (team, mode, all);
+        }
+
+        // ─────────────── Effect Execution v1 ───────────────
+        public void ExecuteEffects(CardData card, GameObject caster, IReadOnlyList<GameObject> primaryTargets)
+        {
+            if (card == null || primaryTargets == null || primaryTargets.Count == 0) return;
+
+            // Parse EffectsJSON (minimal dynamic parsing to avoid coupling)
+            // Expect common patterns: Damage, Knockback with optional targets.offsets and failPolicy.
+            var json = card.EffectsJSON;
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                Debug.LogWarning($"[Effect] No EffectsJSON on {card.name}");
                 return;
             }
-            TransitionTo(new ResolvingState(this, card, caster, filtered));
-        }
 
-        private GameObject[] FilterByPosHit(GameObject[] raw, CardDefinition card)
-        {
-            if (raw == null || raw.Length == 0) return Array.Empty<GameObject>();
-
-            return raw.Where(t =>
+            try
             {
-                var loc = Board.GetUnitLocation(t);
-                if (loc == null) return false;
-                var lane = PositionResolver.ToLane(loc.Value.team, loc.Value.index);
-                return PositionResolver.LaneMatches(lane, card.PosHit);
-            }).ToArray();
+                var effects = MiniJson.Parse(json) as List<object>;
+                if (effects == null) { Debug.LogWarning($"[Effect] JSON not array: {card.name}"); return; }
+
+                foreach (var e in effects)
+                {
+                    var dict = e as Dictionary<string, object>;
+                    if (dict == null) continue;
+                    var type = dict.GetString("type");
+                    switch (type)
+                    {
+                        case "Damage":
+                            int value = dict.GetInt("value", 0);
+                            var allTargets = ExpandWithOffsets(primaryTargets, dict, caster);
+                            int hit = 0;
+                            foreach (var t in allTargets) { if (ApplyDamage(t, value)) hit++; }
+                            Debug.Log($"[Effect] Damage value={value} targets={hit}");
+                            break;
+
+                        case "Knockback":
+                            int cells = dict.GetInt("cells", 1);
+                            foreach (var t in primaryTargets)
+                            {
+                                bool ok = _board.TryKnockback(t, cells);
+                                if (!ok) Debug.Log($"[Effect] Knockback fail (cells={cells})");
+                            }
+                            break;
+
+                        default:
+                            Debug.Log($"[Effect] Unknown type: {type}");
+                            break;
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[Effect] Parse/Exec error: {ex.Message}");
+            }
         }
 
-        private void EmitError(ErrorLabel code, string uiText)
+        private List<GameObject> ExpandWithOffsets(IReadOnlyList<GameObject> primaries, Dictionary<string, object> dict, GameObject caster)
         {
-            Debug.LogWarning($"[CardPlay][{code}] {uiText}");
-            OnErrorLabel?.Invoke(uiText); // v1: 고정 텍스트
+            var result = new List<GameObject>(primaries);
+            var targets = dict.GetDict("targets");
+            if (targets == null) return result;
+
+            var anchor = targets.GetString("anchor", "Primary");
+            if (anchor != "Primary") return result;
+
+            var offsets = targets.GetList("offsets");
+            if (offsets == null || offsets.Count == 0) return result;
+
+            foreach (var p in primaries)
+            {
+                var loc = _board.GetUnitLocation(p);
+                if (loc == null) continue;
+                foreach (var offObj in offsets)
+                {
+                    int off = (offObj is long lo) ? (int)lo : (offObj is int ii ? ii : 0);
+                    int idx = loc.Value.index + off;
+                    var slot = _board.GetSlot(loc.Value.team, idx);
+                    if (slot == null) { /* failPolicy SkipLog */ continue; }
+                    var u = _board.GetOccupant(loc.Value.team, idx);
+                    if (u != null) result.Add(u);
+                }
+            }
+            return result;
         }
+
+        private bool ApplyDamage(GameObject unit, int value)
+        {
+            var hp = unit.GetComponent<IDamageable>();
+            if (hp == null) return false;
+            hp.TakeDamage(value);
+            return true;
+        }
+    }
+
+    // ─────────── small JSON helpers (MiniJson) ───────────
+    internal static class MiniJson
+    {
+        public static object Parse(string json) => UnityEngine.JsonUtility.FromJson<Wrapper>(Wrap(json))?.items;
+        [System.Serializable] private class Wrapper { public List<object> items; }
+        private static string Wrap(string arrJson) => $"{{\"items\":{arrJson}}}";
+    }
+
+    internal static class DictExt
+    {
+        public static string GetString(this Dictionary<string, object> d, string k, string def = "")
+            => d.TryGetValue(k, out var v) ? v?.ToString() ?? def : def;
+
+        public static int GetInt(this Dictionary<string, object> d, string k, int def = 0)
+            => d.TryGetValue(k, out var v) ? (v is long l ? (int)l : v is int i ? i : def) : def;
+
+        public static Dictionary<string, object> GetDict(this Dictionary<string, object> d, string k)
+            => d.TryGetValue(k, out var v) ? v as Dictionary<string, object> : null;
+
+        public static List<object> GetList(this Dictionary<string, object> d, string k)
+            => d.TryGetValue(k, out var v) ? v as List<object> : null;
     }
 }
 ```
@@ -1074,6 +1568,7 @@ using UnityEngine.Events;
 
 namespace SDProject.Combat.Cards
 {
+
     [Serializable] public class TargetSelectionRequestEvent : UnityEvent<TargetType> { }
     [Serializable] public class TargetSelectionProvidedEvent : UnityEvent<GameObject[]> { }
 
@@ -1104,48 +1599,203 @@ namespace SDProject.Combat.Cards
 
 ## Assets\SDProject\Scripts\Combat\Cards\UI\CardView.cs
 ```csharp
+// Assets/SDProject/Scripts/Combat/Cards/UI/CardView.cs
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using SDProject.Data;
 
 namespace SDProject.Combat.Cards
 {
-    public class CardView : MonoBehaviour
+    /// <summary>
+    /// Displays card title and AP; clicking the whole card plays it.
+    /// CardData 스키마: int AP (확정)
+    /// </summary>
+    public sealed class CardView : MonoBehaviour
     {
-        public CardDefinition Card;
-        public TextMeshProUGUI TitleText;
-        public TextMeshProUGUI CostText;
-        public TextMeshProUGUI DescText;
-        public Button PlayButton;
+        [SerializeField] private TMP_Text _title;
+        [SerializeField] private TMP_Text _ap;          // ← 코스트 표시는 AP 텍스트로 고정
+        [SerializeField] private Image _typeIcon;        // (선택) 타입 아이콘 매핑 시 사용
 
-        [Header("Runtime")]
-        public CardPlayController PlayController;
-        public GameObject Caster; // who plays the card
+        private CardData _card;
+        private GameObject _caster;
+        private CardPlayController _play;
 
-        private void Awake()
+        public void Bind(CardData card, GameObject caster, CardPlayController play)
         {
-            if (PlayButton) PlayButton.onClick.AddListener(OnClickPlay);
+            _card = card;
+            _caster = caster;
+            _play = play;
+
+            // v1: SO 이름 사용(로컬라이즈는 v1.1에서 전환)
+            if (_title) _title.text = card != null ? card.name : "(null)";
+
+            // AP 고정 스키마: CardData.AP (int)
+            if (_ap) _ap.text = card != null ? card.AP.ToString() : "-";
+
+            // (선택) 타입 아이콘 매핑:
+            // if (_typeIcon) _typeIcon.sprite = ...
         }
 
-        private void Start() => Refresh();
-
-        public void Refresh()
+        // 카드 루트에 Button을 달아 이 함수를 클릭 이벤트에 연결하거나,
+        // EventTrigger로 PointerClick→이 함수를 호출하세요.
+        public void OnClick()
         {
-            if (!Card) return;
-            if (TitleText) TitleText.SetText(string.IsNullOrEmpty(Card.NameId) ? Card.Id : Card.NameId);
-            if (CostText) CostText.SetText(Card.Cost.ToString());
-            if (DescText) DescText.SetText(string.IsNullOrEmpty(Card.DescId) ? "-" : Card.DescId);
-        }
-
-        private void OnClickPlay()
-        {
-            if (!Card || !PlayController || !Caster)
+            if (_card == null || _play == null || _caster == null)
             {
                 Debug.LogWarning("[CardView] Missing Card/PlayController/Caster.");
                 return;
             }
-            Debug.Log($"[CardView] Play {Card.Id}");
-            PlayController.PlayCard(Card, Caster);
+            _play.PlayCard(_card, _caster);
+        }
+    }
+}
+```
+
+## Assets\SDProject\Scripts\Combat\Cards\UI\HandView.cs
+```csharp
+// Assets/SDProject/Scripts/Combat/Cards/UI/HandView.cs
+using System.Collections.Generic;
+using UnityEngine;
+using SDProject.Data;
+
+namespace SDProject.Combat.Cards
+{
+    /// <summary>
+    /// Simple hand UI: builds CardView items and wires click to play controller.
+    /// </summary>
+    public sealed class HandView : MonoBehaviour
+    {
+        [SerializeField] private Transform _content;
+        [SerializeField] private CardView _cardPrefab;
+
+        public void Rebuild(IReadOnlyList<CardData> hand, GameObject caster, CardPlayController play)
+        {
+            if (_content == null || _cardPrefab == null) return;
+
+            // clear
+            for (int i = _content.childCount - 1; i >= 0; i--)
+                Destroy(_content.GetChild(i).gameObject);
+
+            if (hand == null) return;
+
+            foreach (var c in hand)
+            {
+                var v = Instantiate(_cardPrefab, _content);
+                v.Bind(c, caster, play);
+            }
+        }
+    }
+}
+```
+
+## Assets\SDProject\Scripts\Combat\Targeting\TargetingSystem.cs
+```csharp
+// Assets/SDProject/Scripts/Combat/Targeting/TargetingSystem.cs
+using SDProject.Combat.Board;
+using SDProject.Combat.Cards;
+using SDProject.Data;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace SDProject.Combat
+{
+    /// <summary>
+    /// Manual selection flow; filters by team and PosHit lane mask.
+    /// </summary>
+    public sealed class TargetingSystem : MonoBehaviour
+    {
+        [SerializeField] private BoardRuntime _board;
+
+        private PositionFlags _mask;
+        private TeamSide _team;
+        private int _needCount;
+        private Action<IReadOnlyList<GameObject>> _onDone;
+        private Action _onCancel;
+        private readonly List<GameObject> _picked = new();
+
+        private bool _active;
+
+        public void BeginManualSelect(CardData card, PositionFlags mask, TeamSide team, int needCount,
+                                      Action<IReadOnlyList<GameObject>> onDone,
+                                      Action onCancel)
+        {
+            _active = true;
+            _mask = mask;
+            _team = team;
+            _needCount = Mathf.Max(1, needCount);
+            _onDone = onDone;
+            _onCancel = onCancel;
+            _picked.Clear();
+
+            // TODO: highlight allowed units (optional visual layer)
+            Debug.Log($"[Targeting] Begin manual: team={team}, need={_needCount}, mask={mask}");
+        }
+
+        public void ProvideManualSingle(GameObject unitGO)
+        {
+            if (!_active || unitGO == null) return;
+
+            // Team & lane filter
+            var loc = _board.GetUnitLocation(unitGO);
+            if (loc == null || loc.Value.team != _team) return;
+
+            var lane = BoardRuntime.LaneOf(loc.Value.team, loc.Value.index);
+            if (!BoardRuntime.LaneMatches(lane, _mask)) return;
+
+            if (_picked.Contains(unitGO)) return; // no duplicates
+            _picked.Add(unitGO);
+
+            if (_picked.Count >= _needCount)
+            {
+                var res = new List<GameObject>(_picked);
+                End();
+                _onDone?.Invoke(res);
+            }
+        }
+
+        public void Cancel()
+        {
+            if (!_active) return;
+            Debug.Log("[Targeting] Cancel");
+            End();
+            _onCancel?.Invoke();
+        }
+
+        private void End()
+        {
+            _active = false;
+            _picked.Clear();
+            // TODO: clear highlights (optional)
+        }
+    }
+}
+```
+
+## Assets\SDProject\Scripts\Combat\Targeting\UnitClickForwarder.cs
+```csharp
+// Assets/SDProject/Scripts/Combat/Targeting/UnitClickForwarder.cs
+using UnityEngine;
+
+namespace SDProject.Combat
+{
+    /// <summary>
+    /// For manual targeting: forward OnMouseDown to TargetingSystem.
+    /// Requires a Collider on the unit.
+    /// </summary>
+    public sealed class UnitClickForwarder : MonoBehaviour
+    {
+        [SerializeField] private TargetingSystem _targeting;
+
+        private void Reset()
+        {
+            _targeting = FindFirstObjectByType<TargetingSystem>(FindObjectsInactive.Include);
+        }
+
+        private void OnMouseDown()
+        {
+            if (_targeting) _targeting.ProvideManualSingle(gameObject);
         }
     }
 }
@@ -1153,116 +1803,83 @@ namespace SDProject.Combat.Cards
 
 ## Assets\SDProject\Scripts\Combat\BattleController.cs
 ```csharp
+// Assets/SDProject/Scripts/Combat/BattleController.cs
 using System.Collections;
 using UnityEngine;
-using SDProject.Core.FSM;
+using SDProject.Core.FSM; // if you have it; otherwise remove
+using SDProject.Core.Messaging;
 using SDProject.Data;
-using SDProject.Core.Messaging;   // ← 이벤트만 사용
-
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-#endif
+using SDProject.Combat.Cards;
 
 namespace SDProject.Combat
 {
-    public class BattleController : MonoBehaviour
+    /// <summary>
+    /// Turn hooks: draw at start, discard hand at end. Wires HandView with caster & play controller.
+    /// </summary>
+    public sealed class BattleController : MonoBehaviour
     {
         [Header("Refs")]
         [SerializeField] private DeckRuntime _deck;
         [SerializeField] private HandRuntime _hand;
+        [SerializeField] private HandView _handView;
+        [SerializeField] private CardPlayController _playController;
 
-        private StateMachine _fsm;
-        private StPlayerTurn _stPlayer;
-        private StEnemyTurn _stEnemy;
+        [Header("Caster")]
+        [SerializeField] private GameObject _defaultCaster;
 
         private void Awake()
         {
-            var hand = Object.FindFirstObjectByType<HandRuntime>(FindObjectsInactive.Include);
-            var deck = Object.FindFirstObjectByType<DeckRuntime>(FindObjectsInactive.Include);
-            _hand.OnUsed += OnCardUsed;
-
-            _fsm = new StateMachine();
-            _stPlayer = new StPlayerTurn(this);
-            _stEnemy = new StEnemyTurn(this);
-
-            _fsm.AddTransition(_stPlayer, _stEnemy, SpacePressed);
-            _fsm.AddTransition(_stEnemy, _stPlayer, () => _stEnemy.IsFinished);
+            if (_deck == null) _deck = FindFirstObjectByType<DeckRuntime>(FindObjectsInactive.Include);
+            if (_hand == null) _hand = FindFirstObjectByType<HandRuntime>(FindObjectsInactive.Include);
+            if (_handView == null) _handView = FindFirstObjectByType<HandView>(FindObjectsInactive.Include);
+            if (_playController == null) _playController = FindFirstObjectByType<CardPlayController>(FindObjectsInactive.Include);
         }
 
-        private void Start() => StartCoroutine(BootFSMNextFrame());
-        private IEnumerator BootFSMNextFrame() { yield return null; _fsm.SetState(_stPlayer); }
-        private void Update() => _fsm.Tick(Time.deltaTime);
-
-        private bool SpacePressed()
+        private void Start()
         {
-#if ENABLE_INPUT_SYSTEM
-            var kb = Keyboard.current;
-            return kb != null && kb.spaceKey.wasPressedThisFrame;
-#else
-            return Input.GetKeyDown(KeyCode.Space);
-#endif
+            _deck.Initialize();
+            StartCoroutine(CoStartTurnNextFrame());
         }
 
-        // ── 턴 훅 ──────────────────────────────────────────────────────────────
-        public void OnPlayerTurnEnter() => DrawNewHand();
+        private IEnumerator CoStartTurnNextFrame()
+        {
+            yield return null;
+            OnPlayerTurnEnter();
+        }
+
+        public void OnPlayerTurnEnter()
+        {
+            _hand.Clear();
+            var drawn = _deck.Draw(_deck.DrawPerTurn);
+            _hand.AddCards(drawn, _deck.HandMax);
+
+            _handView?.Rebuild(_hand.Items, _defaultCaster, _playController);
+
+            GameEvents.RaiseDeckChanged(_deck.DrawCount, _deck.DiscardCount);
+            GameEvents.RaiseHandChanged(_hand.Count);
+            GameEvents.RaiseTurnPhaseChanged(SDProject.Core.TurnPhase.PlayerTurn);
+        }
 
         public void OnPlayerTurnExit()
         {
-            if (_deck == null || _hand == null) return;
             var rest = _hand.TakeAll();
             _deck.Discard(rest);
-            // HandRuntime가 내부에서 GameEvents.RaiseHandChanged 호출함
             GameEvents.RaiseDeckChanged(_deck.DrawCount, _deck.DiscardCount);
+            GameEvents.RaiseTurnPhaseChanged(SDProject.Core.TurnPhase.EnemyTurn);
         }
 
-        public void DrawNewHand()
+        // Example hook: call this from UI "End Turn" button.
+        public void OnClickEndTurn()
         {
-            if (_hand == null || _deck == null)
-            {
-                Debug.LogError("[Battle] DrawNewHand: missing refs.");
-                return;
-            }
-
-            _hand.Clear();
-            var drawn = _deck.Draw(_deck.DrawPerTurn);
-            var added = _hand.AddCards(drawn, _deck.HandMax);
-            Debug.Log($"[Battle] Draw request={_deck.DrawPerTurn}, returned={drawn.Count}, added={added}, now hand={_hand.Count}");
-
-            // UI로 알림만 보냄
-            GameEvents.RaiseHandChanged(_hand.Count);
-            GameEvents.RaiseDeckChanged(_deck.DrawCount, _deck.DiscardCount);
+            OnPlayerTurnExit();
+            // enemy act stub...
+            StartCoroutine(CoEnemyThenPlayer());
         }
 
-        // ── States ────────────────────────────────────────────────────────────
-        private class StPlayerTurn : IState
+        private IEnumerator CoEnemyThenPlayer()
         {
-            private readonly BattleController c;
-            public StPlayerTurn(BattleController ctx) => c = ctx;
-            public void Enter() { Debug.Log("▶ PlayerTurn Enter"); c.OnPlayerTurnEnter(); }
-            public void Tick(float dt) { }
-            public void Exit() { Debug.Log("⏸ PlayerTurn Exit"); c.OnPlayerTurnExit(); }
-        }
-
-        private class StEnemyTurn : IState
-        {
-            private readonly BattleController c;
-            public bool IsFinished { get; private set; }
-            public StEnemyTurn(BattleController ctx) => c = ctx;
-            public void Enter() { Debug.Log("[Battle] EnemyTurn..."); IsFinished = false; c.StartCoroutine(CoEnemy()); }
-            private IEnumerator CoEnemy() { yield return new WaitForSeconds(1f); IsFinished = true; }
-            public void Tick(float dt) { }
-            public void Exit() { }
-        }
-
-        private void OnDestroy()
-        {
-            if (_hand != null) _hand.OnUsed -= OnCardUsed;
-        }
-
-        private void OnCardUsed(SDProject.Data.CardData card)
-        {
-            // 카드를 실제로 '버림 더미'로 이동
-            _deck.Discard(card);
+            yield return new WaitForSeconds(0.5f);
+            OnPlayerTurnEnter();
         }
     }
 }
@@ -1270,102 +1887,99 @@ namespace SDProject.Combat
 
 ## Assets\SDProject\Scripts\Combat\DeckRuntime.cs
 ```csharp
-// ... (using 생략)
-
-using SDProject.Core.Messaging;
-using SDProject.Data;
 using System.Collections.Generic;
 using UnityEngine;
+using SDProject.Data;
+using SDProject.Core.Messaging;
+using SDProject.DataBridge;
 
 namespace SDProject.Combat
 {
-    public class DeckRuntime : MonoBehaviour
+    /// <summary>
+    /// Manages draw/discard piles. Initializes from IDeckSource.
+    /// </summary>
+    public sealed class DeckRuntime : MonoBehaviour
     {
         [Header("Config")]
-        [SerializeField] private DeckList deckList;
-        [SerializeField] private int drawPerTurn = 5;
-        [SerializeField] private int handMax = 5;
+        [SerializeField] private MonoBehaviour _deckSource; // IDeckSource
+        [SerializeField] private int _drawPerTurn = 5;
+        [SerializeField] private int _handMax = 10;
 
-        public int DrawPerTurn => drawPerTurn;
-        public int HandMax => handMax;
-
-        // ✅ 여기가 내부 저장소
         private readonly List<CardData> _drawPile = new();
-        private readonly List<CardData> _discardPile = new();
+        private readonly List<CardData> _discard = new();
 
-        // ✅ 🔹추가: BattleController 등에서 읽어갈 공개 카운터
+        public int DrawPerTurn => _drawPerTurn;
+        public int HandMax => _handMax;
         public int DrawCount => _drawPile.Count;
-        public int DiscardCount => _discardPile.Count;
+        public int DiscardCount => _discard.Count;
 
-        private void Awake()
-        {
-            ResetFromList();
-        }
-
-        public void ResetFromList()
+        public void Initialize()
         {
             _drawPile.Clear();
-            _discardPile.Clear();
+            _discard.Clear();
 
-            if (deckList != null && deckList.cards != null)
-                _drawPile.AddRange(deckList.cards);
+            var src = _deckSource as IDeckSource;
+            if (src == null)
+            {
+                Debug.LogError("[DeckRuntime] _deckSource is not IDeckSource.");
+                return;
+            }
 
-            Shuffle(_drawPile);
-            BroadcastCounts();
-            Debug.Log($"[Deck] init: drawPile={_drawPile.Count}, discard={_discardPile.Count}");
+            var initial = src.GetInitialDeck();
+            _drawPile.AddRange(initial);
+
+            // Shuffle
+            for (int i = 0; i < _drawPile.Count; i++)
+            {
+                int j = Random.Range(i, _drawPile.Count);
+                (_drawPile[i], _drawPile[j]) = (_drawPile[j], _drawPile[i]);
+            }
+
+            Debug.Log($"[Deck] init: drawPile={_drawPile.Count}, discard=0");
+            GameEvents.RaiseDeckChanged(DrawCount, DiscardCount);
         }
 
         public List<CardData> Draw(int count)
         {
-            EnsureDrawable(count);
             var result = new List<CardData>(count);
-            for (int i = 0; i < count && _drawPile.Count > 0; i++)
+            for (int i = 0; i < count; i++)
             {
-                var top = _drawPile[^1];
-                _drawPile.RemoveAt(_drawPile.Count - 1);
+                if (_drawPile.Count == 0)
+                {
+                    // Reshuffle discard into draw
+                    if (_discard.Count == 0) break;
+                    _drawPile.AddRange(_discard);
+                    _discard.Clear();
+                    for (int k = 0; k < _drawPile.Count; k++)
+                    {
+                        int j = Random.Range(k, _drawPile.Count);
+                        (_drawPile[k], _drawPile[j]) = (_drawPile[j], _drawPile[k]);
+                    }
+                }
+
+                if (_drawPile.Count == 0) break;
+                int last = _drawPile.Count - 1;
+                var top = _drawPile[last];
+                _drawPile.RemoveAt(last);
                 result.Add(top);
             }
-            BroadcastCounts();
+
+            GameEvents.RaiseDeckChanged(DrawCount, DiscardCount);
             return result;
         }
 
         public void Discard(CardData card)
         {
             if (card == null) return;
-            _discardPile.Add(card);
-            BroadcastCounts();
+            _discard.Add(card);
+            GameEvents.RaiseDeckChanged(DrawCount, DiscardCount);
         }
 
         public void Discard(IEnumerable<CardData> cards)
         {
             if (cards == null) return;
-            _discardPile.AddRange(cards);
-            BroadcastCounts();
-        }
-
-        private void EnsureDrawable(int needed)
-        {
-            if (_drawPile.Count >= needed) return;
-            if (_discardPile.Count == 0) return;
-
-            _drawPile.AddRange(_discardPile);
-            _discardPile.Clear();
-            Shuffle(_drawPile);
-        }
-
-        private static void Shuffle(List<CardData> list)
-        {
-            for (int i = 0; i < list.Count; i++)
-            {
-                int j = Random.Range(i, list.Count);
-                (list[i], list[j]) = (list[j], list[i]);
-            }
-        }
-
-        private void BroadcastCounts()
-        {
-            // UI 갱신 이벤트
-            GameEvents.RaiseDeckChanged(_drawPile.Count, _discardPile.Count);
+            foreach (var c in cards) if (c != null) _discard.Add(c);
+            GameEvents.RaiseDeckChanged(DrawCount, DiscardCount);
         }
     }
 }
@@ -1373,66 +1987,65 @@ namespace SDProject.Combat
 
 ## Assets\SDProject\Scripts\Combat\HandRuntime.cs
 ```csharp
+// Assets/SDProject/Scripts/Combat/HandRuntime.cs
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using SDProject.Data;
 using SDProject.Core.Messaging;
-using System;
 
 namespace SDProject.Combat
 {
     /// <summary>
-    /// 손패 보관/변경 책임. 사용(=버림으로 보낼 후보)은 OnUsed로 통지.
+    /// Holds current hand; raises events when changed.
     /// </summary>
-    public class HandRuntime : MonoBehaviour
+    public sealed class HandRuntime : MonoBehaviour
     {
-        [SerializeField] private List<CardData> _cards = new();
-        public IReadOnlyList<CardData> Cards => _cards;
-        public int Count => _cards.Count;
+        private readonly List<CardData> _items = new();
 
-        /// <summary>카드 한 장이 '사용됨'을 알림 (실제 버림 이동은 상위 컨트롤러 책임).</summary>
+        public int Count => _items.Count;
+        public IReadOnlyList<CardData> Items => _items;
+
+        public event Action<CardData> OnAdded;
         public event Action<CardData> OnUsed;
 
-        public int AddCards(List<CardData> add, int maxHand)
+        public int AddCards(List<CardData> drawResult, int handMax)
         {
-            if (add == null || add.Count == 0) return 0;
-            int canAdd = Mathf.Max(0, maxHand - _cards.Count);
-            int take = Mathf.Min(canAdd, add.Count);
-            if (take <= 0) return 0;
-
-            for (int i = 0; i < take; i++)
-                _cards.Add(add[i]);
-
-            GameEvents.RaiseHandChanged(_cards.Count);
-            return take;
-        }
-
-        public bool Remove(CardData c)
-        {
-            bool ok = _cards.Remove(c);
-            if (ok) GameEvents.RaiseHandChanged(_cards.Count);
-            return ok;
-        }
-
-        /// <summary>사용 버튼 핸들러가 호출. 내부에서 제거 후 OnUsed로 알림.</summary>
-        public void Use(CardData c)
-        {
-            if (Remove(c))
-                OnUsed?.Invoke(c);
+            if (drawResult == null) return 0;
+            int added = 0;
+            foreach (var c in drawResult)
+            {
+                if (c == null) continue;
+                if (_items.Count >= handMax) break;
+                _items.Add(c);
+                added++;
+                OnAdded?.Invoke(c);
+            }
+            GameEvents.RaiseHandChanged(_items.Count);
+            return added;
         }
 
         public void Clear()
         {
-            _cards.Clear();
-            GameEvents.RaiseHandChanged(_cards.Count);
+            _items.Clear();
+            GameEvents.RaiseHandChanged(_items.Count);
         }
 
         public List<CardData> TakeAll()
         {
-            var all = new List<CardData>(_cards);
-            _cards.Clear();
-            GameEvents.RaiseHandChanged(_cards.Count);
+            var all = new List<CardData>(_items);
+            _items.Clear();
+            GameEvents.RaiseHandChanged(_items.Count);
             return all;
+        }
+
+        public void MarkUsed(CardData used)
+        {
+            if (_items.Remove(used))
+            {
+                OnUsed?.Invoke(used);
+                GameEvents.RaiseHandChanged(_items.Count);
+            }
         }
     }
 }
@@ -1687,6 +2300,103 @@ namespace SDProject.Data
     {
         // 초기 덱 구성 리스트 (Inspector에서 카드들을 드래그하여 채우세요)
         public List<CardData> cards = new();
+    }
+}
+```
+
+## Assets\SDProject\Scripts\Data\DeckSourceSOAdapter.cs
+```csharp
+// Assets/SDProject/Scripts/Data/DeckSourceSOAdapter.cs
+using System.Collections.Generic;
+using System.Reflection;
+using UnityEngine;
+using SDProject.Data;
+
+namespace SDProject.DataBridge
+{
+    /// <summary>
+    /// DeckList(SO)의 cards(List<CardData>)를 읽어 초기 덱을 제공합니다.
+    /// CardData에 Enabled/IsEnabled/Active 같은 불리언이 있으면 필터링, 없으면 전부 포함합니다.
+    /// </summary>
+    public sealed class DeckSourceSOAdapter : MonoBehaviour, IDeckSource
+    {
+        [Header("ScriptableObject Source")]
+        [SerializeField] private DeckList _deckList;
+
+        public IReadOnlyList<CardData> GetInitialDeck()
+        {
+            if (_deckList == null)
+            {
+                Debug.LogWarning("[DeckSourceSOAdapter] DeckList not assigned.");
+                return System.Array.Empty<CardData>();
+            }
+
+            if (_deckList.cards == null || _deckList.cards.Count == 0)
+            {
+                Debug.LogWarning("[DeckSourceSOAdapter] DeckList.cards is empty.");
+                return System.Array.Empty<CardData>();
+            }
+
+            var list = new List<CardData>(_deckList.cards.Count);
+            foreach (var c in _deckList.cards)
+            {
+                if (c == null) { Debug.LogWarning("[DeckSourceSOAdapter] Null card skipped."); continue; }
+                if (!IsEnabledIfPresent(c)) { Debug.Log($"[DeckSourceSOAdapter] Skipped(disabled?): {c.name}"); continue; }
+                list.Add(c);
+            }
+
+            Debug.Log($"[DeckSourceSOAdapter] Loaded {list.Count} card(s) from DeckList.cards");
+            return list;
+        }
+
+        /// <summary>
+        /// CardData에 Enabled/IsEnabled/Active 불리언 멤버가 있으면 그 값을 따르고,
+        /// 없으면 true를 반환하여 포함합니다.
+        /// </summary>
+        private static bool IsEnabledIfPresent(CardData card)
+        {
+            var t = card.GetType();
+
+            // 1) Field 우선
+            foreach (var name in new[] { "Enabled", "IsEnabled", "Active", "IsActive" })
+            {
+                var f = t.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                if (f != null && f.FieldType == typeof(bool))
+                {
+                    try { return (bool)f.GetValue(card); } catch { return true; }
+                }
+            }
+
+            // 2) Property
+            foreach (var name in new[] { "Enabled", "IsEnabled", "Active", "IsActive" })
+            {
+                var p = t.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                if (p != null && p.CanRead && p.PropertyType == typeof(bool))
+                {
+                    try { return (bool)p.GetValue(card); } catch { return true; }
+                }
+            }
+
+            // 멤버가 없으면 포함
+            return true;
+        }
+    }
+}
+```
+
+## Assets\SDProject\Scripts\Data\IDeckSource.cs
+```csharp
+using System.Collections.Generic;
+using SDProject.Data;
+
+namespace SDProject.DataBridge
+{
+    /// <summary>
+    /// Read-only source for initial deck (e.g., from DeckList ScriptableObject).
+    /// </summary>
+    public interface IDeckSource
+    {
+        IReadOnlyList<CardData> GetInitialDeck();
     }
 }
 ```
@@ -2284,6 +2994,85 @@ namespace SDProject.DataTable
         }
 
         public static IReadOnlyDictionary<string, TableAsset> All => _tables;
+    }
+}
+```
+
+## Assets\SDProject\Scripts\UI\AssignFirstAllyCaster.cs
+```csharp
+// Assets/SDProject/Scripts/UI/Controls/AssignFirstAllyCaster.cs
+using SDProject.Combat;
+using SDProject.Combat.Cards;
+using SDProject.Combat.Board;  // TeamSide enum
+using System.Collections;
+using System.Linq;
+using UnityEngine;
+
+[RequireComponent(typeof(CardView))]
+public class AssignFirstAllyCaster : MonoBehaviour
+{
+    [Tooltip("Wait a frame so binders can register to BoardRuntime first.")]
+    [SerializeField] private bool waitOneFrame = true;
+
+    [Tooltip("If true, pick the ally with the highest slot index (front-most in our layout).")]
+    [SerializeField] private bool preferFrontMost = true;
+
+    private CardView _cv;
+
+    private void Awake()
+    {
+        _cv = GetComponent<CardView>();
+    }
+
+    private void OnEnable()
+    {
+        if (waitOneFrame) StartCoroutine(AssignNextFrame());
+        else TryAssignNow();
+    }
+
+    private IEnumerator AssignNextFrame()
+    {
+        // 슬롯 등록(바인더) 타이밍 보정을 위해 한 프레임 대기
+        yield return null;
+        TryAssignNow();
+    }
+
+    private void TryAssignNow()
+    {
+        // 이미 수동으로 Caster가 지정되어 있으면 아무것도 하지 않음
+        if (_cv.Caster != null) return;
+
+        // 씬에서 Ally 팀의 SimpleUnitBinder들을 수집
+        var binders = FindObjectsByType<SimpleUnitBinder>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+            .Where(b => b != null && b.Team == TeamSide.Ally)
+            .ToList();
+
+        if (binders.Count == 0)
+        {
+            Debug.LogWarning("[AssignFirstAllyCaster] No Ally binders found in scene.");
+            return;
+        }
+
+        // 캐스터 후보 선택 규칙:
+        // 1) preferFrontMost=true 이면 index가 큰 순서(Front가 큰 인덱스) 우선
+        // 2) 아니면 index가 작은 순서
+        var ordered = preferFrontMost
+            ? binders.OrderByDescending(b => b.Index)
+            : binders.OrderBy(b => b.Index);
+
+        // SimpleUnit 컴포넌트가 있는 첫 후보를 캐스터로 사용
+        foreach (var b in ordered)
+        {
+            var su = b.GetComponent<SimpleUnit>();
+            if (su != null)
+            {
+                _cv.Caster = su.gameObject;
+                Debug.Log($"[AssignFirstAllyCaster] Caster assigned: {su.name} (team={b.Team}, index={b.Index})");
+                return;
+            }
+        }
+
+        Debug.LogWarning("[AssignFirstAllyCaster] Ally binders found, but no SimpleUnit component attached.");
     }
 }
 ```
