@@ -8,6 +8,7 @@ namespace SDProject.Data
         [Header("Identity")]
         public string cardId;
         public string displayName;
+        public string description;
 
         [Header("Cost")]
         [Min(0)] public int apCost = 1;

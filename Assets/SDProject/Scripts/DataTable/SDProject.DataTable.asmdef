@@ -1,12 +1,8 @@
 {
-    "name": "SDProject.Combat",
-    "rootNamespace": "SDProject.Combat",
+    "name": "SDProject.DataTable",
+    "rootNamespace": "SDProject.DataTable",
     "references": [
-        "SDProject.Core",
-        "SDProject.DataBridge",
-        "SDProject.Data",
-        "Unity.InputSystem",
-        "Unity.TextMeshPro"
+        "GUID:f3933ab334dcb534fb9b7e3e6c06a979"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,12 +1,9 @@
 {
-    "name": "SDProject.Combat",
-    "rootNamespace": "SDProject.Combat",
+    "name": "SDProject.DataBridge",
+    "rootNamespace": "SDProject.DataBridge",
     "references": [
-        "SDProject.Core",
-        "SDProject.DataBridge",
-        "SDProject.Data",
-        "Unity.InputSystem",
-        "Unity.TextMeshPro"
+        "GUID:f3933ab334dcb534fb9b7e3e6c06a979",
+        "GUID:4af6bbf72a72bb845b0cca658bae9fdd"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
