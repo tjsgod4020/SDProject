@@ -1,0 +1,912 @@
+﻿D:\SD\SDProject\Assets
+D:\SD\SDProject\Docs
+D:\SD\SDProject\Packages
+D:\SD\SDProject\ProjectSettings
+D:\SD\SDProject\UIElementsSchema
+D:\SD\SDProject\.gitattributes
+D:\SD\SDProject\.gitignore
+D:\SD\SDProject\.vsconfig
+D:\SD\SDProject\asmdef.csproj
+D:\SD\SDProject\Assembly-CSharp-Editor.csproj
+D:\SD\SDProject\Assembly-CSharp.csproj
+D:\SD\SDProject\CODEMAP.txt
+D:\SD\SDProject\CODESNAPSHOT.md
+D:\SD\SDProject\ignore.conf
+D:\SD\SDProject\NewAssembly.csproj
+D:\SD\SDProject\SDProject.Combat.csproj
+D:\SD\SDProject\SDProject.Core.csproj
+D:\SD\SDProject\SDProject.Data.csproj
+D:\SD\SDProject\SDProject.DataBridge.csproj
+D:\SD\SDProject\SDProject.DataTable.csproj
+D:\SD\SDProject\SDProject.sln
+D:\SD\SDProject\SDProject.UI.csproj
+D:\SD\SDProject\Temp.txt
+D:\SD\SDProject\Assets\NuGet
+D:\SD\SDProject\Assets\Packages
+D:\SD\SDProject\Assets\SDProject
+D:\SD\SDProject\Assets\Settings
+D:\SD\SDProject\Assets\TextMesh Pro
+D:\SD\SDProject\Assets\_Recovery
+D:\SD\SDProject\Assets\DefaultVolumeProfile.asset
+D:\SD\SDProject\Assets\DefaultVolumeProfile.asset.meta
+D:\SD\SDProject\Assets\InputSystem_Actions.inputactions
+D:\SD\SDProject\Assets\InputSystem_Actions.inputactions.meta
+D:\SD\SDProject\Assets\NuGet.config
+D:\SD\SDProject\Assets\NuGet.config.meta
+D:\SD\SDProject\Assets\NuGet.meta
+D:\SD\SDProject\Assets\packages.config
+D:\SD\SDProject\Assets\packages.config.meta
+D:\SD\SDProject\Assets\Packages.meta
+D:\SD\SDProject\Assets\SDProject.meta
+D:\SD\SDProject\Assets\Settings.meta
+D:\SD\SDProject\Assets\TextMesh Pro.meta
+D:\SD\SDProject\Assets\UniversalRenderPipelineGlobalSettings.asset
+D:\SD\SDProject\Assets\UniversalRenderPipelineGlobalSettings.asset.meta
+D:\SD\SDProject\Assets\_Recovery.meta
+D:\SD\SDProject\Assets\NuGet\Editor
+D:\SD\SDProject\Assets\NuGet\Resources
+D:\SD\SDProject\Assets\NuGet\Editor.meta
+D:\SD\SDProject\Assets\NuGet\LICENSE
+D:\SD\SDProject\Assets\NuGet\LICENSE.meta
+D:\SD\SDProject\Assets\NuGet\README.pdf
+D:\SD\SDProject\Assets\NuGet\README.pdf.meta
+D:\SD\SDProject\Assets\NuGet\Resources.meta
+D:\SD\SDProject\Assets\NuGet\Editor\NugetForUnity.dll
+D:\SD\SDProject\Assets\NuGet\Editor\NugetForUnity.dll.meta
+D:\SD\SDProject\Assets\NuGet\Editor\NuGetForUnity.PluginAPI.dll
+D:\SD\SDProject\Assets\NuGet\Editor\NuGetForUnity.PluginAPI.dll.meta
+D:\SD\SDProject\Assets\NuGet\Editor\NuGetForUnity.PluginAPI.xml
+D:\SD\SDProject\Assets\NuGet\Editor\NuGetForUnity.PluginAPI.xml.meta
+D:\SD\SDProject\Assets\NuGet\Resources\defaultIcon.png
+D:\SD\SDProject\Assets\NuGet\Resources\defaultIcon.png.meta
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0
+D:\SD\SDProject\Assets\Packages\Enums.NET.5.0.0
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0
+D:\SD\SDProject\Assets\Packages\ExtendedNumerics.BigDecimal.2025.1001.2.129
+D:\SD\SDProject\Assets\Packages\MathNet.Numerics.Signed.5.0.0
+D:\SD\SDProject\Assets\Packages\Microsoft.IO.RecyclableMemoryStream.3.0.1
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5
+D:\SD\SDProject\Assets\Packages\NSax.1.0.2
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2
+D:\SD\SDProject\Assets\Packages\SixLabors.Fonts.1.0.1
+D:\SD\SDProject\Assets\Packages\SixLabors.ImageSharp.2.1.11
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0
+D:\SD\SDProject\Assets\Packages\ZString.2.6.0
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0.meta
+D:\SD\SDProject\Assets\Packages\Enums.NET.5.0.0.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0.meta
+D:\SD\SDProject\Assets\Packages\ExtendedNumerics.BigDecimal.2025.1001.2.129.meta
+D:\SD\SDProject\Assets\Packages\MathNet.Numerics.Signed.5.0.0.meta
+D:\SD\SDProject\Assets\Packages\Microsoft.IO.RecyclableMemoryStream.3.0.1.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5.meta
+D:\SD\SDProject\Assets\Packages\NSax.1.0.2.meta
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2.meta
+D:\SD\SDProject\Assets\Packages\SixLabors.Fonts.1.0.1.meta
+D:\SD\SDProject\Assets\Packages\SixLabors.ImageSharp.2.1.11.meta
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1.meta
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0.meta
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0.meta
+D:\SD\SDProject\Assets\Packages\ZString.2.6.0.meta
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\lib
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\.signature.p7s
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\BouncyCastle.Cryptography.nuspec
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\BouncyCastle.Cryptography.nuspec.meta
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\lib.meta
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\LICENSE.md
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\LICENSE.md.meta
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\packageIcon.png
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\packageIcon.png.meta
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\README.md
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\README.md.meta
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\lib\netstandard2.0
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\lib\netstandard2.0.meta
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\lib\netstandard2.0\BouncyCastle.Cryptography.dll
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\lib\netstandard2.0\BouncyCastle.Cryptography.dll.meta
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\lib\netstandard2.0\BouncyCastle.Cryptography.xml
+D:\SD\SDProject\Assets\Packages\BouncyCastle.Cryptography.2.4.0\lib\netstandard2.0\BouncyCastle.Cryptography.xml.meta
+D:\SD\SDProject\Assets\Packages\Enums.NET.5.0.0\lib
+D:\SD\SDProject\Assets\Packages\Enums.NET.5.0.0\.signature.p7s
+D:\SD\SDProject\Assets\Packages\Enums.NET.5.0.0\Enums.NET.nuspec
+D:\SD\SDProject\Assets\Packages\Enums.NET.5.0.0\Enums.NET.nuspec.meta
+D:\SD\SDProject\Assets\Packages\Enums.NET.5.0.0\lib.meta
+D:\SD\SDProject\Assets\Packages\Enums.NET.5.0.0\lib\netstandard2.1
+D:\SD\SDProject\Assets\Packages\Enums.NET.5.0.0\lib\netstandard2.1.meta
+D:\SD\SDProject\Assets\Packages\Enums.NET.5.0.0\lib\netstandard2.1\Enums.NET.dll
+D:\SD\SDProject\Assets\Packages\Enums.NET.5.0.0\lib\netstandard2.1\Enums.NET.dll.meta
+D:\SD\SDProject\Assets\Packages\Enums.NET.5.0.0\lib\netstandard2.1\Enums.NET.xml
+D:\SD\SDProject\Assets\Packages\Enums.NET.5.0.0\lib\netstandard2.1\Enums.NET.xml.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0\lib
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0\.signature.p7s
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0\ExcelDataReader.nuspec
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0\ExcelDataReader.nuspec.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0\ExcelDataReader.png
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0\ExcelDataReader.png.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0\lib.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0\README.md
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0\README.md.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0\lib\netstandard2.1
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0\lib\netstandard2.1.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0\lib\netstandard2.1\ExcelDataReader.dll
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0\lib\netstandard2.1\ExcelDataReader.dll.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0\lib\netstandard2.1\ExcelDataReader.xml
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.3.8.0\lib\netstandard2.1\ExcelDataReader.xml.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0\lib
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0\.signature.p7s
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0\ExcelDataReader.DataSet.nuspec
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0\ExcelDataReader.DataSet.nuspec.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0\ExcelDataReader.png
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0\ExcelDataReader.png.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0\lib.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0\README.md
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0\README.md.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0\lib\netstandard2.1
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0\lib\netstandard2.1.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0\lib\netstandard2.1\ExcelDataReader.DataSet.dll
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0\lib\netstandard2.1\ExcelDataReader.DataSet.dll.meta
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0\lib\netstandard2.1\ExcelDataReader.DataSet.xml
+D:\SD\SDProject\Assets\Packages\ExcelDataReader.DataSet.3.8.0\lib\netstandard2.1\ExcelDataReader.DataSet.xml.meta
+D:\SD\SDProject\Assets\Packages\ExtendedNumerics.BigDecimal.2025.1001.2.129\lib
+D:\SD\SDProject\Assets\Packages\ExtendedNumerics.BigDecimal.2025.1001.2.129\.signature.p7s
+D:\SD\SDProject\Assets\Packages\ExtendedNumerics.BigDecimal.2025.1001.2.129\ExtendedNumerics.BigDecimal.nuspec
+D:\SD\SDProject\Assets\Packages\ExtendedNumerics.BigDecimal.2025.1001.2.129\ExtendedNumerics.BigDecimal.nuspec.meta
+D:\SD\SDProject\Assets\Packages\ExtendedNumerics.BigDecimal.2025.1001.2.129\lib.meta
+D:\SD\SDProject\Assets\Packages\ExtendedNumerics.BigDecimal.2025.1001.2.129\README.md
+D:\SD\SDProject\Assets\Packages\ExtendedNumerics.BigDecimal.2025.1001.2.129\README.md.meta
+D:\SD\SDProject\Assets\Packages\ExtendedNumerics.BigDecimal.2025.1001.2.129\lib\netstandard2.1
+D:\SD\SDProject\Assets\Packages\ExtendedNumerics.BigDecimal.2025.1001.2.129\lib\netstandard2.1.meta
+D:\SD\SDProject\Assets\Packages\ExtendedNumerics.BigDecimal.2025.1001.2.129\lib\netstandard2.1\ExtendedNumerics.BigDecimal.dll
+D:\SD\SDProject\Assets\Packages\ExtendedNumerics.BigDecimal.2025.1001.2.129\lib\netstandard2.1\ExtendedNumerics.BigDecimal.dll.meta
+D:\SD\SDProject\Assets\Packages\ExtendedNumerics.BigDecimal.2025.1001.2.129\lib\netstandard2.1\ExtendedNumerics.BigDecimal.xml
+D:\SD\SDProject\Assets\Packages\ExtendedNumerics.BigDecimal.2025.1001.2.129\lib\netstandard2.1\ExtendedNumerics.BigDecimal.xml.meta
+D:\SD\SDProject\Assets\Packages\MathNet.Numerics.Signed.5.0.0\lib
+D:\SD\SDProject\Assets\Packages\MathNet.Numerics.Signed.5.0.0\.signature.p7s
+D:\SD\SDProject\Assets\Packages\MathNet.Numerics.Signed.5.0.0\icon.png
+D:\SD\SDProject\Assets\Packages\MathNet.Numerics.Signed.5.0.0\icon.png.meta
+D:\SD\SDProject\Assets\Packages\MathNet.Numerics.Signed.5.0.0\lib.meta
+D:\SD\SDProject\Assets\Packages\MathNet.Numerics.Signed.5.0.0\MathNet.Numerics.Signed.nuspec
+D:\SD\SDProject\Assets\Packages\MathNet.Numerics.Signed.5.0.0\MathNet.Numerics.Signed.nuspec.meta
+D:\SD\SDProject\Assets\Packages\MathNet.Numerics.Signed.5.0.0\lib\netstandard2.0
+D:\SD\SDProject\Assets\Packages\MathNet.Numerics.Signed.5.0.0\lib\netstandard2.0.meta
+D:\SD\SDProject\Assets\Packages\MathNet.Numerics.Signed.5.0.0\lib\netstandard2.0\MathNet.Numerics.dll
+D:\SD\SDProject\Assets\Packages\MathNet.Numerics.Signed.5.0.0\lib\netstandard2.0\MathNet.Numerics.dll.meta
+D:\SD\SDProject\Assets\Packages\MathNet.Numerics.Signed.5.0.0\lib\netstandard2.0\MathNet.Numerics.xml
+D:\SD\SDProject\Assets\Packages\MathNet.Numerics.Signed.5.0.0\lib\netstandard2.0\MathNet.Numerics.xml.meta
+D:\SD\SDProject\Assets\Packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib
+D:\SD\SDProject\Assets\Packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\.signature.p7s
+D:\SD\SDProject\Assets\Packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib.meta
+D:\SD\SDProject\Assets\Packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\Microsoft.IO.RecyclableMemoryStream.nuspec
+D:\SD\SDProject\Assets\Packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\Microsoft.IO.RecyclableMemoryStream.nuspec.meta
+D:\SD\SDProject\Assets\Packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\README.md
+D:\SD\SDProject\Assets\Packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\README.md.meta
+D:\SD\SDProject\Assets\Packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib\netstandard2.1
+D:\SD\SDProject\Assets\Packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib\netstandard2.1.meta
+D:\SD\SDProject\Assets\Packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib\netstandard2.1\Microsoft.IO.RecyclableMemoryStream.dll
+D:\SD\SDProject\Assets\Packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib\netstandard2.1\Microsoft.IO.RecyclableMemoryStream.dll.meta
+D:\SD\SDProject\Assets\Packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib\netstandard2.1\Microsoft.IO.RecyclableMemoryStream.xml
+D:\SD\SDProject\Assets\Packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib\netstandard2.1\Microsoft.IO.RecyclableMemoryStream.xml.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\logo
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\.signature.p7s
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\LICENSE
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\LICENSE.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\logo.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\NPOI.nuspec
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\NPOI.nuspec.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\README.md
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\README.md.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.Core.dll
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.Core.dll.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.Core.xml
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.Core.xml.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.OOXML.dll
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.OOXML.dll.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.OOXML.xml
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.OOXML.xml.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.OpenXml4Net.dll
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.OpenXml4Net.dll.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.OpenXml4Net.xml
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.OpenXml4Net.xml.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.OpenXmlFormats.dll
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.OpenXmlFormats.dll.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.OpenXmlFormats.xml
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\lib\netstandard2.1\NPOI.OpenXmlFormats.xml.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\logo\120_120.jpg
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\logo\120_120.jpg.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\logo\240_240.png
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\logo\240_240.png.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\logo\32_32.jpg
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\logo\32_32.jpg.meta
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\logo\60_60.jpg
+D:\SD\SDProject\Assets\Packages\NPOI.2.7.5\logo\60_60.jpg.meta
+D:\SD\SDProject\Assets\Packages\NSax.1.0.2\lib
+D:\SD\SDProject\Assets\Packages\NSax.1.0.2\.signature.p7s
+D:\SD\SDProject\Assets\Packages\NSax.1.0.2\lib.meta
+D:\SD\SDProject\Assets\Packages\NSax.1.0.2\NSax.nuspec
+D:\SD\SDProject\Assets\Packages\NSax.1.0.2\NSax.nuspec.meta
+D:\SD\SDProject\Assets\Packages\NSax.1.0.2\README.md
+D:\SD\SDProject\Assets\Packages\NSax.1.0.2\README.md.meta
+D:\SD\SDProject\Assets\Packages\NSax.1.0.2\lib\netstandard2.1
+D:\SD\SDProject\Assets\Packages\NSax.1.0.2\lib\netstandard2.1.meta
+D:\SD\SDProject\Assets\Packages\NSax.1.0.2\lib\netstandard2.1\NSax.dll
+D:\SD\SDProject\Assets\Packages\NSax.1.0.2\lib\netstandard2.1\NSax.dll.meta
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2\images
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2\lib
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2\.signature.p7s
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2\images.meta
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2\lib.meta
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2\SharpZipLib.nuspec
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2\SharpZipLib.nuspec.meta
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2\images\sharpziplib-nuget-256x256.png
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2\images\sharpziplib-nuget-256x256.png.meta
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2\lib\netstandard2.1
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2\lib\netstandard2.1.meta
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2\lib\netstandard2.1\ICSharpCode.SharpZipLib.dll
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2\lib\netstandard2.1\ICSharpCode.SharpZipLib.dll.meta
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2\lib\netstandard2.1\ICSharpCode.SharpZipLib.xml
+D:\SD\SDProject\Assets\Packages\SharpZipLib.1.4.2\lib\netstandard2.1\ICSharpCode.SharpZipLib.xml.meta
+D:\SD\SDProject\Assets\Packages\SixLabors.Fonts.1.0.1\lib
+D:\SD\SDProject\Assets\Packages\SixLabors.Fonts.1.0.1\.signature.p7s
+D:\SD\SDProject\Assets\Packages\SixLabors.Fonts.1.0.1\lib.meta
+D:\SD\SDProject\Assets\Packages\SixLabors.Fonts.1.0.1\sixlabors.fonts.128.png
+D:\SD\SDProject\Assets\Packages\SixLabors.Fonts.1.0.1\sixlabors.fonts.128.png.meta
+D:\SD\SDProject\Assets\Packages\SixLabors.Fonts.1.0.1\SixLabors.Fonts.nuspec
+D:\SD\SDProject\Assets\Packages\SixLabors.Fonts.1.0.1\SixLabors.Fonts.nuspec.meta
+D:\SD\SDProject\Assets\Packages\SixLabors.Fonts.1.0.1\lib\netstandard2.1
+D:\SD\SDProject\Assets\Packages\SixLabors.Fonts.1.0.1\lib\netstandard2.1.meta
+D:\SD\SDProject\Assets\Packages\SixLabors.Fonts.1.0.1\lib\netstandard2.1\SixLabors.Fonts.dll
+D:\SD\SDProject\Assets\Packages\SixLabors.Fonts.1.0.1\lib\netstandard2.1\SixLabors.Fonts.dll.meta
+D:\SD\SDProject\Assets\Packages\SixLabors.Fonts.1.0.1\lib\netstandard2.1\SixLabors.Fonts.xml
+D:\SD\SDProject\Assets\Packages\SixLabors.Fonts.1.0.1\lib\netstandard2.1\SixLabors.Fonts.xml.meta
+D:\SD\SDProject\Assets\Packages\SixLabors.ImageSharp.2.1.11\lib
+D:\SD\SDProject\Assets\Packages\SixLabors.ImageSharp.2.1.11\.signature.p7s
+D:\SD\SDProject\Assets\Packages\SixLabors.ImageSharp.2.1.11\lib.meta
+D:\SD\SDProject\Assets\Packages\SixLabors.ImageSharp.2.1.11\sixlabors.imagesharp.128.png
+D:\SD\SDProject\Assets\Packages\SixLabors.ImageSharp.2.1.11\sixlabors.imagesharp.128.png.meta
+D:\SD\SDProject\Assets\Packages\SixLabors.ImageSharp.2.1.11\SixLabors.ImageSharp.nuspec
+D:\SD\SDProject\Assets\Packages\SixLabors.ImageSharp.2.1.11\SixLabors.ImageSharp.nuspec.meta
+D:\SD\SDProject\Assets\Packages\SixLabors.ImageSharp.2.1.11\lib\netstandard2.1
+D:\SD\SDProject\Assets\Packages\SixLabors.ImageSharp.2.1.11\lib\netstandard2.1.meta
+D:\SD\SDProject\Assets\Packages\SixLabors.ImageSharp.2.1.11\lib\netstandard2.1\SixLabors.ImageSharp.dll
+D:\SD\SDProject\Assets\Packages\SixLabors.ImageSharp.2.1.11\lib\netstandard2.1\SixLabors.ImageSharp.dll.meta
+D:\SD\SDProject\Assets\Packages\SixLabors.ImageSharp.2.1.11\lib\netstandard2.1\SixLabors.ImageSharp.xml
+D:\SD\SDProject\Assets\Packages\SixLabors.ImageSharp.2.1.11\lib\netstandard2.1\SixLabors.ImageSharp.xml.meta
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\lib
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\.signature.p7s
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\Icon.png
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\Icon.png.meta
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\lib.meta
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\LICENSE.TXT
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\LICENSE.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\System.ComponentModel.Annotations.nuspec
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\System.ComponentModel.Annotations.nuspec.meta
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\THIRD-PARTY-NOTICES.TXT
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\THIRD-PARTY-NOTICES.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\useSharedDesignerContext.txt
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\useSharedDesignerContext.txt.meta
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\version.txt
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\version.txt.meta
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\lib\netstandard2.1
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\lib\netstandard2.1.meta
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\lib\netstandard2.1\System.ComponentModel.Annotations.dll
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\lib\netstandard2.1\System.ComponentModel.Annotations.dll.meta
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\lib\netstandard2.1\System.ComponentModel.Annotations.xml
+D:\SD\SDProject\Assets\Packages\System.ComponentModel.Annotations.5.0.0\lib\netstandard2.1\System.ComponentModel.Annotations.xml.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\lib
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\.signature.p7s
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\Icon.png
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\Icon.png.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\lib.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\LICENSE.TXT
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\LICENSE.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\System.Formats.Asn1.nuspec
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\System.Formats.Asn1.nuspec.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\THIRD-PARTY-NOTICES.TXT
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\THIRD-PARTY-NOTICES.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\useSharedDesignerContext.txt
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\useSharedDesignerContext.txt.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\net461
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\net462
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\net6.0
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\netcoreapp2.0
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\net461.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\net462.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\net6.0.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\netcoreapp2.0.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\net461\System.Formats.Asn1.targets
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\net461\System.Formats.Asn1.targets.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\net462\_._
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\net462\_._.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\net6.0\_._
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\net6.0\_._.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\netcoreapp2.0\System.Formats.Asn1.targets
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\buildTransitive\netcoreapp2.0\System.Formats.Asn1.targets.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\lib\netstandard2.0
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\lib\netstandard2.0.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\lib\netstandard2.0\System.Formats.Asn1.dll
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\lib\netstandard2.0\System.Formats.Asn1.dll.meta
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\lib\netstandard2.0\System.Formats.Asn1.xml
+D:\SD\SDProject\Assets\Packages\System.Formats.Asn1.8.0.1\lib\netstandard2.0\System.Formats.Asn1.xml.meta
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\buildTransitive
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\lib
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\.signature.p7s
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\buildTransitive.meta
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\Icon.png
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\Icon.png.meta
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\lib.meta
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\LICENSE.TXT
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\LICENSE.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\System.Security.AccessControl.nuspec
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\System.Security.AccessControl.nuspec.meta
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\THIRD-PARTY-NOTICES.TXT
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\THIRD-PARTY-NOTICES.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\useSharedDesignerContext.txt
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\useSharedDesignerContext.txt.meta
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\buildTransitive\netcoreapp2.0
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\buildTransitive\netcoreapp3.1
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\buildTransitive\netcoreapp2.0.meta
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\buildTransitive\netcoreapp3.1.meta
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\buildTransitive\netcoreapp2.0\System.Security.AccessControl.targets
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\buildTransitive\netcoreapp2.0\System.Security.AccessControl.targets.meta
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\buildTransitive\netcoreapp3.1\_._
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\buildTransitive\netcoreapp3.1\_._.meta
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\lib\netstandard2.0
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\lib\netstandard2.0.meta
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\lib\netstandard2.0\System.Security.AccessControl.dll
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\lib\netstandard2.0\System.Security.AccessControl.dll.meta
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\lib\netstandard2.0\System.Security.AccessControl.xml
+D:\SD\SDProject\Assets\Packages\System.Security.AccessControl.6.0.0\lib\netstandard2.0\System.Security.AccessControl.xml.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\lib
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\.signature.p7s
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\Icon.png
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\Icon.png.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\lib.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\LICENSE.TXT
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\LICENSE.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\System.Security.Cryptography.Cng.nuspec
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\System.Security.Cryptography.Cng.nuspec.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\THIRD-PARTY-NOTICES.TXT
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\THIRD-PARTY-NOTICES.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\useSharedDesignerContext.txt
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\useSharedDesignerContext.txt.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\version.txt
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\version.txt.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\lib\netstandard2.1
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\lib\netstandard2.1.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\lib\netstandard2.1\System.Security.Cryptography.Cng.dll
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\lib\netstandard2.1\System.Security.Cryptography.Cng.dll.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\lib\netstandard2.1\System.Security.Cryptography.Cng.xml
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Cng.5.0.0\lib\netstandard2.1\System.Security.Cryptography.Cng.xml.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\lib
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\.signature.p7s
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\Icon.png
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\Icon.png.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\lib.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\LICENSE.TXT
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\LICENSE.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\System.Security.Cryptography.Pkcs.nuspec
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\System.Security.Cryptography.Pkcs.nuspec.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\THIRD-PARTY-NOTICES.TXT
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\THIRD-PARTY-NOTICES.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\useSharedDesignerContext.txt
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\useSharedDesignerContext.txt.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\net461
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\net462
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\net6.0
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\netcoreapp2.0
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\net461.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\net462.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\net6.0.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\netcoreapp2.0.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\net461\System.Security.Cryptography.Pkcs.targets
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\net461\System.Security.Cryptography.Pkcs.targets.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\net462\_._
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\net462\_._.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\net6.0\_._
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\net6.0\_._.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\netcoreapp2.0\System.Security.Cryptography.Pkcs.targets
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\buildTransitive\netcoreapp2.0\System.Security.Cryptography.Pkcs.targets.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\lib\netstandard2.1
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\lib\netstandard2.1.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\lib\netstandard2.1\System.Security.Cryptography.Pkcs.dll
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\lib\netstandard2.1\System.Security.Cryptography.Pkcs.dll.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\lib\netstandard2.1\System.Security.Cryptography.Pkcs.xml
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Pkcs.8.0.1\lib\netstandard2.1\System.Security.Cryptography.Pkcs.xml.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\lib
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\.signature.p7s
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\Icon.png
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\Icon.png.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\lib.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\LICENSE.TXT
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\LICENSE.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\System.Security.Cryptography.Xml.nuspec
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\System.Security.Cryptography.Xml.nuspec.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\THIRD-PARTY-NOTICES.TXT
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\THIRD-PARTY-NOTICES.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\useSharedDesignerContext.txt
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\useSharedDesignerContext.txt.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\net461
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\net462
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\net6.0
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\netcoreapp2.0
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\net461.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\net462.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\net6.0.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\netcoreapp2.0.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\net461\System.Security.Cryptography.Xml.targets
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\net461\System.Security.Cryptography.Xml.targets.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\net462\_._
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\net462\_._.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\net6.0\_._
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\net6.0\_._.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\netcoreapp2.0\System.Security.Cryptography.Xml.targets
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\buildTransitive\netcoreapp2.0\System.Security.Cryptography.Xml.targets.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\lib\netstandard2.0
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\lib\netstandard2.0.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\lib\netstandard2.0\System.Security.Cryptography.Xml.dll
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\lib\netstandard2.0\System.Security.Cryptography.Xml.dll.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\lib\netstandard2.0\System.Security.Cryptography.Xml.xml
+D:\SD\SDProject\Assets\Packages\System.Security.Cryptography.Xml.8.0.2\lib\netstandard2.0\System.Security.Cryptography.Xml.xml.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\lib
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\.signature.p7s
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\Icon.png
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\Icon.png.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\lib.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\LICENSE.TXT
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\LICENSE.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\System.Security.Principal.Windows.nuspec
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\System.Security.Principal.Windows.nuspec.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\THIRD-PARTY-NOTICES.TXT
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\THIRD-PARTY-NOTICES.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\useSharedDesignerContext.txt
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\useSharedDesignerContext.txt.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\version.txt
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\version.txt.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\lib\netstandard2.0
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\lib\netstandard2.0.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\lib\netstandard2.0\System.Security.Principal.Windows.dll
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\lib\netstandard2.0\System.Security.Principal.Windows.dll.meta
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\lib\netstandard2.0\System.Security.Principal.Windows.xml
+D:\SD\SDProject\Assets\Packages\System.Security.Principal.Windows.5.0.0\lib\netstandard2.0\System.Security.Principal.Windows.xml.meta
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\lib
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\.signature.p7s
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\Icon.png
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\Icon.png.meta
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\lib.meta
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\LICENSE.TXT
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\LICENSE.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\System.Text.Encoding.CodePages.nuspec
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\System.Text.Encoding.CodePages.nuspec.meta
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\THIRD-PARTY-NOTICES.TXT
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\THIRD-PARTY-NOTICES.TXT.meta
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\useSharedDesignerContext.txt
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\useSharedDesignerContext.txt.meta
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\version.txt
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\version.txt.meta
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\lib\netstandard2.0
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\lib\netstandard2.0.meta
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\lib\netstandard2.0\System.Text.Encoding.CodePages.dll
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\lib\netstandard2.0\System.Text.Encoding.CodePages.dll.meta
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\lib\netstandard2.0\System.Text.Encoding.CodePages.xml
+D:\SD\SDProject\Assets\Packages\System.Text.Encoding.CodePages.5.0.0\lib\netstandard2.0\System.Text.Encoding.CodePages.xml.meta
+D:\SD\SDProject\Assets\Packages\ZString.2.6.0\lib
+D:\SD\SDProject\Assets\Packages\ZString.2.6.0\.signature.p7s
+D:\SD\SDProject\Assets\Packages\ZString.2.6.0\Icon.png
+D:\SD\SDProject\Assets\Packages\ZString.2.6.0\Icon.png.meta
+D:\SD\SDProject\Assets\Packages\ZString.2.6.0\lib.meta
+D:\SD\SDProject\Assets\Packages\ZString.2.6.0\ZString.nuspec
+D:\SD\SDProject\Assets\Packages\ZString.2.6.0\ZString.nuspec.meta
+D:\SD\SDProject\Assets\Packages\ZString.2.6.0\lib\netstandard2.1
+D:\SD\SDProject\Assets\Packages\ZString.2.6.0\lib\netstandard2.1.meta
+D:\SD\SDProject\Assets\Packages\ZString.2.6.0\lib\netstandard2.1\ZString.dll
+D:\SD\SDProject\Assets\Packages\ZString.2.6.0\lib\netstandard2.1\ZString.dll.meta
+D:\SD\SDProject\Assets\Packages\ZString.2.6.0\lib\netstandard2.1\ZString.xml
+D:\SD\SDProject\Assets\Packages\ZString.2.6.0\lib\netstandard2.1\ZString.xml.meta
+D:\SD\SDProject\Assets\SDProject\Art
+D:\SD\SDProject\Assets\SDProject\CardEffects
+D:\SD\SDProject\Assets\SDProject\DataTable
+D:\SD\SDProject\Assets\SDProject\Prefabs
+D:\SD\SDProject\Assets\SDProject\Scenes
+D:\SD\SDProject\Assets\SDProject\Scripts
+D:\SD\SDProject\Assets\SDProject\Settings
+D:\SD\SDProject\Assets\SDProject\Tests
+D:\SD\SDProject\Assets\SDProject\ThirdParty
+D:\SD\SDProject\Assets\SDProject\Art.meta
+D:\SD\SDProject\Assets\SDProject\CardEffects.meta
+D:\SD\SDProject\Assets\SDProject\DataTable.meta
+D:\SD\SDProject\Assets\SDProject\Prefabs.meta
+D:\SD\SDProject\Assets\SDProject\Scenes.meta
+D:\SD\SDProject\Assets\SDProject\Scripts.meta
+D:\SD\SDProject\Assets\SDProject\Settings.meta
+D:\SD\SDProject\Assets\SDProject\Tests.meta
+D:\SD\SDProject\Assets\SDProject\ThirdParty.meta
+D:\SD\SDProject\Assets\SDProject\Art\Data
+D:\SD\SDProject\Assets\SDProject\Art\Data.meta
+D:\SD\SDProject\Assets\SDProject\Art\Data\Card_Defend.asset
+D:\SD\SDProject\Assets\SDProject\Art\Data\Card_Defend.asset.meta
+D:\SD\SDProject\Assets\SDProject\Art\Data\Card_Focus.asset
+D:\SD\SDProject\Assets\SDProject\Art\Data\Card_Focus.asset.meta
+D:\SD\SDProject\Assets\SDProject\Art\Data\Card_Move.asset
+D:\SD\SDProject\Assets\SDProject\Art\Data\Card_Move.asset.meta
+D:\SD\SDProject\Assets\SDProject\Art\Data\Card_Pray.asset
+D:\SD\SDProject\Assets\SDProject\Art\Data\Card_Pray.asset.meta
+D:\SD\SDProject\Assets\SDProject\Art\Data\Card_Strike.asset
+D:\SD\SDProject\Assets\SDProject\Art\Data\Card_Strike.asset.meta
+D:\SD\SDProject\Assets\SDProject\Art\Data\DeckList_Starter.asset
+D:\SD\SDProject\Assets\SDProject\Art\Data\DeckList_Starter.asset.meta
+D:\SD\SDProject\Assets\SDProject\CardEffects\ATK_ShieldBash_00.asset
+D:\SD\SDProject\Assets\SDProject\CardEffects\ATK_ShieldBash_00.asset.meta
+D:\SD\SDProject\Assets\SDProject\CardEffects\DamageEffect_Strike.asset
+D:\SD\SDProject\Assets\SDProject\CardEffects\DamageEffect_Strike.asset.meta
+D:\SD\SDProject\Assets\SDProject\CardEffects\KnockbackEffect_1.asset
+D:\SD\SDProject\Assets\SDProject\CardEffects\KnockbackEffect_1.asset.meta
+D:\SD\SDProject\Assets\SDProject\DataTable\Resources
+D:\SD\SDProject\Assets\SDProject\DataTable\Xlsx
+D:\SD\SDProject\Assets\SDProject\DataTable\Resources.meta
+D:\SD\SDProject\Assets\SDProject\DataTable\TableRegistry.asset
+D:\SD\SDProject\Assets\SDProject\DataTable\TableRegistry.asset.meta
+D:\SD\SDProject\Assets\SDProject\DataTable\TableRegistry.cs
+D:\SD\SDProject\Assets\SDProject\DataTable\TableRegistry.cs.meta
+D:\SD\SDProject\Assets\SDProject\DataTable\TableSchema.cs
+D:\SD\SDProject\Assets\SDProject\DataTable\TableSchema.cs.meta
+D:\SD\SDProject\Assets\SDProject\DataTable\Xlsx.meta
+D:\SD\SDProject\Assets\SDProject\DataTable\Resources\DataTableGen
+D:\SD\SDProject\Assets\SDProject\DataTable\Resources\DataTableGen.meta
+D:\SD\SDProject\Assets\SDProject\DataTable\Resources\DataTableGen\CardData.csv
+D:\SD\SDProject\Assets\SDProject\DataTable\Resources\DataTableGen\CardData.csv.meta
+D:\SD\SDProject\Assets\SDProject\DataTable\Resources\DataTableGen\CardDesc.csv
+D:\SD\SDProject\Assets\SDProject\DataTable\Resources\DataTableGen\CardDesc.csv.meta
+D:\SD\SDProject\Assets\SDProject\DataTable\Resources\DataTableGen\CardName.csv
+D:\SD\SDProject\Assets\SDProject\DataTable\Resources\DataTableGen\CardName.csv.meta
+D:\SD\SDProject\Assets\SDProject\DataTable\Xlsx\CardData.xlsx
+D:\SD\SDProject\Assets\SDProject\DataTable\Xlsx\CardData.xlsx.meta
+D:\SD\SDProject\Assets\SDProject\DataTable\Xlsx\CardDesc.xlsx
+D:\SD\SDProject\Assets\SDProject\DataTable\Xlsx\CardDesc.xlsx.meta
+D:\SD\SDProject\Assets\SDProject\DataTable\Xlsx\CardName.xlsx
+D:\SD\SDProject\Assets\SDProject\DataTable\Xlsx\CardName.xlsx.meta
+D:\SD\SDProject\Assets\SDProject\Prefabs\Ally.prefab
+D:\SD\SDProject\Assets\SDProject\Prefabs\Ally.prefab.meta
+D:\SD\SDProject\Assets\SDProject\Prefabs\CardView.prefab
+D:\SD\SDProject\Assets\SDProject\Prefabs\CardView.prefab.meta
+D:\SD\SDProject\Assets\SDProject\Prefabs\DummyCharacter.prefab
+D:\SD\SDProject\Assets\SDProject\Prefabs\DummyCharacter.prefab.meta
+D:\SD\SDProject\Assets\SDProject\Prefabs\Enemy.prefab
+D:\SD\SDProject\Assets\SDProject\Prefabs\Enemy.prefab.meta
+D:\SD\SDProject\Assets\SDProject\Prefabs\Slot.prefab
+D:\SD\SDProject\Assets\SDProject\Prefabs\Slot.prefab.meta
+D:\SD\SDProject\Assets\SDProject\Prefabs\Spr_UnitPlaceholder.png
+D:\SD\SDProject\Assets\SDProject\Prefabs\Spr_UnitPlaceholder.png.meta
+D:\SD\SDProject\Assets\SDProject\Scenes\Battle.unity
+D:\SD\SDProject\Assets\SDProject\Scenes\Battle.unity.meta
+D:\SD\SDProject\Assets\SDProject\Scenes\Boot.unity
+D:\SD\SDProject\Assets\SDProject\Scenes\Boot.unity.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Bootstrap
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat
+D:\SD\SDProject\Assets\SDProject\Scripts\Core
+D:\SD\SDProject\Assets\SDProject\Scripts\Data
+D:\SD\SDProject\Assets\SDProject\Scripts\DataBridge
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable
+D:\SD\SDProject\Assets\SDProject\Scripts\UI
+D:\SD\SDProject\Assets\SDProject\Scripts\Bootstrap.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Core.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Data.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataBridge.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\UI.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Bootstrap\UnitAutoSpawner.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Bootstrap\UnitAutoSpawner.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Board
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Targeting
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\BattleController.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\BattleController.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Board.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\DeckRuntime.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\DeckRuntime.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\HandRuntime.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\HandRuntime.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\SDProject.Combat.asmdef
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\SDProject.Combat.asmdef.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Targeting.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Board\BoardLayout.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Board\BoardLayout.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Board\BoardRuntime.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Board\BoardRuntime.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Board\CharacterSlot.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Board\CharacterSlot.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Board\DummyCharacter.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Board\DummyCharacter.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Board\Positioning.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Board\Positioning.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Board\TeamSide.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Board\TeamSide.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Board
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Core
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Data
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Effects
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\UI
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Board.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Core.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Data.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Effects.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\UI.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Board\SimpleUnit.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Board\SimpleUnit.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Board\SimpleUnitBinder.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Board\SimpleUnitBinder.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Core\CardPlayController.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Core\CardPlayController.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Core\Enums.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Core\Enums.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Core\RuntimeInterfaces.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Core\RuntimeInterfaces.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Data\CardDefinition.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Data\CardDefinition.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Data\CardLibrary.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Data\CardLibrary.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Effects\DamageEffectDef.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Effects\DamageEffectDef.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Effects\ICardEffect.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Effects\ICardEffect.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Effects\KnockbackEffectDef.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\Effects\KnockbackEffectDef.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\UI\CardView.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\UI\CardView.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\UI\HandView.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Cards\UI\HandView.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Targeting\TargetingSystem.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Targeting\TargetingSystem.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Targeting\UnitClickForwarder.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Combat\Targeting\UnitClickForwarder.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\Boot
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\FSM
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\Messaging
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\Boot.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\FSM.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\Messaging.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\SDProject.Core.asmdef
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\SDProject.Core.asmdef.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\TurnPhase.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\TurnPhase.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\Boot\GameInstaller.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\Boot\GameInstaller.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\FSM\IState.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\FSM\IState.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\FSM\StateMachine.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\FSM\StateMachine.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\Messaging\GameEvents.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Core\Messaging\GameEvents.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Data\BattleConfig.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Data\BattleConfig.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Data\CardData.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Data\CardData.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Data\DeckList.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\Data\DeckList.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\Data\SDProject.Data.asmdef
+D:\SD\SDProject\Assets\SDProject\Scripts\Data\SDProject.Data.asmdef.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataBridge\DeckSourceFromCardData.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\DataBridge\DeckSourceFromCardData.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataBridge\IDeckSource.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\DataBridge\IDeckSource.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataBridge\SDProject.DataBridge.asmdef
+D:\SD\SDProject\Assets\SDProject\Scripts\DataBridge\SDProject.DataBridge.asmdef.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Editor
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Runtime
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\CardDataRow.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\CardDataRow.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\CsvUtil.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\CsvUtil.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Editor.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Runtime.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\SDProject.DataTable.asmdef
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\SDProject.DataTable.asmdef.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\TextTableLoader.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\TextTableLoader.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Editor\ExcelEncodingInit.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Editor\ExcelEncodingInit.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Editor\XlsxAssetPostprocessor.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Editor\XlsxAssetPostprocessor.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Runtime\CsvLite.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Runtime\CsvLite.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Runtime\DataTableLoader.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Runtime\DataTableLoader.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Runtime\DataTablePaths.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Runtime\DataTablePaths.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Runtime\GenericCsvTable.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Runtime\GenericCsvTable.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Runtime\TableAsset.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Runtime\TableAsset.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Runtime\TableHub.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\DataTable\Runtime\TableHub.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\UI\AssignFirstAllyCaster.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\UI\AssignFirstAllyCaster.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\UI\BattleHUD.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\UI\BattleHUD.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\UI\CardItemView.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\UI\CardItemView.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\UI\HandView.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\UI\HandView.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\UI\PileCounterView.cs
+D:\SD\SDProject\Assets\SDProject\Scripts\UI\PileCounterView.cs.meta
+D:\SD\SDProject\Assets\SDProject\Scripts\UI\SDProject.UI.asmdef
+D:\SD\SDProject\Assets\SDProject\Scripts\UI\SDProject.UI.asmdef.meta
+D:\SD\SDProject\Assets\SDProject\Settings\BattleConfig.asset
+D:\SD\SDProject\Assets\SDProject\Settings\BattleConfig.asset.meta
+D:\SD\SDProject\Assets\SDProject\Settings\Renderer2D.asset
+D:\SD\SDProject\Assets\SDProject\Settings\Renderer2D.asset.meta
+D:\SD\SDProject\Assets\SDProject\Settings\UniversalRP.asset
+D:\SD\SDProject\Assets\SDProject\Settings\UniversalRP.asset.meta
+D:\SD\SDProject\Assets\Settings\Scenes
+D:\SD\SDProject\Assets\Settings\Lit2DSceneTemplate.scenetemplate
+D:\SD\SDProject\Assets\Settings\Lit2DSceneTemplate.scenetemplate.meta
+D:\SD\SDProject\Assets\Settings\Scenes.meta
+D:\SD\SDProject\Assets\Settings\Scenes\URP2DSceneTemplate.unity
+D:\SD\SDProject\Assets\Settings\Scenes\URP2DSceneTemplate.unity.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Fonts
+D:\SD\SDProject\Assets\TextMesh Pro\Resources
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders
+D:\SD\SDProject\Assets\TextMesh Pro\Sprites
+D:\SD\SDProject\Assets\TextMesh Pro\Fonts.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Resources.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Sprites.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt
+D:\SD\SDProject\Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Fonts\LiberationSans.ttf
+D:\SD\SDProject\Assets\TextMesh Pro\Fonts\LiberationSans.ttf.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Fonts & Materials
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Sprite Assets
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Style Sheets
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Fonts & Materials.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Sprite Assets.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Style Sheets.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\TMP Settings.asset
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\TMP Settings.asset.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Fonts & Materials\LiberationSans SDF - Drop Shadow.mat
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Fonts & Materials\LiberationSans SDF - Drop Shadow.mat.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Fonts & Materials\LiberationSans SDF - Fallback.asset
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Fonts & Materials\LiberationSans SDF - Fallback.asset.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Fonts & Materials\LiberationSans SDF - Outline.mat
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Fonts & Materials\LiberationSans SDF - Outline.mat.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Fonts & Materials\LiberationSans SDF.asset
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Fonts & Materials\LiberationSans SDF.asset.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Sprite Assets\EmojiOne.asset
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Sprite Assets\EmojiOne.asset.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Style Sheets\Default Style Sheet.asset
+D:\SD\SDProject\Assets\TextMesh Pro\Resources\Style Sheets\Default Style Sheet.asset.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\SDFFunctions.hlsl
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\SDFFunctions.hlsl.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMPro.cginc
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMPro.cginc.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-HDRP LIT.shadergraph
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-HDRP LIT.shadergraph.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-HDRP UNLIT.shadergraph
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-HDRP UNLIT.shadergraph.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile-2-Pass.shader
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile-2-Pass.shader.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-URP Lit.shadergraph
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-URP Lit.shadergraph.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-URP Unlit.shadergraph
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF-URP Unlit.shadergraph.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF.shader
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_SDF.shader.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_Sprite.shader
+D:\SD\SDProject\Assets\TextMesh Pro\Shaders\TMP_Sprite.shader.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt
+D:\SD\SDProject\Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Sprites\EmojiOne.json
+D:\SD\SDProject\Assets\TextMesh Pro\Sprites\EmojiOne.json.meta
+D:\SD\SDProject\Assets\TextMesh Pro\Sprites\EmojiOne.png
+D:\SD\SDProject\Assets\TextMesh Pro\Sprites\EmojiOne.png.meta
+D:\SD\SDProject\Docs\folder-tree.txt
+D:\SD\SDProject\Packages\manifest.json
+D:\SD\SDProject\Packages\packages-lock.json
+D:\SD\SDProject\ProjectSettings\AudioManager.asset
+D:\SD\SDProject\ProjectSettings\ClusterInputManager.asset
+D:\SD\SDProject\ProjectSettings\DynamicsManager.asset
+D:\SD\SDProject\ProjectSettings\EditorBuildSettings.asset
+D:\SD\SDProject\ProjectSettings\EditorSettings.asset
+D:\SD\SDProject\ProjectSettings\GraphicsSettings.asset
+D:\SD\SDProject\ProjectSettings\InputManager.asset
+D:\SD\SDProject\ProjectSettings\MemorySettings.asset
+D:\SD\SDProject\ProjectSettings\MultiplayerManager.asset
+D:\SD\SDProject\ProjectSettings\NavMeshAreas.asset
+D:\SD\SDProject\ProjectSettings\NetworkManager.asset
+D:\SD\SDProject\ProjectSettings\PackageManagerSettings.asset
+D:\SD\SDProject\ProjectSettings\Physics2DSettings.asset
+D:\SD\SDProject\ProjectSettings\PresetManager.asset
+D:\SD\SDProject\ProjectSettings\ProjectSettings.asset
+D:\SD\SDProject\ProjectSettings\ProjectVersion.txt
+D:\SD\SDProject\ProjectSettings\QualitySettings.asset
+D:\SD\SDProject\ProjectSettings\SceneTemplateSettings.json
+D:\SD\SDProject\ProjectSettings\ShaderGraphSettings.asset
+D:\SD\SDProject\ProjectSettings\TagManager.asset
+D:\SD\SDProject\ProjectSettings\TimelineSettings.asset
+D:\SD\SDProject\ProjectSettings\TimeManager.asset
+D:\SD\SDProject\ProjectSettings\UnityConnectSettings.asset
+D:\SD\SDProject\ProjectSettings\URPProjectSettings.asset
+D:\SD\SDProject\ProjectSettings\VersionControlSettings.asset
+D:\SD\SDProject\ProjectSettings\VFXManager.asset
+D:\SD\SDProject\ProjectSettings\XRSettings.asset
+D:\SD\SDProject\UIElementsSchema\UIElements.xsd
+D:\SD\SDProject\UIElementsSchema\Unity.Profiling.Editor.UI.xsd
+D:\SD\SDProject\UIElementsSchema\Unity.Profiling.Editor.xsd
+D:\SD\SDProject\UIElementsSchema\Unity.UI.Builder.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.Accessibility.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.Audio.UIElements.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.Experimental.GraphView.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.Inspector.GraphicsSettingsInspectors.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.Inspector.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.Overlays.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.PackageManager.UI.Internal.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.Rendering.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.Search.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.ShaderGraph.Drawing.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.ShortcutManagement.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.Tilemaps.External.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.Tilemaps.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.U2D.Animation.SpriteLibraryEditor.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.U2D.Animation.Upgrading.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.U2D.Animation.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.U2D.Layout.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.U2D.Sprites.SpriteEditorTool.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.UIElements.Debugger.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.UIElements.ProjectSettings.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEditor.UIElements.xsd
+D:\SD\SDProject\UIElementsSchema\UnityEngine.UIElements.xsd
