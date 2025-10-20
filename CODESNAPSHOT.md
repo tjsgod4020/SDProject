@@ -1,5 +1,5 @@
 ﻿# Code Snapshot - 2025-10-20 21:00:00
-Commit: a70a616
+Commit: f50bf21
 
 ## Assets\SDProject\Scripts\Core\Domain\SD.Core.Domain.asmdef
 ```csharp
