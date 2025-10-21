@@ -1,0 +1,16 @@
+﻿{
+  "name": "SD.Gameplay.Cards.Domain",
+  "rootNamespace": "SD.Gameplay.Cards.Domain",
+  "references": [
+    "SD.DataTable.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

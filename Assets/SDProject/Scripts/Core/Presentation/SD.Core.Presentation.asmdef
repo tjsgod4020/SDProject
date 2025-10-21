@@ -1,0 +1,16 @@
+﻿{
+  "name": "SD.Core.Presentation",
+  "references": [
+    "SD.Core.Domain",
+    "SD.Core.Infrastructure",
+    "Unity.TextMeshPro"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "noEngineReferences": false
+}

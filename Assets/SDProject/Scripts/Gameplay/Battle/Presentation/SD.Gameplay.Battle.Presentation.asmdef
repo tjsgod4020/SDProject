@@ -1,0 +1,15 @@
+﻿{
+  "name": "SD.Gameplay.Battle.Presentation",
+  "references": [
+    "SD.Gameplay.Battle.Domain",
+    "SD.Core.Presentation"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "noEngineReferences": false
+}

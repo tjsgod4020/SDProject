@@ -1,0 +1,20 @@
+﻿{
+  "name": "SD.Tests.EditMode",
+  "references": [
+    "SD.Core.Domain",
+    "SD.Core.Infrastructure"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

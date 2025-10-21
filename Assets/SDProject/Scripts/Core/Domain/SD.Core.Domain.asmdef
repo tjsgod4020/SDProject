@@ -1,0 +1,12 @@
+﻿{
+  "name": "SD.Core.Domain",
+  "references": [],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "noEngineReferences": false
+}

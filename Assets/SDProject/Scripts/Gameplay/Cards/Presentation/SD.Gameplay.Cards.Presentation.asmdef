@@ -1,0 +1,15 @@
+﻿{
+  "name": "SD.Gameplay.Cards.Presentation",
+  "references": [
+    "SD.Gameplay.Cards.Domain",
+    "SD.Core.Presentation"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "noEngineReferences": false
+}

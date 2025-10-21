@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aacda135314a098419d16869d2f02076, type: 3}
+  m_Name: DataTableConfig
+  m_EditorClassIdentifier: SD.DataTable.Runtime::SD.DataTable.DataTableConfig
+  _enabled: 1
+  _tables:
+  - Id: CardData
+    Csv: {fileID: 4900000, guid: c7e546bf4b27f5e4688884f0ec92c78b, type: 3}
+    RowTypeName: SD.Gameplay.Cards.Domain.CardDataModel, SD.Gameplay.Cards.Domain,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Id: CardDesc
+    Csv: {fileID: 4900000, guid: d0edacfc32a51904bb1fe2647e10379c, type: 3}
+    RowTypeName: SD.Gameplay.Cards.Domain.Localization.CardDescRow, SD.Gameplay.Cards.Domain,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Id: CardName
+    Csv: {fileID: 4900000, guid: 0506c3105c0da92458ffc5f71c9d6a9e, type: 3}
+    RowTypeName: SD.Gameplay.Cards.Domain.Localization.CardNameRow, SD.Gameplay.Cards.Domain,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null

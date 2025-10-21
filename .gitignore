@@ -1,4 +1,6 @@
-# Unity
+# =========================
+# Unity (core caches)
+# =========================
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
@@ -7,34 +9,67 @@
 [Ll]ogs/
 [Mm]emoryCaptures/
 UserSettings/
+CrashReports/
+*.dmp
 
-# Unity extra
+# =========================
+# Unity extra artifacts
+# =========================
 *.pidb
 *.pdb
 *.mdb
 *.opendb
 *.VC.db
-[Aa]ssets/AddressableAssetsData/*/link.xml
+
+# =========================
+# Addressables
+#  - 프로젝트에서 기본 폴더(Assets/AddressableAssetsData)와
+#    네이밍 변경안(Assets/_AddressableAssetsData) 모두 커버
+#  - 카탈로그/해시/링크는 커밋 X, content state bin은 커밋 O
+# =========================
 [Aa]ssets/AddressableAssetsData/*/catalog_*.json
 [Aa]ssets/AddressableAssetsData/*/catalog_*.hash
+[Aa]ssets/AddressableAssetsData/*/link.xml
+[Aa]ssets/_AddressableAssetsData/*/catalog_*.json
+[Aa]ssets/_AddressableAssetsData/*/catalog_*.hash
+[Aa]ssets/_AddressableAssetsData/*/link.xml
 ServerData/
 
+# =========================
 # VS / IDE
+# =========================
 .vs/
 .vscode/
 .idea/
 *.sln.DotSettings.user
+# (Unity가 재생성하므로 보통 커밋 불필요)
 *.csproj
 *.sln
 *.user
 *.unityproj
 *.suo
 
+# =========================
 # OS
+# =========================
 .DS_Store
 Thumbs.db
 
-# (Optional) Mobile build artifacts
+# =========================
+# DataTables (project-specific)
+#  - XLSX 잠금파일/임시파일 무시
+#  - Csv/Schemas/Generated는 정책에 맞춰 선택
+#    (현재는 Csv 커밋 유지 가정 → 제외하지 않음)
+# =========================
+[Aa]ssets/_Project/DataTables/Xlsx/~$*.xlsx
+[Aa]ssets/_Project/DataTables/Xlsx/*.tmp
+[Aa]ssets/_Project/DataTables/Generated/*.tmp
+# 만약 Generated 산출물을 비결정적이면 전체 제외 권장:
+# [Aa]ssets/_Project/DataTables/Generated/
+
+# =========================
+# Optional: Mobile build artifacts
+# =========================
 .gradle/
 *.apk
 *.aab

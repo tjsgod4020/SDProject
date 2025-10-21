@@ -1,0 +1,15 @@
+﻿{
+  "name": "SD.Gameplay.Battle.Infrastructure",
+  "references": [
+    "SD.Gameplay.Battle.Domain",
+    "SD.Core.Infrastructure"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "noEngineReferences": false
+}

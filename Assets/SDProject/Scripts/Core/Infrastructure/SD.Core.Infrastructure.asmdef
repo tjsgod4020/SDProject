@@ -1,0 +1,14 @@
+﻿{
+  "name": "SD.Core.Infrastructure",
+  "references": [
+    "SD.Core.Domain"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "noEngineReferences": false
+}

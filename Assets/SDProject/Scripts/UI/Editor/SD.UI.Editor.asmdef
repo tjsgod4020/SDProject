@@ -1,0 +1,16 @@
+﻿{
+  "name": "SD.UI.Editor",
+  "references": [
+    "SD.UI.Common"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "noEngineReferences": false
+}

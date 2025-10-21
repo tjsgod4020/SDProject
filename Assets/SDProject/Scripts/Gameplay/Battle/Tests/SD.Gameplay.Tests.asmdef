@@ -1,0 +1,22 @@
+﻿{
+  "name": "SD.Gameplay.Tests",
+  "references": [
+    "SD.Gameplay.Battle.Domain",
+    "SD.Gameplay.Battle.Infrastructure",
+    "SD.Core.Infrastructure",
+    "SD.Gameplay.Cards.Domain"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

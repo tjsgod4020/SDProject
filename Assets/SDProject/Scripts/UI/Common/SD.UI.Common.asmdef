@@ -1,0 +1,16 @@
+﻿{
+  "name": "SD.UI.Common",
+  "rootNamespace": "SD.UI.Common",
+  "references": [
+    "SD.Gameplay.Cards.Domain"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
