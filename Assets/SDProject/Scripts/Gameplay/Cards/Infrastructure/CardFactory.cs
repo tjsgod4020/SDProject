@@ -1,36 +1,28 @@
-using System;
+Ôªøusing System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using SD.Gameplay.Cards.Domain;
-using SD.Gameplay.Cards.Domain.Effects;           // EffectJsonParser / EffectSpec
-using SD.Gameplay.Cards.Domain.Localization;      // CardNameRow / CardDescRow
+using SD.Gameplay.Cards.Domain.Effects;
 
 namespace SD.Gameplay.Cards.Infrastructure
 {
-    /// <summary>
-    /// CSV ∑ŒøÏ(IList)µÈ¿ª π≠æÓ CardDefinition ∏ÆΩ∫∆Æ∏¶ ª˝º∫.
-    /// - « µÂ ≈∏¿‘(string/enum/flags/int)¿ª ∏Æ«√∑∫º«¿∏∑Œ ∞¸¥Î«œ∞‘ ºˆøÎ
-    /// - Effects: EffectModel¿« EffectJsonParser.Parse∏∏ ªÁøÎ (Damage∏∏ «„øÎ)
-    /// - ∆ƒΩÃ Ω«∆–¥¬ Unknown/±‚∫ª∞™¿∏∑Œ æ»¿¸ ±Õ∞· + ∞Ê∞Ì ∑Œ±◊
-    /// </summary>
     public static class CardFactory
     {
         public static List<CardDefinition> BuildAll(
-            IList cardDataRows,   // List<CardDataModel> as IList
-            IList nameRows,       // List<CardNameRow>  as IList
-            IList descRows,       // List<CardDescRow>  as IList
-            string locale = null  // "ko"|"en" (null¿Ã∏È Ω√Ω∫≈€ ææÓ)
+            IList cardDataRows,
+            IList nameRows,
+            IList descRows,
+            string locale = null
         )
         {
             var result = new List<CardDefinition>();
             if (cardDataRows == null) return result;
 
-            // ∑Œƒ√∂Û¿Ã¡Ó ∏ 
-            var nameMap = ToTextMap(nameRows);
-            var descMap = ToTextMap(descRows);
+            var nameMap = ToTextMap(nameRows, "Name");
+            var descMap = ToTextMap(descRows, "Desc");
             var lang = NormalizeLocale(locale);
 
             foreach (var row in cardDataRows.Cast<object>())
@@ -41,8 +33,8 @@ namespace SD.Gameplay.Cards.Infrastructure
                     if (!enabled) continue;
 
                     var id = GetString(row, "Id");
-                    var nameId = GetString(row, "NameId");
-                    var descId = GetString(row, "DescId");
+                    var nameId = GetString(row, "NameId", "NameID", "NameKey");
+                    var descId = GetString(row, "DescId", "DescID", "DescKey", "DescriptionId");
 
                     var def = new CardDefinition
                     {
@@ -51,14 +43,15 @@ namespace SD.Gameplay.Cards.Infrastructure
 
                         NameId = nameId,
                         DescId = descId,
-                        DisplayName = ResolveText(nameMap, nameId, lang),
-                        DisplayDesc = ResolveText(descMap, descId, lang),
+                        // ‚òÖ Ïó¨Í∏∞ÏÑú nameId/descIdÍ∞Ä Ïã§Ìå®ÌïòÎ©¥ IdÎ°úÎèÑ Ï∞æÎäîÎã§.
+                        DisplayName = ResolveTextMulti(nameMap, lang, nameId, id),
+                        DisplayDesc = ResolveTextMulti(descMap, lang, descId, id),
 
                         Type = GetEnum<CardType>(row, "Type", CardType.Unknown),
                         Class = GetEnum<CardClass>(row, "Class", CardClass.Unknown, normalize: NormalizeClass),
                         Rarity = GetEnum<CardRarity>(row, "Rarity", CardRarity.Unknown),
 
-                        CharId = GetString(row, "CharId"),
+                        CharId = GetString(row, "CharId", "CharacterId"),
                         Cost = GetInt(row, "Cost", 0),
 
                         TargetType = GetEnum<TargetType>(row, "TargetType", TargetType.Unknown),
@@ -66,7 +59,6 @@ namespace SD.Gameplay.Cards.Infrastructure
                         PosUse = GetFlags<PositionUseFlags>(row, "PosUse", ParseUseFlags),
                         PosHit = GetFlags<PositionHitFlags>(row, "PosHit", ParseHitFlags),
 
-                        // ¿Ã∆Â∆Æ: √÷º“ ±∏«ˆ(Damage∏∏) - ø©∑Ø »ƒ∫∏ « µÂ∏Ì ¡ˆø¯
                         Effects = EffectJsonParser.Parse(
                             FirstNonEmpty(
                                 GetString(row, "EffectsJSON"),
@@ -76,12 +68,15 @@ namespace SD.Gameplay.Cards.Infrastructure
                             ) ?? string.Empty
                         ),
 
-                        Upgradable = GetBool(row, true, "Enabled", "IsEnabled", "Enable"),
+                        Upgradable = GetBool(row, true, "Upgradable", "Upgradeable", "IsUpgradable"),
                         UpgradeStep = GetInt(row, "UpgradeStep", 0),
-                        UpgradeRefId = GetString(row, "UpgradeRefId"),
+                        UpgradeRefId = GetString(row, "UpgradeRefId", "UpgradeTo"),
 
                         Tags = GetTags(row, "Tags"),
                     };
+
+                    if (string.IsNullOrWhiteSpace(def.DisplayName))
+                        def.DisplayName = def.NameId?.Length > 0 ? def.NameId : def.Id; // ÏµúÏ¢Ö ÏïàÏ†ÑÏû•Ïπò
 
                     result.Add(def);
                 }
@@ -94,7 +89,7 @@ namespace SD.Gameplay.Cards.Infrastructure
             return result;
         }
 
-        // -------------------- Reflection helpers --------------------
+        // ---------- Reflection helpers ----------
         static readonly BindingFlags _bf = BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase;
 
         static MemberInfo FindMember(object obj, params string[] names)
@@ -119,10 +114,14 @@ namespace SD.Gameplay.Cards.Infrastructure
 
         static string GetString(object obj, params string[] names)
         {
-            var v = GetRaw(obj, names);
-            if (v == null) return string.Empty;
-            if (v is string s) return s;
-            return v.ToString();
+            foreach (var n in names)
+            {
+                var v = GetRaw(obj, n);
+                if (v == null) continue;
+                if (v is string s) return s;
+                return v.ToString();
+            }
+            return string.Empty;
         }
 
         static int GetInt(object obj, string name, int def = 0)
@@ -156,10 +155,8 @@ namespace SD.Gameplay.Cards.Infrastructure
             var v = GetRaw(obj, name);
             if (v == null) return def;
 
-            // ¿ÃπÃ enum
             if (v is TEnum e) return e;
 
-            // º˝¿⁄ ±‚π›
             if (v is IConvertible)
             {
                 try
@@ -168,10 +165,9 @@ namespace SD.Gameplay.Cards.Infrastructure
                     if (Enum.IsDefined(typeof(TEnum), i))
                         return (TEnum)Enum.ToObject(typeof(TEnum), i);
                 }
-                catch { /* ignore */ }
+                catch { }
             }
 
-            // πÆ¿⁄ø≠
             var s = v.ToString();
             if (string.IsNullOrWhiteSpace(s)) return def;
             if (normalize != null) s = normalize(s);
@@ -183,15 +179,15 @@ namespace SD.Gameplay.Cards.Infrastructure
             var v = GetRaw(obj, name);
             if (v == null) return parseFromString(string.Empty);
 
-            if (v is TFlags en) return en; // ¿ÃπÃ Flags enum
+            if (v is TFlags en) return en;
 
             if (v is IConvertible)
             {
                 try { return (TFlags)Enum.ToObject(typeof(TFlags), Convert.ToInt32(v)); }
-                catch { /* ignore */ }
+                catch { }
             }
 
-            return parseFromString(v.ToString()); // πÆ¿⁄ø≠ ∆ƒΩÃ
+            return parseFromString(v.ToString());
         }
 
         static string FirstNonEmpty(params string[] ss)
@@ -200,10 +196,9 @@ namespace SD.Gameplay.Cards.Infrastructure
             return null;
         }
 
-        // -------------------- Domain parsers --------------------
+        // ---------- Domain parsers ----------
         static string NormalizeClass(string s)
         {
-            // ∞˙∞≈ «•±‚ ∫∏¡§: Mythic °Ê Myth
             if (string.IsNullOrWhiteSpace(s)) return s;
             return s.Equals("Mythic", StringComparison.OrdinalIgnoreCase) ? "Myth" : s;
         }
@@ -246,11 +241,9 @@ namespace SD.Gameplay.Cards.Infrastructure
             var v = GetRaw(obj, name);
             if (v == null) return new List<string>();
 
-            // πÆ¿⁄ø≠ °Ê ±∏∫–¿⁄ ∆ƒΩÃ
             if (v is string s)
                 return SplitTokens(s).Where(x => x.Length > 0).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
-            // Flags enum °Ê ƒ—¡¯ ∫Ò∆Æ ∂Û∫ß √ﬂ√‚
             var t = v.GetType();
             if (t.IsEnum)
             {
@@ -268,44 +261,120 @@ namespace SD.Gameplay.Cards.Infrastructure
             return new List<string> { v.ToString() };
         }
 
-        // -------------------- Localization helpers --------------------
-        static Dictionary<string, (string ko, string en)> ToTextMap(IList rows)
+        // ---------- Localization ----------
+        static readonly string[] KoCandidates = { "Ko", "KO", "ko" };
+        static readonly string[] EnCandidates = { "En", "EN", "en" };
+        static readonly string[] IdCandidates = { "Id", "ID", "id", "Key" };
+
+        static readonly string[] Prefixes = {
+            "CardData_", "CardName_", "CardDesc_",
+            "Name_", "Desc_", "Card_", "Data_"
+        };
+
+        static string Canon(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return string.Empty;
+            s = s.Trim();
+            foreach (var p in Prefixes)
+                if (s.StartsWith(p, StringComparison.OrdinalIgnoreCase))
+                    s = s.Substring(p.Length);
+
+            var sb = new System.Text.StringBuilder(s.Length);
+            foreach (var ch in s)
+                if (char.IsLetterOrDigit(ch)) sb.Append(char.ToLowerInvariant(ch));
+            return sb.ToString();
+        }
+
+        static Dictionary<string, (string ko, string en)> ToTextMap(IList rows, string label)
         {
             var map = new Dictionary<string, (string, string)>(StringComparer.OrdinalIgnoreCase);
             if (rows == null) return map;
 
+            int added = 0;
             foreach (var any in rows)
             {
-                switch (any)
+                if (any == null) continue;
+
+                var rawId = GetString(any, IdCandidates);
+                if (string.IsNullOrWhiteSpace(rawId)) continue;
+
+                var ko = GetString(any, KoCandidates);
+                var en = GetString(any, EnCandidates);
+                if (string.IsNullOrWhiteSpace(ko) && string.IsNullOrWhiteSpace(en))
+                    continue;
+
+                map[rawId] = (ko ?? "", en ?? "");
+                added++;
+
+                var c = Canon(rawId);
+                if (!string.IsNullOrEmpty(c) && !map.ContainsKey(c))
+                    map[c] = (ko ?? "", en ?? "");
+            }
+
+            Debug.Log($"[CardFactory] ToTextMap({label}) built: {added} entries");
+            return map;
+        }
+
+        // Ïó¨Îü¨ ÌõÑÎ≥¥ ÌÇ§(Ïòà: NameId, Id)Î•º Î∞õÏïÑ ÏàúÏ∞®Ï†ÅÏúºÎ°ú Îß§Ïπ≠
+        static string ResolveTextMulti(Dictionary<string, (string ko, string en)> map, string lang, params string[] keys)
+        {
+            foreach (var key in keys)
+            {
+                var v = ResolveTextSingle(map, key, lang);
+                if (!string.IsNullOrEmpty(v) && !v.Equals(key ?? "", StringComparison.Ordinal)) // Ïã§Ï†ú ÌÖçÏä§Ìä∏Î•º Ï∞æÏùÄ Í≤ΩÏö∞
+                    return v;
+            }
+            // Ï†ÑÎ∂Ä Ïã§Ìå® ‚Üí ÎßàÏßÄÎßâ ÌÇ§(ÎåÄÍ∞ú NameId ÎòêÎäî Id)Î•º Í∑∏ÎåÄÎ°ú
+            var last = keys.LastOrDefault() ?? string.Empty;
+            return last;
+        }
+
+        // Îã®Ïùº ÌÇ§Ïóê ÎåÄÌï¥ ÏõêÎ≥∏/Trim/Canon/Ï†ëÎëêÏÇ¨Ï†úÍ±∞/CanonÏùÑ Î™®Îëê ÏãúÎèÑ
+        static string ResolveTextSingle(Dictionary<string, (string ko, string en)> map, string key, string lang)
+        {
+            if (string.IsNullOrWhiteSpace(key)) return string.Empty;
+
+            var candidates = new List<string>(8) { key, key.Trim() };
+            var c = Canon(key);
+            if (!string.IsNullOrEmpty(c)) candidates.Add(c);
+
+            foreach (var p in Prefixes)
+            {
+                if (key.StartsWith(p, StringComparison.OrdinalIgnoreCase))
                 {
-                    case CardNameRow nr: map[nr.Id] = (nr.Ko ?? "", nr.En ?? ""); break;
-                    case CardDescRow dr: map[dr.Id] = (dr.Ko ?? "", dr.En ?? ""); break;
-                    default:
-                        Debug.LogWarning("[CardFactory] Unknown text row type: " + any?.GetType().Name);
-                        break;
+                    var trimmed = key.Substring(p.Length).Trim();
+                    if (!string.IsNullOrEmpty(trimmed)) candidates.Add(trimmed);
+
+                    var c2 = Canon(trimmed);
+                    if (!string.IsNullOrEmpty(c2)) candidates.Add(c2);
                 }
             }
-            return map;
+
+            foreach (var cand in candidates.Distinct())
+            {
+                if (map.TryGetValue(cand, out var t))
+                {
+                    if (lang == "ko")
+                        return string.IsNullOrWhiteSpace(t.ko)
+                            ? (string.IsNullOrWhiteSpace(t.en) ? key : t.en)
+                            : t.ko;
+                    else
+                        return string.IsNullOrWhiteSpace(t.en)
+                            ? (string.IsNullOrWhiteSpace(t.ko) ? key : t.ko)
+                            : t.en;
+                }
+            }
+            return key; // Î™ª Ï∞æÏúºÎ©¥ ÌÇ§ Î∞òÌôò
         }
 
         static string NormalizeLocale(string loc)
         {
             if (string.IsNullOrEmpty(loc))
                 return (Application.systemLanguage == SystemLanguage.Korean) ? "ko" : "en";
-
             loc = loc.ToLowerInvariant();
-            if (loc.StartsWith("ko")) return "ko";
-            return "en";
+            return loc.StartsWith("ko") ? "ko" : "en";
         }
 
-        static string ResolveText(Dictionary<string, (string ko, string en)> map, string id, string lang)
-        {
-            if (string.IsNullOrWhiteSpace(id)) return string.Empty;
-            if (!map.TryGetValue(id, out var t)) return id; // ≈∞ æ¯¿∏∏È ≈∞ ¿⁄√º π›»Ø(µπˆ±◊ø° ¿ØøÎ)
-            return lang == "ko" ? t.ko : t.en;
-        }
-
-        // -------------------- Shared tokenization --------------------
         static IEnumerable<string> SplitTokens(string s)
             => s.Split(new[] { '|', ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.Trim());

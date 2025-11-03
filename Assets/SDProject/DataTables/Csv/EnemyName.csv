@@ -1,0 +1,16 @@
+Id,Enabled,Ko,En
+string,bool,string,string
+EnemyName_Test00,True,적군 01,적군 01
+EnemyName_Test01,True,적군 02,적군 02
+EnemyName_Test02,True,적군 03,적군 03
+EnemyName_Test03,True,적군 04,적군 04
+EnemyName_Test04,True,적군 05,적군 05
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,
+,,,

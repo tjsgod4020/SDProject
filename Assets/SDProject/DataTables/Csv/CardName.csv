@@ -2,8 +2,6 @@ Id,Enabled,Ko,En
 string,bool,string,string
 CardName_Base_Atk_Strike_00,True,타격,타격
 CardName_Base_Atk_Strike_01,True,타격+,타격+
-CardName_Base_Atk_HeavyStrike_00,True,강타,강타
-CardName_Base_Atk_HeavyStrike_01,True,강타+,강타+
 CardName_Def_Guard_00,True,방어,방어
 CardName_Def_Guard_01,True,방어+,방어+
 CardName_Sup_Bandage_00,True,붕대,붕대
@@ -14,3 +12,5 @@ CardName_Move_Swap_00,True,교대,교대
 CardName_Move_Swap_01,True,교대+,교대+
 CardName_Move_Regroup_00,True,재정비,재정비
 CardName_Move_Regroup_01,True,재정비+,재정비+
+,,,
+,,,

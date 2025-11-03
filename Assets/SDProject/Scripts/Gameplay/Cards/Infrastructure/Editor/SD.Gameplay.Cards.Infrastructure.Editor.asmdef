@@ -1,0 +1,17 @@
+{
+  "name": "SD.Gameplay.Cards.Infrastructure.Editor",
+  "references": [
+    "SD.Gameplay.Cards.Domain",
+    "SD.Gameplay.Cards.Infrastructure",
+    "SD.DataTable.Runtime",
+    "UnityEditor"
+  ],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "noEngineReferences": false
+}

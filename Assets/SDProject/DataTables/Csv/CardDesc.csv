@@ -2,8 +2,6 @@ Id,Enabled,Ko,En
 string,bool,string,string
 CardDesc_Base_Atk_Strike_00,True,단일 대상을 공격하여 피해를 입힌다.,단일 대상을 공격하여 피해를 입힌다.
 CardDesc_Base_Atk_Strike_01,True,단일 대상을 공격하여 피해를 입힌다.,단일 대상을 공격하여 피해를 입힌다.
-CardDesc_Base_Atk_HeavyStrike_00,True,단일 대상을 강하게 공격하여 피해를 입힌다.,단일 대상을 강하게 공격하여 피해를 입힌다.
-CardDesc_Base_Atk_HeavyStrike_01,True,단일 대상을 강하게 공격하여 피해를 입힌다.,단일 대상을 강하게 공격하여 피해를 입힌다.
 CardDesc_Def_Guard_00,True,방어 태세를 갖춰 다음 적의 피해를 1회 줄인다.,방어 태세를 갖춰 다음 적의 피해를 1회 줄인다.
 CardDesc_Def_Guard_01,True,방어 태세를 갖춰 다음 적의 피해를 1회 줄인다.,방어 태세를 갖춰 다음 적의 피해를 1회 줄인다.
 CardDesc_Sup_Bandage_00,True,붕대를 감아 체력을 소량 회복한다.,붕대를 감아 체력을 소량 회복한다.

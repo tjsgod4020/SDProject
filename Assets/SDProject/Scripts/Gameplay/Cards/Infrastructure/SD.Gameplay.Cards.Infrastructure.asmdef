@@ -1,18 +1,15 @@
 {
-    "name": "SD.Gameplay.Cards.Infrastructure",
-    "rootNamespace": "",
-    "references": [
-        "SD.Gameplay.Cards.Domain",
-        "SD.DataTable.Runtime",
-        "SD.Core.Infrastructure"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "SD.Gameplay.Cards.Infrastructure",
+  "references": [
+    "SD.Gameplay.Cards.Domain",
+    "SD.DataTable.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "noEngineReferences": false
 }

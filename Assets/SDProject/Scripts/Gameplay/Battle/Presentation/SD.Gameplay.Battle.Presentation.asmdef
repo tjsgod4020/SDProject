@@ -1,8 +1,10 @@
-﻿{
+{
   "name": "SD.Gameplay.Battle.Presentation",
   "references": [
     "SD.Gameplay.Battle.Domain",
-    "SD.Core.Presentation"
+    "SD.Gameplay.Battle.Infrastructure",
+    "SD.Gameplay.Cards.Domain",
+    "Unity.TextMeshPro"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

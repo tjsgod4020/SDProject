@@ -1,17 +1,15 @@
 ﻿{
   "name": "SD.Tools.Editor",
-  "rootNamespace": "SD.Tools.Editor",
   "references": [
     "SD.DataTable.Runtime",
-    "SD.Gameplay.Cards.Domain",
-    "SD.UI.Common"
+    "SD.DataTable.Editor"
   ],
   "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
   "allowUnsafeCode": false,
   "autoReferenced": true,
   "overrideReferences": false,
   "precompiledReferences": [],
   "defineConstraints": [],
-  "versionDefines": [],
   "noEngineReferences": false
 }

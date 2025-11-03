@@ -8,6 +8,12 @@ using UnityEngine;
 
 namespace SD.DataTable
 {
+    /// <summary>
+    /// CSV → RowType 파싱 → TableRegistry 등록.
+    /// - RowTypeName 비어있는 항목은 "미사용 CSV"로 간주하여 조용히 스킵(옵션).
+    /// - 에디터에선 Config SO 자동 바인딩(최다 테이블 보유 자산 1개).
+    /// - 빈 줄/주석(#)/Enabled=false는 파싱 단계에서 제외.
+    /// </summary>
     [DefaultExecutionOrder(-100)] // 부트스트랩보다 먼저 실행
     public sealed partial class DataTableLoader : MonoBehaviour
     {
@@ -16,16 +22,21 @@ namespace SD.DataTable
         {
             public string Id;
             public TextAsset Csv;
-            public string RowTypeName; // AssemblyQualifiedName
+            public string RowTypeName; // AssemblyQualifiedName (비면 '미사용 CSV'로 간주 가능)
         }
 
         [SerializeField] private bool _enabled = true;
 
-        // 🔹 인스펙터에서 연결할 Config 슬롯 (Auto Sync로 채워진 SO)
+        // 인스펙터에서 연결할 Config (Auto Sync로 채워진 SO)
         [SerializeField] private DataTableConfig _config;
 
         // (옵션) 수동 등록용 리스트: Config가 비어있을 때만 사용
         [SerializeField] private List<TableEntry> _tables = new();
+
+        // ▼ 유연 스킵 모드: RowTypeName 비었으면 미사용 CSV로 간주해 조용히 스킵
+        [Header("Unused Table Handling")]
+        [SerializeField] private bool _treatEmptyRowTypeAsUnused = true; // 권장: true
+        [SerializeField] private bool _warnOnUnusedTable = true;         // 스킵 시 경고 로그 남길지
 
         private void Awake()
         {
@@ -73,32 +84,48 @@ namespace SD.DataTable
             {
                 try
                 {
+                    // 0) CSV 없음 → 조용히 스킵
                     if (t.Csv == null)
                     {
-                        Debug.LogWarning($"[DataTable] Load skipped: {t.Id} :: CSV is null");
+                        if (_warnOnUnusedTable)
+                            Debug.LogWarning($"[DataTable] Load skipped: {t.Id} :: CSV is null");
                         continue;
                     }
 
+                    // 1) RowTypeName 비었으면 '미사용 CSV'로 취급
                     if (string.IsNullOrWhiteSpace(t.RowTypeName))
                     {
-                        Debug.LogError(
-                            $"[DataTable] Load skipped: {t.Id} :: RowTypeName is empty. " +
-                            $"Tools > DataTables > Sync All Configs Now 실행 또는 Row 타입에 [SD.DataTable.DataTableId(\"{t.Id}\")]를 부여하세요.");
-                        continue;
+                        if (_treatEmptyRowTypeAsUnused)
+                        {
+                            if (_warnOnUnusedTable)
+                                Debug.LogWarning($"[DataTable] Skip(unused): {t.Id} :: RowTypeName empty");
+                            continue; // 조용히 스킵
+                        }
+                        else
+                        {
+                            Debug.LogError(
+                                $"[DataTable] Load skipped: {t.Id} :: RowTypeName is empty. " +
+                                $"Tools > DataTables > Sync All Configs Now 또는 [DataTableId(\"{t.Id}\")]");
+                            continue;
+                        }
                     }
 
+                    // 2) 타입 확인
                     var rowType = Type.GetType(t.RowTypeName, throwOnError: false);
                     if (rowType == null)
                     {
-                        Debug.LogError($"[DataTable] Load failed: {t.Id} :: Cannot resolve type '{t.RowTypeName}'");
+                        if (_treatEmptyRowTypeAsUnused && _warnOnUnusedTable)
+                            Debug.LogWarning($"[DataTable] Skip(unresolved): {t.Id} :: Cannot resolve '{t.RowTypeName}'");
+                        else
+                            Debug.LogError($"[DataTable] Load failed: {t.Id} :: Cannot resolve type '{t.RowTypeName}'");
                         continue;
                     }
 
-                    // 핵심: 비제네릭 IList로 결과 수집 (제네릭 캐스팅 없음)
+                    // 3) 파싱
                     var rows = BuildRows(t.Csv.text, rowType);
 
-                    // 전역 레지스트리에 등록
-                    SD.DataTable.TableRegistry.Set(t.Id, rows);
+                    // 4) 전역 레지스트리에 등록
+                    TableRegistry.Set(t.Id, rows);
 
                     var count = (rows as System.Collections.ICollection)?.Count ?? 0;
                     Debug.Log($"[DataTable] Loaded {t.Id} → {rowType.Name} ({count} rows)");
@@ -116,15 +143,18 @@ namespace SD.DataTable
 
         /// <summary>
         /// CSV 텍스트를 rowType으로 매핑한 행 리스트를 반환한다.
-        /// 반환 타입은 비제네릭 IList (List<rowType>를 박싱).
+        /// 반환 타입은 비제네릭 IList (List&lt;rowType&gt;를 박싱).
+        /// - 빈 줄/주석(#...) 스킵
+        /// - (존재 시) Id 공란 스킵
+        /// - (존재 시) Enabled=false 스킵
         /// </summary>
         private static IList BuildRows(string csvText, Type rowType)
         {
             if (string.IsNullOrWhiteSpace(csvText))
                 return (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(rowType));
 
-            var lines = ReadCsv(csvText);            // RFC4180 간이 파서
-            if (lines.Count == 0)                    // 빈 파일
+            var lines = ReadCsv(csvText);
+            if (lines.Count == 0)
                 return (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(rowType));
 
             var header = lines[0].Select(h => h.Trim()).ToArray();
@@ -144,13 +174,13 @@ namespace SD.DataTable
                 var cells = lines[r];
                 int n = Math.Min(header.Length, cells.Length);
 
-                // 0) 빈 줄 스킵 (모든 셀이 공란)
+                // 0) 빈 줄 스킵
                 bool allEmpty = true;
                 for (int c = 0; c < n; c++)
                     if (!string.IsNullOrWhiteSpace(cells[c])) { allEmpty = false; break; }
                 if (allEmpty) continue;
 
-                // 1) 주석 줄 스킵: 첫 셀 "#..." 이면 무시 (선택 규칙)
+                // 1) 주석 줄 스킵: 첫 셀 "#..." 이면 무시
                 if (n > 0 && cells[0].TrimStart().StartsWith("#")) continue;
 
                 // 2) Id 빈 값 스킵 (Id 컬럼이 존재할 때만)
@@ -166,7 +196,7 @@ namespace SD.DataTable
                     var s = cells[enCol]?.Trim();
 
                     // 공란을 true로 볼지 여부:
-                    //   - 공란 = 활성(true)로 보려면 다음 줄의 주석을 해제하세요.
+                    //   - 공란 = 활성(true)로 보려면 다음 줄의 주석을 해제
                     // if (string.IsNullOrWhiteSpace(s)) goto BUILD;
 
                     bool enabled = !string.IsNullOrEmpty(s) &&
@@ -175,7 +205,7 @@ namespace SD.DataTable
                 }
 
                 // ---- 인스턴스 생성 & 멤버 매핑 ----
-                var row = Activator.CreateInstance(rowType); // (기본 생성자 필요; 없으면 이전 안내대로 폴백 추가 가능)
+                var row = Activator.CreateInstance(rowType); // 기본 생성자 필요
                 for (int c = 0; c < n; c++)
                 {
                     var m = members[c];

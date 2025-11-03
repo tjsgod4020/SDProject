@@ -1,29 +1,20 @@
-using SD.DataTable;
+using System;
 
 namespace SD.Gameplay.Cards.Domain.Localization
 {
-    /// <summary>
-    /// CardName.csv → (Id, Ko, En, …)
-    /// 기획서: Id = 로컬라이즈 키, Ko/En = 언어별 텍스트
-    /// </summary>
-    [DataTableId("CardName")]
-    public sealed class CardNameRow : IHasStringId
+    // !! SD.DataTable 특성과 IHasStringId 제거 !!
+    // AutoSync: "CardNameRow" → Id "CardName" 로 매칭, "CardDescRow" → "CardDesc" 로 매칭
+    public sealed class CardNameRow
     {
-        // CSV 헤더와 동일한 public set 가능 프로퍼티여야 ReflectionMapper가 채워 넣습니다.
-        public string Id { get; set; }
-        public string Ko { get; set; }
-        public string En { get; set; }
-        // 필요 시 추가 언어 컬럼도 그대로 프로퍼티로 확장: public string Jp { get; set; } 등
+        public string Id;   // 카드 키
+        public string ko;   // 한국어
+        public string en;   // 영어 (없으면 빈칸)
     }
 
-    /// <summary>
-    /// CardDesc.csv → (Id, Ko, En, …)
-    /// </summary>
-    [DataTableId("CardDesc")]
-    public sealed class CardDescRow : IHasStringId
+    public sealed class CardDescRow
     {
-        public string Id { get; set; }
-        public string Ko { get; set; }
-        public string En { get; set; }
+        public string Id;
+        public string ko;
+        public string en;
     }
 }

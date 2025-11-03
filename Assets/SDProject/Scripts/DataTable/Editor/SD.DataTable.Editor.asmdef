@@ -1,0 +1,14 @@
+{
+  "name": "SD.DataTable.Editor",
+  "references": [
+    "SD.DataTable.Runtime"
+  ],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "defineConstraints": [],
+  "noEngineReferences": false
+}

@@ -15,17 +15,35 @@ Assets/SDProject/
       - CardData.csv
       - CardDesc.csv
       - CardName.csv
+      - CharacterData.csv
+      - CharacterName.csv
+      - EnemyData.csv
+      - EnemyName.csv
     Schemas/
     Xlsx/
       - CardData.xlsx
       - CardDesc.xlsx
       - CardName.xlsx
+      - CharacterData.xlsx
+      - CharacterName.xlsx
+      - EnemyData.xlsx
+      - EnemyName.xlsx
+      - ~$CardData.xlsx
     - CardData.csv
     - CardDesc.csv
     - CardName.csv
+    - CharacterData.csv
+    - CharacterName.csv
+    - EnemyData.csv
+    - EnemyName.csv
     - CardData.xlsx
     - CardDesc.xlsx
     - CardName.xlsx
+    - CharacterData.xlsx
+    - CharacterName.xlsx
+    - EnemyData.xlsx
+    - EnemyName.xlsx
+    - ~$CardData.xlsx
   Docs/
   Prefabs/
     Battle/
@@ -52,9 +70,10 @@ Assets/SDProject/
     DataTable/
       Editor/
         - DataTableConfigAutoSync.cs
+        - DataTableConfigInspector.cs
         - DataTableConfigSyncEditor.cs
         - ExcelCodePagesInit.cs
-        - SD.DataTables.Editor.asmdef
+        - SD.DataTable.Editor.asmdef
         - XlsxAssetPostprocessor.cs
         - XlsxToCsvConverter.cs
       Runtime/
@@ -65,13 +84,14 @@ Assets/SDProject/
         - ICsvTable.cs
         - IHasStringId.cs
         - ReflectionMapper.cs
-        - SD.DataTables.Runtime.asmdef
+        - SD.DataTable.Runtime.asmdef
         - Table.cs
         - TableRegistry.cs
       - DataTableConfigAutoSync.cs
+      - DataTableConfigInspector.cs
       - DataTableConfigSyncEditor.cs
       - ExcelCodePagesInit.cs
-      - SD.DataTables.Editor.asmdef
+      - SD.DataTable.Editor.asmdef
       - XlsxAssetPostprocessor.cs
       - XlsxToCsvConverter.cs
       - CsvReader.cs
@@ -81,21 +101,43 @@ Assets/SDProject/
       - ICsvTable.cs
       - IHasStringId.cs
       - ReflectionMapper.cs
-      - SD.DataTables.Runtime.asmdef
+      - SD.DataTable.Runtime.asmdef
       - Table.cs
       - TableRegistry.cs
     Gameplay/
       Battle/
         Domain/
+          - CardInstance.cs
           - SD.Gameplay.Battle.Domain.asmdef
+          - UnitDefinition.cs
+          - UnitRows.cs
         Infrastructure/
+          - BattleSystem.cs
+          - CardRuntimeRepository.cs
+          - PartySpawner.cs
           - SD.Gameplay.Battle.Infrastructure.asmdef
+          - TurnController.cs
+          - UnitCatalog.cs
         Presentation/
+          - CardView.cs
+          - HandView.cs
+          - PilesPanelView.cs
           - SD.Gameplay.Battle.Presentation.asmdef
         Tests/
           - SD.Gameplay.Tests.asmdef
+        - CardInstance.cs
         - SD.Gameplay.Battle.Domain.asmdef
+        - UnitDefinition.cs
+        - UnitRows.cs
+        - BattleSystem.cs
+        - CardRuntimeRepository.cs
+        - PartySpawner.cs
         - SD.Gameplay.Battle.Infrastructure.asmdef
+        - TurnController.cs
+        - UnitCatalog.cs
+        - CardView.cs
+        - HandView.cs
+        - PilesPanelView.cs
         - SD.Gameplay.Battle.Presentation.asmdef
         - SD.Gameplay.Tests.asmdef
       Cards/
@@ -121,6 +163,7 @@ Assets/SDProject/
             - CsvReader.cs
           Editor/
             - CardDataValidateMenu.cs
+            - SD.Gameplay.Cards.Infrastructure.Editor.asmdef
           - CardCatalog.cs
           - CardFactory.cs
           - CardCsvParser.cs
@@ -128,6 +171,7 @@ Assets/SDProject/
           - CsvCardRepository.cs
           - CsvReader.cs
           - CardDataValidateMenu.cs
+          - SD.Gameplay.Cards.Infrastructure.Editor.asmdef
           - GameBootstrap.cs
           - SD.Gameplay.Cards.Infrastructure.asmdef
         Presentation/
@@ -147,11 +191,23 @@ Assets/SDProject/
         - CsvCardRepository.cs
         - CsvReader.cs
         - CardDataValidateMenu.cs
+        - SD.Gameplay.Cards.Infrastructure.Editor.asmdef
         - GameBootstrap.cs
         - SD.Gameplay.Cards.Infrastructure.asmdef
         - SD.Gameplay.Cards.Presentation.asmdef
+      - CardInstance.cs
       - SD.Gameplay.Battle.Domain.asmdef
+      - UnitDefinition.cs
+      - UnitRows.cs
+      - BattleSystem.cs
+      - CardRuntimeRepository.cs
+      - PartySpawner.cs
       - SD.Gameplay.Battle.Infrastructure.asmdef
+      - TurnController.cs
+      - UnitCatalog.cs
+      - CardView.cs
+      - HandView.cs
+      - PilesPanelView.cs
       - SD.Gameplay.Battle.Presentation.asmdef
       - SD.Gameplay.Tests.asmdef
       - CardDataModel.cs
@@ -169,6 +225,7 @@ Assets/SDProject/
       - CsvCardRepository.cs
       - CsvReader.cs
       - CardDataValidateMenu.cs
+      - SD.Gameplay.Cards.Infrastructure.Editor.asmdef
       - GameBootstrap.cs
       - SD.Gameplay.Cards.Infrastructure.asmdef
       - SD.Gameplay.Cards.Presentation.asmdef
@@ -194,9 +251,10 @@ Assets/SDProject/
     - SD.Core.Presentation.asmdef
     - SD.Tests.EditMode.asmdef
     - DataTableConfigAutoSync.cs
+    - DataTableConfigInspector.cs
     - DataTableConfigSyncEditor.cs
     - ExcelCodePagesInit.cs
-    - SD.DataTables.Editor.asmdef
+    - SD.DataTable.Editor.asmdef
     - XlsxAssetPostprocessor.cs
     - XlsxToCsvConverter.cs
     - CsvReader.cs
@@ -206,11 +264,22 @@ Assets/SDProject/
     - ICsvTable.cs
     - IHasStringId.cs
     - ReflectionMapper.cs
-    - SD.DataTables.Runtime.asmdef
+    - SD.DataTable.Runtime.asmdef
     - Table.cs
     - TableRegistry.cs
+    - CardInstance.cs
     - SD.Gameplay.Battle.Domain.asmdef
+    - UnitDefinition.cs
+    - UnitRows.cs
+    - BattleSystem.cs
+    - CardRuntimeRepository.cs
+    - PartySpawner.cs
     - SD.Gameplay.Battle.Infrastructure.asmdef
+    - TurnController.cs
+    - UnitCatalog.cs
+    - CardView.cs
+    - HandView.cs
+    - PilesPanelView.cs
     - SD.Gameplay.Battle.Presentation.asmdef
     - SD.Gameplay.Tests.asmdef
     - CardDataModel.cs
@@ -228,6 +297,7 @@ Assets/SDProject/
     - CsvCardRepository.cs
     - CsvReader.cs
     - CardDataValidateMenu.cs
+    - SD.Gameplay.Cards.Infrastructure.Editor.asmdef
     - GameBootstrap.cs
     - SD.Gameplay.Cards.Infrastructure.asmdef
     - SD.Gameplay.Cards.Presentation.asmdef
@@ -252,17 +322,27 @@ Assets/SDProject/
   - CardData.csv
   - CardDesc.csv
   - CardName.csv
+  - CharacterData.csv
+  - CharacterName.csv
+  - EnemyData.csv
+  - EnemyName.csv
   - CardData.xlsx
   - CardDesc.xlsx
   - CardName.xlsx
+  - CharacterData.xlsx
+  - CharacterName.xlsx
+  - EnemyData.xlsx
+  - EnemyName.xlsx
+  - ~$CardData.xlsx
   - SD.Core.Domain.asmdef
   - SD.Core.Infrastructure.asmdef
   - SD.Core.Presentation.asmdef
   - SD.Tests.EditMode.asmdef
   - DataTableConfigAutoSync.cs
+  - DataTableConfigInspector.cs
   - DataTableConfigSyncEditor.cs
   - ExcelCodePagesInit.cs
-  - SD.DataTables.Editor.asmdef
+  - SD.DataTable.Editor.asmdef
   - XlsxAssetPostprocessor.cs
   - XlsxToCsvConverter.cs
   - CsvReader.cs
@@ -272,11 +352,22 @@ Assets/SDProject/
   - ICsvTable.cs
   - IHasStringId.cs
   - ReflectionMapper.cs
-  - SD.DataTables.Runtime.asmdef
+  - SD.DataTable.Runtime.asmdef
   - Table.cs
   - TableRegistry.cs
+  - CardInstance.cs
   - SD.Gameplay.Battle.Domain.asmdef
+  - UnitDefinition.cs
+  - UnitRows.cs
+  - BattleSystem.cs
+  - CardRuntimeRepository.cs
+  - PartySpawner.cs
   - SD.Gameplay.Battle.Infrastructure.asmdef
+  - TurnController.cs
+  - UnitCatalog.cs
+  - CardView.cs
+  - HandView.cs
+  - PilesPanelView.cs
   - SD.Gameplay.Battle.Presentation.asmdef
   - SD.Gameplay.Tests.asmdef
   - CardDataModel.cs
@@ -294,6 +385,7 @@ Assets/SDProject/
   - CsvCardRepository.cs
   - CsvReader.cs
   - CardDataValidateMenu.cs
+  - SD.Gameplay.Cards.Infrastructure.Editor.asmdef
   - GameBootstrap.cs
   - SD.Gameplay.Cards.Infrastructure.asmdef
   - SD.Gameplay.Cards.Presentation.asmdef

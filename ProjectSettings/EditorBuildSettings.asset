@@ -6,11 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/SDProject/Scenes/Boot.unity
-    guid: 5582800a776371e4eae20cc32c1b29e4
+    path: Assets/SDProject/Scenes/Boot/Boot.unity
+    guid: 601ec345e883330409b5f2e2617b7e2d
   - enabled: 1
-    path: Assets/SDProject/Scenes/Battle.unity
-    guid: 57ae9f193679f674dad8b5eaf1715798
+    path: Assets/SDProject/Scenes/Battle/Battle.unity
+    guid: f8d3daa4d8a17c34790838a3c4558c45
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

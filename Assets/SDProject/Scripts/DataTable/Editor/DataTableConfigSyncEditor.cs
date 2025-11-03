@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using SD.DataTable;
 
 namespace SD.DataTable.Editor
 {

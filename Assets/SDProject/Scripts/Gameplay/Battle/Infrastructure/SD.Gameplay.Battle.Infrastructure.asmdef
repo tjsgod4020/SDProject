@@ -2,7 +2,11 @@
   "name": "SD.Gameplay.Battle.Infrastructure",
   "references": [
     "SD.Gameplay.Battle.Domain",
-    "SD.Core.Infrastructure"
+    "SD.Gameplay.Cards.Domain",
+    "SD.Gameplay.Cards.Infrastructure",
+    "SD.Core.Domain",
+    "SD.Core.Infrastructure",
+    "SD.DataTable.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

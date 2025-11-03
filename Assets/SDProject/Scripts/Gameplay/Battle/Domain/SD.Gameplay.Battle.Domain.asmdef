@@ -1,7 +1,7 @@
-﻿{
+{
   "name": "SD.Gameplay.Battle.Domain",
   "references": [
-    "SD.Core.Domain",
+    "SD.DataTable.Runtime",
     "SD.Gameplay.Cards.Domain"
   ],
   "includePlatforms": [],

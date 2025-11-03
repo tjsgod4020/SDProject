@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aacda135314a098419d16869d2f02076, type: 3}
   m_Name: DataTableConfig
   m_EditorClassIdentifier: SD.DataTable.Runtime::SD.DataTable.DataTableConfig
-  _enabled: 1
   _tables:
   - Id: CardData
     Csv: {fileID: 4900000, guid: c7e546bf4b27f5e4688884f0ec92c78b, type: 3}
