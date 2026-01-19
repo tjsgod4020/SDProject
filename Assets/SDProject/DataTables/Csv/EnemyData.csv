@@ -1,7 +1,7 @@
-Id,Enabled,NameId,Role,Faction,HP,ATK,DEF,EVA,ACC,CRT,Resist_Stun,Resist_Poison,Resist_Bleed,Resist_Weaken,Resist_Vulnerable,Resist_Move,Rank,PassiveJson,SlotWidth,Tags
-string,bool,string,string,enum,int,int,int,int,int,int,int,int,int,int,int,int,enum,json,int,flags
-EnemyData_Test00,True,EnemyName_Test00,Tank,,1000,100,100,100,100,100,30,30,30,30,30,30,,,1,
-EnemyData_Test01,True,EnemyName_Test01,Tank,,1000,100,100,100,100,100,30,30,30,30,30,30,,,1,
-EnemyData_Test02,True,EnemyName_Test02,Dealer,,1000,100,100,100,100,100,30,30,30,30,30,30,,,1,
-EnemyData_Test03,True,EnemyName_Test03,Healer,,1000,100,100,100,100,100,30,30,30,30,30,30,,,1,
-EnemyData_Test04,True,EnemyName_Test04,Support,,1000,100,100,100,100,100,30,30,30,30,30,30,,,1,
+Id,Enabled,NameId,Role,Faction,HP,ATK,DEF,EVA,ACC,CRT,Resist_Stun,Resist_Poison,Resist_Bleed,Resist_Weaken,Resist_Vulnerable,Resist_Move,Rank,PassiveJson,SlotWidth,Tags,PrefabKey
+string,bool,string,string,enum,int,int,int,int,int,int,int,int,int,int,int,int,enum,json,int,flags,string
+EnemyData_Test00,True,EnemyName_Test00,Tank,,1000,100,100,100,100,100,30,30,30,30,30,30,,,1,,PF_TestUnit
+EnemyData_Test01,True,EnemyName_Test01,Tank,,1000,100,100,100,100,100,30,30,30,30,30,30,,,1,,PF_TestUnit
+EnemyData_Test02,True,EnemyName_Test02,Dealer,,1000,100,100,100,100,100,30,30,30,30,30,30,,,1,,PF_TestUnit
+EnemyData_Test03,True,EnemyName_Test03,Healer,,1000,100,100,100,100,100,30,30,30,30,30,30,,,1,,PF_TestUnit
+EnemyData_Test04,True,EnemyName_Test04,Support,,1000,100,100,100,100,100,30,30,30,30,30,30,,,1,,PF_TestUnit

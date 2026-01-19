@@ -4,7 +4,7 @@ using SD.Gameplay.Battle.Infrastructure;
 
 namespace SD.Gameplay.Battle.Presentation
 {
-    /// µ¦/¹ö¸°ÆÐ °³¼ö Ç¥½Ã. Repository ÀÌº¥Æ® ±¸µ¶.
+    /// ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½. Repository ï¿½Ìºï¿½Æ® ï¿½ï¿½ï¿½ï¿½.
     public sealed class PilesPanelView : MonoBehaviour
     {
         [SerializeField] private TMP_Text _drawText;     // "Draw (..)"
@@ -18,13 +18,13 @@ namespace SD.Gameplay.Battle.Presentation
 
         private void OnEnable()
         {
-            if (_repo == null) _repo = FindAnyObjectByType<CardRuntimeRepository>();
+            EnsureRepo();
             if (_repo != null)
             {
                 _repo.OnPileChanged += OnPilesChanged;
 
-                // ÃÊ±â Ç¥½Ã´Â ºñ¿öµÎ°í, Repository¿¡¼­ Ã¹ ÀÌº¥Æ®°¡ ¿Ã ¶§ °»½Å.
-                // (¿øÇÏ¸é ¾Æ·¡ ÇÑ ÁÙ·Î 0,0 ÀÓ½Ã Ç¥±â °¡´É)
+                // ï¿½Ê±ï¿½ Ç¥ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½Î°ï¿½, Repositoryï¿½ï¿½ï¿½ï¿½ Ã¹ ï¿½Ìºï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
+                // (ï¿½ï¿½ï¿½Ï¸ï¿½ ï¿½Æ·ï¿½ ï¿½ï¿½ ï¿½Ù·ï¿½ 0,0 ï¿½Ó½ï¿½ Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
                 OnPilesChanged(0, 0);
             }
         }
@@ -33,6 +33,11 @@ namespace SD.Gameplay.Battle.Presentation
         {
             if (_repo != null)
                 _repo.OnPileChanged -= OnPilesChanged;
+        }
+
+        private void EnsureRepo()
+        {
+            if (_repo == null) _repo = FindAnyObjectByType<CardRuntimeRepository>();
         }
 
         private void OnPilesChanged(int draw, int discard)

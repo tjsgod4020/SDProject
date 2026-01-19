@@ -1,20 +1,23 @@
 using System;
+using SD.DataTable;
 
 namespace SD.Gameplay.Battle.Domain
 {
-    // Character.csv ¡ê CharacterRow  (°ü½À ¸ÅÄª)
+    // Character.csv â†’ CharacterRow  (ìë™ ë§¤ì¹­)
+    [DataTableId("CharacterData")]
     public sealed class CharacterRow
     {
         public string Id;      // CSV: "Id"
-        public string Prefab;  // CSV: "Prefab" (Resources °æ·Î)
-        public bool Enabled; // CSV: "Enabled" (¾øÀ¸¸é false·Î µé¾î¿Ã ¼ö ÀÖÀ½)
+        public string PrefabKey;  // CSV: "PrefabKey" (AssetIdë¡œ ì‚¬ìš©, Addressables ë¡œë“œ)
+        public bool Enabled; // CSV: "Enabled" (ë¹„í™œì„±í™”ë©´ falseë¡œ ì„¤ì • ì‹œ ìŠ¤í‚µ)
     }
 
-    // Enemy.csv ¡ê EnemyRow  (°ü½À ¸ÅÄª)
+    // Enemy.csv â†’ EnemyRow  (ìë™ ë§¤ì¹­)
+    [DataTableId("EnemyData")]
     public sealed class EnemyRow
     {
         public string Id;
-        public string Prefab;
+        public string PrefabKey;  // CSV: "PrefabKey" (AssetIdë¡œ ì‚¬ìš©, Addressables ë¡œë“œ)
         public bool Enabled;
     }
 }

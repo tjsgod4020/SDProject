@@ -2,16 +2,16 @@ using UnityEngine;
 
 namespace SD.Gameplay.Battle.Domain
 {
-    /// ÀüÅõ À¯´ÖÀÇ ÃÖ¼Ò Á¤ÀÇ(½ºÆù¿ë). È®Àå ÇÊµå´Â ÀÌÈÄ ±âÈ¹ È®Á¤ ½Ã Ãß°¡.
+    /// ìœ ë‹› ì •ì˜ì˜ ìµœì†Œ ì •ë³´(ë„ë©”ì¸). í–¥í›„ í•„ë“œ ì¶”ê°€ ì‹œ ì¸í”„ë¼ ê³„ì¸µì—ì„œ ì²˜ë¦¬.
     public sealed class UnitDefinition
     {
         public string Id { get; }
-        public string PrefabPath { get; }  // Resources °æ·Î (È®Á¤ Àü Addressables ¹ÌµµÀÔ)
+        public string AssetId { get; }  // Addressables AssetId (PrefabKeyì—ì„œ ë§¤í•‘)
 
-        public UnitDefinition(string id, string prefabPath)
+        public UnitDefinition(string id, string assetId)
         {
             Id = id;
-            PrefabPath = prefabPath;
+            AssetId = assetId;
         }
     }
 }

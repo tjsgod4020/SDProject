@@ -23,18 +23,16 @@ namespace SD.Gameplay.Battle.Presentation
                 var t = transform.Find("Cards");
                 if (t != null) _cardsRoot = t;
             }
-            if (_repo == null) _repo = FindAnyObjectByType<CardRuntimeRepository>();
-            if (_battle == null) _battle = FindAnyObjectByType<BattleSystem>();
         }
 
         private void Awake()
         {
-            if (_repo == null) _repo = FindAnyObjectByType<CardRuntimeRepository>();
-            if (_battle == null) _battle = FindAnyObjectByType<BattleSystem>();
+            EnsureSources();
         }
 
         private void OnEnable()
         {
+            EnsureSources();
             if (_repo != null)
                 _repo.OnHandChanged += Rebuild; // 시그니처가 정확히 일치해야 함
         }
@@ -43,6 +41,12 @@ namespace SD.Gameplay.Battle.Presentation
         {
             if (_repo != null)
                 _repo.OnHandChanged -= Rebuild;
+        }
+
+        private void EnsureSources()
+        {
+            if (_repo == null) _repo = FindAnyObjectByType<CardRuntimeRepository>();
+            if (_battle == null) _battle = FindAnyObjectByType<BattleSystem>();
         }
 
         // 🔧 핵심 수정: 파라미터 타입을 Repository의 중첩 타입으로 변경

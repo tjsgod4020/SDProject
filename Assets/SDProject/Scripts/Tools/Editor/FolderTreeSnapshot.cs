@@ -31,29 +31,37 @@ namespace SD.Tools.Editor
             GenerateFolderTreeFile();
         }
 
-        [PreferenceItem("SDProject")]
-        public static void Prefs()
+        [SettingsProvider]
+        public static SettingsProvider CreateSettingsProvider()
         {
-            EditorGUILayout.Space(8);
-            EditorGUILayout.LabelField("Folder Tree Snapshot", EditorStyles.boldLabel);
+            var provider = new SettingsProvider("Preferences/SDProject", SettingsScope.User)
+            {
+                label = "SDProject",
+                guiHandler = (searchContext) =>
+                {
+                    EditorGUILayout.Space(8);
+                    EditorGUILayout.LabelField("Folder Tree Snapshot", EditorStyles.boldLabel);
 
-            var root = EditorPrefs.GetString(PrefKey_Root, DefaultRoot);
-            var outRel = EditorPrefs.GetString(PrefKey_Out, DefaultOut);
+                    var root = EditorPrefs.GetString(PrefKey_Root, DefaultRoot);
+                    var outRel = EditorPrefs.GetString(PrefKey_Out, DefaultOut);
 
-            EditorGUILayout.BeginHorizontal();
-            var nextRoot = EditorGUILayout.TextField("Root Folder", root);
-            if (GUILayout.Button("Reset", GUILayout.Width(70))) nextRoot = DefaultRoot;
-            EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginHorizontal();
+                    var nextRoot = EditorGUILayout.TextField("Root Folder", root);
+                    if (GUILayout.Button("Reset", GUILayout.Width(70))) nextRoot = DefaultRoot;
+                    EditorGUILayout.EndHorizontal();
 
-            EditorGUILayout.BeginHorizontal();
-            var nextOut = EditorGUILayout.TextField("Output Path", outRel);
-            if (GUILayout.Button("Reset", GUILayout.Width(70))) nextOut = DefaultOut;
-            EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginHorizontal();
+                    var nextOut = EditorGUILayout.TextField("Output Path", outRel);
+                    if (GUILayout.Button("Reset", GUILayout.Width(70))) nextOut = DefaultOut;
+                    EditorGUILayout.EndHorizontal();
 
-            if (nextRoot != root) EditorPrefs.SetString(PrefKey_Root, nextRoot);
-            if (nextOut != outRel) EditorPrefs.SetString(PrefKey_Out, nextOut);
+                    if (nextRoot != root) EditorPrefs.SetString(PrefKey_Root, nextRoot);
+                    if (nextOut != outRel) EditorPrefs.SetString(PrefKey_Out, nextOut);
 
-            if (GUILayout.Button("Generate Folder Tree Now")) GenerateFolderTreeFile();
+                    if (GUILayout.Button("Generate Folder Tree Now")) GenerateFolderTreeFile();
+                }
+            };
+            return provider;
         }
 
         private static void WriteTree(string rootFolder, string outRelPath)
@@ -74,12 +82,12 @@ namespace SD.Tools.Editor
             File.WriteAllText(outFull, sb.ToString(), new UTF8Encoding(false));
             File.WriteAllText(outFull, sb.ToString(), new UTF8Encoding(false));
 
-            // ¡Ú Unity¿¡ °­Á¦ ¹Ý¿µ
+            // ï¿½ï¿½ Unityï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ý¿ï¿½
             AssetDatabase.ImportAsset(outRelPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 
-            // ¡Ú Ç® °æ·Î ·Î±×
+            // ï¿½ï¿½ Ç® ï¿½ï¿½ï¿½ ï¿½Î±ï¿½
             Debug.Log($"[folder-tree] Wrote (rel): {outRelPath}");
             Debug.Log($"[folder-tree] Wrote (abs): {outFull}");
         }

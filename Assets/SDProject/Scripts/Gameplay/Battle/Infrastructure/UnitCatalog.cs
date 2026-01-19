@@ -11,8 +11,8 @@ namespace SD.Gameplay.Battle.Infrastructure
     {
         public static UnitCatalog Instance { get; private set; }
 
-        [SerializeField] private string _characterTableId = "Character";
-        [SerializeField] private string _enemyTableId = "Enemy";
+        [SerializeField] private string _characterTableId = "CharacterData";
+        [SerializeField] private string _enemyTableId = "EnemyData";
 
         private readonly List<UnitDefinition> _players = new List<UnitDefinition>();
         private readonly List<UnitDefinition> _enemies = new List<UnitDefinition>();
@@ -34,14 +34,14 @@ namespace SD.Gameplay.Battle.Infrastructure
             _players.Clear();
             _enemies.Clear();
 
-            // Ç®³×ÀÓ È£Ãâ (using SD.DataTable Á¦°Å)
+            // Ç®ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½ (using SD.DataTable ï¿½ï¿½ï¿½ï¿½)
             IList chars = global::SD.DataTable.TableRegistry.Get(_characterTableId);
             IList enem = global::SD.DataTable.TableRegistry.Get(_enemyTableId);
 
             int pc = BuildList(chars, _players, _characterTableId);
             int ec = BuildList(enem, _enemies, _enemyTableId);
 
-            Debug.Log("[Units] Catalog built ¡æ Players=" + pc + ", Enemies=" + ec);
+            Debug.Log("[Units] Catalog built ï¿½ï¿½ Players=" + pc + ", Enemies=" + ec);
         }
 
         private static int BuildList(IList rows, List<UnitDefinition> outList, string tableId)
@@ -59,7 +59,7 @@ namespace SD.Gameplay.Battle.Infrastructure
                 if (row == null) continue;
 
                 string id = GetString(row, "Id");
-                string prefab = GetString(row, "Prefab");
+                string prefabKey = GetString(row, "PrefabKey");
 
                 if (string.IsNullOrWhiteSpace(id))
                 {
@@ -67,12 +67,12 @@ namespace SD.Gameplay.Battle.Infrastructure
                     continue;
                 }
 
-                if (string.IsNullOrWhiteSpace(prefab))
+                if (string.IsNullOrWhiteSpace(prefabKey))
                 {
-                    Debug.LogWarning("[Units] " + tableId + " '" + id + "': Prefab empty -> will use placeholder");
+                    Debug.LogWarning("[Units] " + tableId + " '" + id + "': PrefabKey empty -> will use placeholder");
                 }
 
-                outList.Add(new UnitDefinition(id, prefab));
+                outList.Add(new UnitDefinition(id, prefabKey));
                 added++;
             }
             return added;

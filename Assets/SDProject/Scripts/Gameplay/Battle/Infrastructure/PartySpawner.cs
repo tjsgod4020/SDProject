@@ -3,9 +3,9 @@ using SD.Gameplay.Battle.Domain;
 
 namespace SD.Gameplay.Battle.Infrastructure
 {
-    /// ¾À¿¡ ¹èÄ¡ÇØ¼­ ¾Æ±º/Àû±ºÀ» ½ºÆùÇÑ´Ù.
-    /// - PlayerRoot/EnemyRoot ¾Æ·¡¿¡ Â÷·Ê·Î ¹èÄ¡
-    /// - Prefab °æ·Î°¡ ¾ø°Å³ª ·Îµå ½ÇÆĞ ½Ã ÇÃ·¹ÀÌ½ºÈ¦´õ(½ºÇÁ¶óÀÌÆ®) »ı¼º
+    /// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½Ø¼ï¿½ ï¿½Æ±ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
+    /// - PlayerRoot/EnemyRoot ï¿½Æ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ê·ï¿½ ï¿½ï¿½Ä¡
+    /// - Prefab ï¿½ï¿½Î°ï¿½ ï¿½ï¿½ï¿½Å³ï¿½ ï¿½Îµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì½ï¿½È¦ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®) ï¿½ï¿½ï¿½ï¿½
     public sealed class PartySpawner : MonoBehaviour
     {
         [Header("Roots")]
@@ -13,10 +13,10 @@ namespace SD.Gameplay.Battle.Infrastructure
         [SerializeField] private Transform _enemyRoot;  // Scenes/Battle/Parties/EnemyParty
 
         [Header("Visuals")]
-        [SerializeField] private Vector2 _spacing = new Vector2(1.2f, 0f); // °¡·Î °£°İ
+        [SerializeField] private Vector2 _spacing = new Vector2(1.2f, 0f); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         [SerializeField] private float _startXPlayer = -4f;
         [SerializeField] private float _startXEnemy = 4f;
-        [SerializeField] private float _y = 0f; // ¹èÄ¡ y
+        [SerializeField] private float _y = 0f; // ï¿½ï¿½Ä¡ y
 
         private void Reset()
         {
@@ -52,7 +52,7 @@ namespace SD.Gameplay.Battle.Infrastructure
             {
                 var def = defs[i];
                 var go = TryInstantiate(def, root, isEnemy);
-                // ÁÂ¡æ¿ì or ¿ì¡æÁÂ Á¤·Ä
+                // ï¿½Â¡ï¿½ï¿½ or ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                 float x = startX + (isEnemy ? -i : i) * _spacing.x;
                 go.transform.localPosition = new Vector3(x, _y, 0f);
                 go.name = $"{(isEnemy ? "EN" : "PL")}_{def.Id}";
@@ -62,13 +62,29 @@ namespace SD.Gameplay.Battle.Infrastructure
         private GameObject TryInstantiate(UnitDefinition def, Transform parent, bool isEnemy)
         {
             GameObject go = null;
-            if (!string.IsNullOrWhiteSpace(def.PrefabPath))
+            if (!string.IsNullOrWhiteSpace(def.AssetId))
             {
-                var prefab = Resources.Load<GameObject>(def.PrefabPath);
+#if UNITY_ADDRESSABLES
+                var handle = UnityEngine.AddressableAssets.Addressables.LoadAssetAsync<GameObject>(def.AssetId);
+                var prefab = handle.WaitForCompletion();
+                if (prefab != null)
+                {
+                    UnityEngine.AddressableAssets.Addressables.Release(handle);
+                    go = Instantiate(prefab, parent);
+                }
+                else
+                {
+                    UnityEngine.AddressableAssets.Addressables.Release(handle);
+                    Debug.LogWarning($"[PartySpawner] Asset not found via Addressables: '{def.AssetId}' for '{def.Id}'. Using placeholder.");
+                }
+#else
+                // Addressablesê°€ ì—†ìœ¼ë©´ Resourcesë¡œ í´ë°± ì‹œë„
+                var prefab = Resources.Load<GameObject>(def.AssetId);
                 if (prefab != null)
                     go = Instantiate(prefab, parent);
                 else
-                    Debug.LogWarning($"[PartySpawner] Prefab not found: '{def.PrefabPath}' for '{def.Id}'. Using placeholder.");
+                    Debug.LogWarning($"[PartySpawner] Asset not found: '{def.AssetId}' for '{def.Id}'. Using placeholder.");
+#endif
             }
 
             if (go == null) go = CreatePlaceholder(parent, isEnemy);
@@ -87,7 +103,7 @@ namespace SD.Gameplay.Battle.Infrastructure
             return go;
         }
 
-        // °£´ÜÇÑ 1¡¿1 »ç°¢Çü ½ºÇÁ¶óÀÌÆ® »ı¼º(·±Å¸ÀÓ Ä³½Ã)
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 1ï¿½ï¿½1 ï¿½ç°¢ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½Å¸ï¿½ï¿½ Ä³ï¿½ï¿½)
         private static Sprite _quadSprite;
         private static Sprite CreateQuadSprite()
         {

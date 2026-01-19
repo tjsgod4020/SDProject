@@ -980,56 +980,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1332396413}
   m_CullTransparentMesh: 1
---- !u!1 &1446229210
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1446229211}
-  - component: {fileID: 1446229212}
-  m_Layer: 0
-  m_Name: PartySpawner
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1446229211
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1446229210}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2098517576}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1446229212
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1446229210}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27a8d186778b42444806d93e28b32707, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SD.Gameplay.Battle.Infrastructure::SD.Gameplay.Battle.Infrastructure.PartySpawner
-  _playerRoot: {fileID: 0}
-  _enemyRoot: {fileID: 0}
-  _spacing: {x: 1.2, y: 0}
-  _startXPlayer: -4
-  _startXEnemy: 4
-  _y: 0
 --- !u!1 &1471107848
 GameObject:
   m_ObjectHideFlags: 0
@@ -1074,8 +1024,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94546ece0e821c7429f2f8af695e3d8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SD.Gameplay.Battle.Infrastructure::SD.Gameplay.Battle.Infrastructure.UnitCatalog
-  _characterTableId: Character
-  _enemyTableId: Enemy
+  _characterTableId: CharacterData
+  _enemyTableId: EnemyData
 --- !u!1 &1551447118
 GameObject:
   m_ObjectHideFlags: 0
@@ -1374,6 +1324,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1627580306}
+  - component: {fileID: 1627580307}
   m_Layer: 0
   m_Name: Parties
   m_TagString: Untagged
@@ -1390,7 +1341,7 @@ Transform:
   m_GameObject: {fileID: 1627580305}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 868.94336, y: 393.76718, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1398,6 +1349,25 @@ Transform:
   - {fileID: 1951167676}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1627580307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1627580305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4464d8aa910581448cec226381dde83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SD.Gameplay.Battle.Presentation::SD.Gameplay.Battle.Presentation.PartySlotSpawner
+  _playerLayout: {fileID: 2087182592}
+  _enemyLayout: {fileID: 1951167677}
+  _characterTableId: CharacterData
+  _enemyTableId: EnemyData
+  _fallbackUnitPrefab: {fileID: 259772363139221674, guid: edeefc14583a2334b8b0627d176dce54, type: 3}
+  _spawnOnStart: 1
+  _maxWaitFrames: 60
 --- !u!1 &1631852642
 GameObject:
   m_ObjectHideFlags: 0
@@ -1722,6 +1692,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1951167676}
+  - component: {fileID: 1951167677}
   m_Layer: 0
   m_Name: EnemyParty
   m_TagString: Untagged
@@ -1744,6 +1715,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1627580306}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1951167677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1951167675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99f7a83e87404884d9e84eb82d779e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SD.Gameplay.Battle.Presentation::SD.Gameplay.Battle.Presentation.PartySlotLayout
+  _isEnemy: 1
+  _slotCount: 5
+  _buildOnStart: 1
+  _rebuildOnStart: 1
+  _spacing: {x: 1.5, y: 0}
+  _startX: 1
+  _y: 1
+  _reverseX: 0
 --- !u!1 &2087182590
 GameObject:
   m_ObjectHideFlags: 0
@@ -1753,6 +1744,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2087182591}
+  - component: {fileID: 2087182592}
   m_Layer: 0
   m_Name: PlayerParty
   m_TagString: Untagged
@@ -1775,6 +1767,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1627580306}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2087182592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2087182590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99f7a83e87404884d9e84eb82d779e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SD.Gameplay.Battle.Presentation::SD.Gameplay.Battle.Presentation.PartySlotLayout
+  _isEnemy: 0
+  _slotCount: 4
+  _buildOnStart: 1
+  _rebuildOnStart: 1
+  _spacing: {x: -1.5, y: 0}
+  _startX: -1
+  _y: 1
+  _reverseX: 0
 --- !u!1 &2098517575
 GameObject:
   m_ObjectHideFlags: 0
@@ -1800,7 +1812,7 @@ Transform:
   m_GameObject: {fileID: 2098517575}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 868.94336, y: 393.76718, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1810,7 +1822,6 @@ Transform:
   - {fileID: 472042600}
   - {fileID: 190613532}
   - {fileID: 1471107849}
-  - {fileID: 1446229211}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807

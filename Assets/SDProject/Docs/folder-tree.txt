@@ -28,7 +28,6 @@ Assets/SDProject/
       - CharacterName.xlsx
       - EnemyData.xlsx
       - EnemyName.xlsx
-      - ~$CardData.xlsx
     - CardData.csv
     - CardDesc.csv
     - CardName.csv
@@ -43,12 +42,15 @@ Assets/SDProject/
     - CharacterName.xlsx
     - EnemyData.xlsx
     - EnemyName.xlsx
-    - ~$CardData.xlsx
   Docs/
   Prefabs/
     Battle/
+      Units/
     Common/
     UI/
+  Resources/
+    Battle/
+      Units/
   Scenes/
     Battle/
     Boot/
@@ -73,6 +75,7 @@ Assets/SDProject/
         - DataTableConfigInspector.cs
         - DataTableConfigSyncEditor.cs
         - ExcelCodePagesInit.cs
+        - RowClassGenerator.cs
         - SD.DataTable.Editor.asmdef
         - XlsxAssetPostprocessor.cs
         - XlsxToCsvConverter.cs
@@ -91,6 +94,7 @@ Assets/SDProject/
       - DataTableConfigInspector.cs
       - DataTableConfigSyncEditor.cs
       - ExcelCodePagesInit.cs
+      - RowClassGenerator.cs
       - SD.DataTable.Editor.asmdef
       - XlsxAssetPostprocessor.cs
       - XlsxToCsvConverter.cs
@@ -107,7 +111,12 @@ Assets/SDProject/
     Gameplay/
       Battle/
         Domain/
+          Localization/
+            - EnemyNameRow.cs
+            - UnitTextRows.cs
           - CardInstance.cs
+          - EnemyNameRow.cs
+          - UnitTextRows.cs
           - SD.Gameplay.Battle.Domain.asmdef
           - UnitDefinition.cs
           - UnitRows.cs
@@ -121,11 +130,16 @@ Assets/SDProject/
         Presentation/
           - CardView.cs
           - HandView.cs
+          - PartySlot.cs
+          - PartySlotLayout.cs
+          - PartySlotSpawner.cs
           - PilesPanelView.cs
           - SD.Gameplay.Battle.Presentation.asmdef
         Tests/
           - SD.Gameplay.Tests.asmdef
         - CardInstance.cs
+        - EnemyNameRow.cs
+        - UnitTextRows.cs
         - SD.Gameplay.Battle.Domain.asmdef
         - UnitDefinition.cs
         - UnitRows.cs
@@ -137,6 +151,9 @@ Assets/SDProject/
         - UnitCatalog.cs
         - CardView.cs
         - HandView.cs
+        - PartySlot.cs
+        - PartySlotLayout.cs
+        - PartySlotSpawner.cs
         - PilesPanelView.cs
         - SD.Gameplay.Battle.Presentation.asmdef
         - SD.Gameplay.Tests.asmdef
@@ -196,6 +213,8 @@ Assets/SDProject/
         - SD.Gameplay.Cards.Infrastructure.asmdef
         - SD.Gameplay.Cards.Presentation.asmdef
       - CardInstance.cs
+      - EnemyNameRow.cs
+      - UnitTextRows.cs
       - SD.Gameplay.Battle.Domain.asmdef
       - UnitDefinition.cs
       - UnitRows.cs
@@ -207,6 +226,9 @@ Assets/SDProject/
       - UnitCatalog.cs
       - CardView.cs
       - HandView.cs
+      - PartySlot.cs
+      - PartySlotLayout.cs
+      - PartySlotSpawner.cs
       - PilesPanelView.cs
       - SD.Gameplay.Battle.Presentation.asmdef
       - SD.Gameplay.Tests.asmdef
@@ -254,6 +276,7 @@ Assets/SDProject/
     - DataTableConfigInspector.cs
     - DataTableConfigSyncEditor.cs
     - ExcelCodePagesInit.cs
+    - RowClassGenerator.cs
     - SD.DataTable.Editor.asmdef
     - XlsxAssetPostprocessor.cs
     - XlsxToCsvConverter.cs
@@ -268,6 +291,8 @@ Assets/SDProject/
     - Table.cs
     - TableRegistry.cs
     - CardInstance.cs
+    - EnemyNameRow.cs
+    - UnitTextRows.cs
     - SD.Gameplay.Battle.Domain.asmdef
     - UnitDefinition.cs
     - UnitRows.cs
@@ -279,6 +304,9 @@ Assets/SDProject/
     - UnitCatalog.cs
     - CardView.cs
     - HandView.cs
+    - PartySlot.cs
+    - PartySlotLayout.cs
+    - PartySlotSpawner.cs
     - PilesPanelView.cs
     - SD.Gameplay.Battle.Presentation.asmdef
     - SD.Gameplay.Tests.asmdef
@@ -333,7 +361,6 @@ Assets/SDProject/
   - CharacterName.xlsx
   - EnemyData.xlsx
   - EnemyName.xlsx
-  - ~$CardData.xlsx
   - SD.Core.Domain.asmdef
   - SD.Core.Infrastructure.asmdef
   - SD.Core.Presentation.asmdef
@@ -342,6 +369,7 @@ Assets/SDProject/
   - DataTableConfigInspector.cs
   - DataTableConfigSyncEditor.cs
   - ExcelCodePagesInit.cs
+  - RowClassGenerator.cs
   - SD.DataTable.Editor.asmdef
   - XlsxAssetPostprocessor.cs
   - XlsxToCsvConverter.cs
@@ -356,6 +384,8 @@ Assets/SDProject/
   - Table.cs
   - TableRegistry.cs
   - CardInstance.cs
+  - EnemyNameRow.cs
+  - UnitTextRows.cs
   - SD.Gameplay.Battle.Domain.asmdef
   - UnitDefinition.cs
   - UnitRows.cs
@@ -367,6 +397,9 @@ Assets/SDProject/
   - UnitCatalog.cs
   - CardView.cs
   - HandView.cs
+  - PartySlot.cs
+  - PartySlotLayout.cs
+  - PartySlotSpawner.cs
   - PilesPanelView.cs
   - SD.Gameplay.Battle.Presentation.asmdef
   - SD.Gameplay.Tests.asmdef

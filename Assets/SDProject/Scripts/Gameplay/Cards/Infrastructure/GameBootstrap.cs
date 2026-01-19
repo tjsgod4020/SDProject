@@ -1,26 +1,25 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;               // ¡Ú ¾À ÀüÈ¯
+using UnityEngine.SceneManagement;               // ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½È¯
 using SD.Gameplay.Cards.Domain;
 
 namespace SD.Gameplay.Cards.Infrastructure
 {
-    [DefaultExecutionOrder(-90)] // DataTableLoader(-100) ÀÌÈÄ ½ÇÇà
+    [DefaultExecutionOrder(-90)] // DataTableLoader(-100) ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     public sealed class GameBootstrap : MonoBehaviour
     {
         [SerializeField] private string _locale = "ko";
-        [SerializeField] private CardCatalog _catalog;
 
         [Header("Scene Load")]
-        [SerializeField] private bool _loadBattleOnBoot = true;     // ¡Ú ºÎÆ® ¿Ï·á ÈÄ Battle·Î ÀÌµ¿ÇÒÁö
-        [SerializeField] private string _battleSceneName = "Battle"; // ¡Ú Scenes/Battle/Battle.unity (Build Settings¿¡ µî·Ï)
+        [SerializeField] private bool _loadBattleOnBoot = true;     // ï¿½ï¿½ ï¿½ï¿½Æ® ï¿½Ï·ï¿½ ï¿½ï¿½ Battleï¿½ï¿½ ï¿½Ìµï¿½ï¿½ï¿½ï¿½ï¿½
+        [SerializeField] private string _battleSceneName = "Battle"; // ï¿½ï¿½ Scenes/Battle/Battle.unity (Build Settingsï¿½ï¿½ ï¿½ï¿½ï¿½)
 
-        // ³»ºÎ »óÅÂ: Ä«µå Á¤»ó ºôµå ¿Ï·á ¿©ºÎ
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: Ä«ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ï·ï¿½ ï¿½ï¿½ï¿½ï¿½
         private int _builtCardCount = 0;
 
         private void Awake()
         {
-            // 1) ÇöÀç Registry »óÅÂ Á¡°Ë
+            // 1) ï¿½ï¿½ï¿½ï¿½ Registry ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             var rowsCard = global::SD.DataTable.TableRegistry.Get("CardData");
             var rowsName = global::SD.DataTable.TableRegistry.Get("CardName");
             var rowsDesc = global::SD.DataTable.TableRegistry.Get("CardDesc");
@@ -30,16 +29,16 @@ namespace SD.Gameplay.Cards.Infrastructure
             int cntDesc = rowsDesc is System.Collections.ICollection dc ? dc.Count : 0;
             Debug.Log($"[Bootstrap] precheck tables: CardData={cntCard}, CardName={cntName}, CardDesc={cntDesc}");
 
-            // 2) ºñ¾úÀ¸¸é ¾À ³» DataTableLoader È£Ãâ·Î Áï½Ã º¹±¸ ½Ãµµ
+            // 2) ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ DataTableLoader È£ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ãµï¿½
             if (cntCard == 0 || cntName == 0 || cntDesc == 0)
             {
                 var loader = FindAnyObjectByType<global::SD.DataTable.DataTableLoader>();
                 if (loader != null)
                 {
-                    Debug.Log("[Bootstrap] TableRegistry empty ¡æ calling DataTableLoader.LoadAll()");
+                    Debug.Log("[Bootstrap] TableRegistry empty ï¿½ï¿½ calling DataTableLoader.LoadAll()");
                     loader.LoadAll();
 
-                    // ´Ù½Ã Á¶È¸
+                    // ï¿½Ù½ï¿½ ï¿½ï¿½È¸
                     rowsCard = global::SD.DataTable.TableRegistry.Get("CardData");
                     rowsName = global::SD.DataTable.TableRegistry.Get("CardName");
                     rowsDesc = global::SD.DataTable.TableRegistry.Get("CardDesc");
@@ -60,28 +59,27 @@ namespace SD.Gameplay.Cards.Infrastructure
             rowsName ??= System.Array.Empty<object>();
             rowsDesc ??= System.Array.Empty<object>();
 
-            // 3) Ä«µå ºôµå
+            // 3) Ä«ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             var cards = CardFactory.BuildAll(rowsCard, rowsName, rowsDesc, _locale);
             _builtCardCount = cards.Count;
 
-            // 4) Ä«Å»·Î±× ÁÖÀÔ (¾øÀ¸¸é »ı¼º) + »ıÁ¸ º¸Àå
-            if (_catalog == null)
+            // 4) Ä«Å»ï¿½Î±ï¿½ ï¿½ï¿½ï¿½ï¿½ (CardCatalog ì‹±ê¸€í†¤ ë³´ì¥) + ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            if (CardCatalog.Instance == null)
             {
                 var go = new GameObject("CardCatalog");
-                _catalog = go.AddComponent<CardCatalog>();
-                DontDestroyOnLoad(go); // ¾À ÀüÈ¯ À¯Áö
+                go.AddComponent<CardCatalog>(); // Awakeì—ì„œ Instance/DontDestroyOnLoad ì²˜ë¦¬
             }
-            _catalog.Set(cards);
+            CardCatalog.Instance.Set(cards);
 
             Debug.Log($"[Bootstrap] CardCatalog ready: {_builtCardCount} cards");
         }
 
         private void Start()
         {
-            // 5) ¾À ÀüÈ¯ (Start¿¡¼­ ½ÇÇà: Awake Á÷ÈÄ ·Îµå½Ã °£Çæ ÀÌ½´ ¹æÁö)
+            // 5) ï¿½ï¿½ ï¿½ï¿½È¯ (Startï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: Awake ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ì½ï¿½ ï¿½ï¿½ï¿½ï¿½)
             if (!_loadBattleOnBoot)
             {
-                Debug.Log("[Bootstrap] _loadBattleOnBoot=false ¡æ Boot ¾À¿¡ ¸Ó¹«¸§");
+                Debug.Log("[Bootstrap] _loadBattleOnBoot=false ï¿½ï¿½ Boot ï¿½ï¿½ï¿½ï¿½ ï¿½Ó¹ï¿½ï¿½ï¿½");
                 return;
             }
 
@@ -91,9 +89,9 @@ namespace SD.Gameplay.Cards.Infrastructure
                 return;
             }
 
-            // ºôµå ¼¼ÆÃ¿¡ µî·Ï ¿©ºÎ Á¡°Ë
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ã¿ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 #if UNITY_6000_0_OR_NEWER
-            // 6000¿¡¼­µµ CanStreamedLevelBeLoaded´Â µ¿ÀÛÇÕ´Ï´Ù.
+            // 6000ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CanStreamedLevelBeLoadedï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
 #endif
             if (!Application.CanStreamedLevelBeLoaded(_battleSceneName))
             {

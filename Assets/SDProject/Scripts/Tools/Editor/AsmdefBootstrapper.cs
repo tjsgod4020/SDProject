@@ -1,6 +1,6 @@
 // File: Assets/SDProject/Scripts/Tools/Editor/AsmdefBootstrapper.cs
-// ¸ñÀû: Á¤½Ä ±¸Á¶¿ë asmdef ÀÏ°ı »ı¼º (idempotent)
-// ¸Ş´º: SD/Bootstrap/Create asmdefs
+// ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ asmdef ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ (idempotent)
+// ï¿½Ş´ï¿½: SD/Bootstrap/Create asmdefs
 #if UNITY_EDITOR
 using System;
 using System.IO;
@@ -16,16 +16,16 @@ namespace SD.Tools.Editor
     {
         private const bool OverwriteExisting = true;
 
-        // °æ·Î À¯Æ¿
+        // ï¿½ï¿½ï¿½ ï¿½ï¿½Æ¿
         private static string P(params string[] parts) => string.Join("/", parts);
 
-        // ÇöÀç ½ºÅ©¸³Æ®ÀÇ °æ·Î¸¦ ±â¹İÀ¸·Î ·çÆ®(Assets/***±îÁö)¸¦ ÀÚµ¿ ÃßÃâ
-        // ¿¹: Assets/SDProject/Scripts/Tools/Editor/AsmdefBootstrapper.cs -> Assets/SDProject
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å©ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½Î¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ®(Assets/***ï¿½ï¿½ï¿½ï¿½)ï¿½ï¿½ ï¿½Úµï¿½ ï¿½ï¿½ï¿½ï¿½
+        // ï¿½ï¿½: Assets/SDProject/Scripts/Tools/Editor/AsmdefBootstrapper.cs -> Assets/SDProject
         private static string DetectProjectRoot()
         {
             try
             {
-                // ÀÌ Å¬·¡½º ¼Ò½º ¿¡¼Â °Ë»ö
+                // ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½Ò½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ë»ï¿½
                 var guids = AssetDatabase.FindAssets("AsmdefBootstrapper t:Script");
                 foreach (var guid in guids)
                 {
@@ -44,7 +44,7 @@ namespace SD.Tools.Editor
             }
             catch { /* no-op */ }
 
-            // Æú¹é: ÈçÇÑ ·çÆ® ÈÄº¸
+            // ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ® ï¿½Äºï¿½
             var candidates = new[] { "Assets/SDProject", "Assets/_Project" };
             foreach (var c in candidates)
             {
@@ -52,10 +52,10 @@ namespace SD.Tools.Editor
                     return c;
             }
 
-            throw new InvalidOperationException("ÇÁ·ÎÁ§Æ® ·çÆ®¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù. 'Assets/SDProject' ¶Ç´Â 'Assets/_Project' Áß ÇÏ³ª¸¦ »ı¼ºÇÏ°Å³ª, ½ºÅ©¸³Æ®¸¦ 'Assets/<Root>/Scripts/.../AsmdefBootstrapper.cs'¿¡ µÎ¼¼¿ä.");
+            throw new InvalidOperationException("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½Æ®ï¿½ï¿½ Ã£ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½. 'Assets/SDProject' ï¿½Ç´ï¿½ 'Assets/_Project' ï¿½ï¿½ ï¿½Ï³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°Å³ï¿½, ï¿½ï¿½Å©ï¿½ï¿½Æ®ï¿½ï¿½ 'Assets/<Root>/Scripts/.../AsmdefBootstrapper.cs'ï¿½ï¿½ ï¿½Î¼ï¿½ï¿½ï¿½.");
         }
 
-        // asmdef JSON ¸ğµ¨
+        // asmdef JSON ï¿½ï¿½
         [Serializable]
         private class AsmdefJson
         {
@@ -75,7 +75,7 @@ namespace SD.Tools.Editor
         private class AsmdefSpec
         {
             public string Name;
-            public string RelFolder;              // ·çÆ®(base)/ ÇÏÀ§ »ó´ë °æ·Î ("Scripts/Core/Domain" µî)
+            public string RelFolder;              // ï¿½ï¿½Æ®(base)/ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ("Scripts/Core/Domain" ï¿½ï¿½)
             public string[] References;
             public bool EditorOnly = false;
             public bool IsTestAssembly = false;
@@ -83,8 +83,8 @@ namespace SD.Tools.Editor
             public bool AutoReferenced = true;
         }
 
-        // ====== Á¤ÀÇ ¸ñ·Ï ======
-        // ÁÖÀÇ: Æú´õ´Â "·çÆ®/RelFolder"·Î »ı¼ºµÊ. ·çÆ®´Â DetectProjectRoot()·Î ÀÚµ¿ °áÁ¤.
+        // ====== ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ======
+        // ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ "ï¿½ï¿½Æ®/RelFolder"ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½. ï¿½ï¿½Æ®ï¿½ï¿½ DetectProjectRoot()ï¿½ï¿½ ï¿½Úµï¿½ ï¿½ï¿½ï¿½ï¿½.
         private static readonly List<AsmdefSpec> _specs = new()
         {
             // Core
@@ -144,11 +144,7 @@ namespace SD.Tools.Editor
 
                     if (File.Exists(asmdefPath))
                     {
-                        if (!OverwriteExisting)
-                        {
-                            skipped++;
-                            continue;
-                        }
+                        // OverwriteExistingì´ trueì´ë¯€ë¡œ í•­ìƒ ë®ì–´ì“°ê¸°
                         var old = File.ReadAllText(asmdefPath, Encoding.UTF8);
                         if (old == json)
                         {
@@ -179,7 +175,7 @@ namespace SD.Tools.Editor
         {
             var parts = folderPath.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 0 || parts[0] != "Assets")
-                throw new InvalidOperationException($"°æ·Î´Â 'Assets/..'·Î ½ÃÀÛÇØ¾ß ÇÕ´Ï´Ù: {folderPath}");
+                throw new InvalidOperationException($"ï¿½ï¿½Î´ï¿½ 'Assets/..'ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ ï¿½Õ´Ï´ï¿½: {folderPath}");
 
             var current = "Assets";
             for (int i = 1; i < parts.Length; i++)

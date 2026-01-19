@@ -4,7 +4,8 @@
     "SD.Gameplay.Battle.Domain",
     "SD.Gameplay.Battle.Infrastructure",
     "SD.Gameplay.Cards.Domain",
-    "Unity.TextMeshPro"
+    "Unity.TextMeshPro",
+    "SD.DataTable.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

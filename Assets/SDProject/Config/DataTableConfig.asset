@@ -25,3 +25,19 @@ MonoBehaviour:
     Csv: {fileID: 4900000, guid: 0506c3105c0da92458ffc5f71c9d6a9e, type: 3}
     RowTypeName: SD.Gameplay.Cards.Domain.Localization.CardNameRow, SD.Gameplay.Cards.Domain,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Id: CharacterData
+    Csv: {fileID: 4900000, guid: 2450e0781b95eb943bddaa99467e9902, type: 3}
+    RowTypeName: SD.Gameplay.Battle.Domain.CharacterRow, SD.Gameplay.Battle.Domain,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Id: CharacterName
+    Csv: {fileID: 4900000, guid: 21728912b06e62143b4069492dc7d0c1, type: 3}
+    RowTypeName: SD.Gameplay.Battle.Domain.Localization.CharacterNameRow, SD.Gameplay.Battle.Domain,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Id: EnemyData
+    Csv: {fileID: 4900000, guid: 961e03e3f52d40b4383ac1ab4310a164, type: 3}
+    RowTypeName: SD.Gameplay.Battle.Domain.EnemyRow, SD.Gameplay.Battle.Domain, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Id: EnemyName
+    Csv: {fileID: 4900000, guid: edddbb529b06a014e92a889724649c6c, type: 3}
+    RowTypeName: SD.Gameplay.Battle.Domain.Localization.EnemyNameRow, SD.Gameplay.Battle.Domain,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
